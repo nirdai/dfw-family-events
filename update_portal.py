@@ -30,7 +30,7 @@ import os
 # נתיבים יחסיים לשורש ה-repo — כך שהסקריפט עובד גם מקומית וגם ב-GitHub Actions
 OUTPUT_PATH = pathlib.Path("index.html")
 LOG_PATH    = pathlib.Path("update_log.txt")
-MODEL       = "gemini-2.5-flash"  # נמצא בטיר החינמי של Gemini API — ודא שזה עדיין המצב בזמן ההרצה
+MODEL       = "gemini-3.6-flash"  # נמצא בטיר החינמי של Gemini API — ודא שזה עדיין המצב בזמן ההרצה
 
 REGIONS = [
     "פלאנו (Plano)",
