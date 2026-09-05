@@ -1,0 +1,336 @@
+"""
+DFW Family Events Portal — Auto-Updater
+========================================
+רץ אוטומטית כל יום שני ב-07:00 (שעון מרכז/America-Chicago, בקירוב)
+דרך GitHub Actions — לא תלוי במחשב מקומי דלוק.
+פונה ל-Anthropic API, מקבל אירועים מעודכנים לשבוע הנוכחי,
+וכותב את index.html החדש בשורש ה-repo.
+
+איך זה רץ עכשיו:
+    - .github/workflows/weekly-update.yml מפעיל את הסקריפט הזה בכל שני
+    - מפתח ה-API נשמר כ-Secret בשם ANTHROPIC_API_KEY בהגדרות ה-repo ב-GitHub
+      (Settings → Secrets and variables → Actions)
+    - אחרי שהסקריפט רץ, ה-workflow עושה git commit + push לשינויים
+      (אם היו שינויים ב-index.html)
+    - אפשר גם להריץ ידנית מלשונית Actions → Weekly DFW Events Update → Run workflow
+
+הרצה ידנית מקומית לבדיקה (אופציונלי):
+    pip install anthropic
+    set ANTHROPIC_API_KEY=sk-ant-...   (Windows cmd)  /  $env:ANTHROPIC_API_KEY="sk-ant-..." (PowerShell)
+    python update_portal.py
+"""
+
+import anthropic
+import datetime
+import pathlib
+import sys
+import os
+
+# ── הגדרות ──────────────────────────────────────────
+# נתיבים יחסיים לשורש ה-repo — כך שהסקריפט עובד גם מקומית וגם ב-GitHub Actions
+OUTPUT_PATH = pathlib.Path("index.html")
+LOG_PATH    = pathlib.Path("update_log.txt")
+MODEL       = "claude-sonnet-4-6"  # ⚠️ ודא שזה שם מודל תקף בזמן ההרצה
+
+REGIONS = [
+    "פלאנו (Plano)",
+    "פריסקו (Frisco)",
+    "מקיני (McKinney)",
+    "ארווינג (Irving)",
+    "דאלאס ופורט וורת' (Dallas / Fort Worth area)"
+]
+
+# ── Prompt ──────────────────────────────────────────
+def build_prompt() -> str:
+    today             = datetime.date.today()
+    days_since_monday = today.weekday()
+    week_start        = today - datetime.timedelta(days=days_since_monday)
+    week_end          = week_start + datetime.timedelta(days=6)
+    saturday          = week_start + datetime.timedelta(days=5)
+    sunday            = week_start + datetime.timedelta(days=6)
+
+    return f"""
+אתה עוזר שיוצר פורטל HTML של פעילויות משפחתיות שבועיות לאזור דאלאס-פורט וורת', טקסס.
+
+היום: {today.strftime('%A, %B %d, %Y')}
+שבוע נוכחי: {week_start.strftime('%B %d')} עד {week_end.strftime('%B %d, %Y')}
+סוף שבוע: שבת {saturday.strftime('%B %d')} + ראשון {sunday.strftime('%B %d')}
+
+המשימה: מצא אירועים מעניינים שקורים השבוע באזורים:
+{chr(10).join(f'- {r}' for r in REGIONS)}
+
+כללים חשובים:
+- רק אירועים חד-פעמיים / עונתיים: פסטיבלים, שווקי סוף שבוע, הופעות, ירידים, מרוצי NASCAR/IndyCar, תחרויות ספורט, ויניל מרקטים
+- לא פארקים / מוזיאונים קבועים שפתוחים כל הזמן
+- עדיפות חזקה לאירועי סוף שבוע (שבת-ראשון)
+- כלול מרוצי NASCAR / IndyCar / Dirt Track אם יש ב-Texas Motor Speedway או באזור
+- לכל אירוע תן דירוג 1-10 בהתאם לביקורות היסטוריות ורמת האטרקציה
+
+החזר בדיוק את קוד JavaScript הבא — מערך events בלבד, ללא backticks או הסברים:
+
+const events = [
+  {{
+    id: 1,
+    region: "plano",       // plano / frisco / mckinney / irving / dallas
+    cat: "festival",       // market / festival / concert / sport / art / food / comedy / film / race
+    catLabel: "🎡 פסטיבל",
+    weekend: true,         // true אם שבת או ראשון
+    title: "שם האירוע",
+    desc: "תיאור קצר ומשכנע בעברית — מה מיוחד, למה כדאי לבוא",
+    who: "כל הגילאים",
+    whenLabel: "שבת {saturday.strftime('%d/%m')}",
+    hours: "10:00-18:00",
+    where: "שם המקום, עיר",
+    price: "חינם",         // חינם / מ-$XX / $XX
+    rating: 8
+  }},
+];
+
+חשוב: החזר את הקוד JavaScript בלבד, מ-const events = [ עד סגירת ];
+"""
+
+# ── HTML Template ──────────────────────────────────
+HTML_TEMPLATE = """<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DFW Family Week — פעילויות השבוע</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{--g0:#091510;--g2:#0f3320;--g4:#1a7a3e;--g5:#22a352;--g6:#2ecc71;--g7:#52d987;--g8:#85e8a8;--accent:#00ff88;--gold:#ffd700;--warm:#ff8c42;--wknd:#ff6b6b;--wknd-glow:rgba(255,107,107,0.3);--text:#dff5ea;--text-dim:#7bbf94;--card-bg:rgba(13,36,22,0.92);--card-border:rgba(46,204,113,0.2)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Rubik',sans-serif;background:var(--g0);color:var(--text);min-height:100vh;overflow-x:hidden;direction:rtl}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 50% at 15% 5%,rgba(34,163,82,.13) 0%,transparent 55%),radial-gradient(ellipse 50% 70% at 85% 85%,rgba(0,255,136,.07) 0%,transparent 55%),repeating-linear-gradient(0deg,transparent,transparent 60px,rgba(46,204,113,.022) 60px,rgba(46,204,113,.022) 61px),repeating-linear-gradient(90deg,transparent,transparent 60px,rgba(46,204,113,.022) 60px,rgba(46,204,113,.022) 61px);pointer-events:none;z-index:0}
+  header{position:relative;z-index:10;padding:2.5rem 2rem 1.5rem;text-align:center;border-bottom:1px solid var(--card-border)}
+  .header-badge{display:inline-block;font-family:'Space Mono',monospace;font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);background:rgba(0,255,136,.07);border:1px solid rgba(0,255,136,.25);padding:.3rem 1rem;border-radius:2rem;margin-bottom:1rem}
+  h1{font-size:clamp(2.2rem,6vw,4.5rem);font-weight:900;line-height:1;background:linear-gradient(135deg,var(--accent) 0%,var(--g6) 45%,var(--g8) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.4rem}
+  .subtitle{font-size:.95rem;color:var(--text-dim);font-weight:300}
+  .week-tags{display:flex;gap:.6rem;justify-content:center;margin-top:.85rem;flex-wrap:wrap}
+  .wtag{font-family:'Space Mono',monospace;font-size:.68rem;padding:.28rem .85rem;border-radius:.3rem}
+  .wtag.reg{color:var(--g7);background:rgba(46,204,113,.08);border:1px solid rgba(46,204,113,.25)}
+  .wtag.wknd{color:var(--wknd);background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.35);animation:pulseTag 2.5s ease-in-out infinite}
+  @keyframes pulseTag{0%,100%{box-shadow:0 0 0 0 rgba(255,107,107,.2)}50%{box-shadow:0 0 0 6px rgba(255,107,107,0)}}
+  nav{position:sticky;top:0;z-index:20;display:flex;justify-content:center;gap:.5rem;padding:.85rem 1rem;background:rgba(9,21,16,.96);backdrop-filter:blur(14px);border-bottom:1px solid var(--card-border);flex-wrap:wrap}
+  .tab-btn{font-family:'Rubik',sans-serif;font-size:.82rem;font-weight:500;padding:.45rem 1.1rem;border:1px solid var(--card-border);border-radius:2rem;background:transparent;color:var(--text-dim);cursor:pointer;transition:all .22s;white-space:nowrap}
+  .tab-btn:hover{border-color:var(--g6);color:var(--g6);background:rgba(46,204,113,.05)}
+  .tab-btn.active{background:var(--g6);border-color:var(--g6);color:var(--g0);font-weight:700;box-shadow:0 0 18px rgba(46,204,113,.45)}
+  main{position:relative;z-index:5;max-width:1380px;margin:0 auto;padding:1.8rem 1.4rem 5rem}
+  .filter-bar{display:flex;gap:.5rem;margin-bottom:1.6rem;flex-wrap:wrap;align-items:center}
+  .filter-label{font-size:.7rem;color:var(--text-dim)}
+  .filter-btn{font-size:.72rem;font-weight:500;padding:.28rem .8rem;border:1px solid var(--card-border);border-radius:1.5rem;background:transparent;color:var(--text-dim);cursor:pointer;transition:all .2s}
+  .filter-btn:hover{border-color:var(--g6);color:var(--g6)}
+  .filter-btn.f-wknd{background:rgba(255,107,107,.12);border-color:var(--wknd);color:var(--wknd)}
+  .filter-btn.f-cat{background:rgba(46,204,113,.1);border-color:var(--g6);color:var(--g6)}
+  .stats-bar{display:flex;gap:.85rem;margin-bottom:2rem;flex-wrap:wrap}
+  .stat-chip{background:rgba(46,204,113,.06);border:1px solid var(--card-border);border-radius:.5rem;padding:.55rem 1rem;display:flex;flex-direction:column;gap:.05rem}
+  .stat-num{font-family:'Space Mono',monospace;font-size:1.25rem;font-weight:700;color:var(--accent)}
+  .stat-lbl{font-size:.62rem;color:var(--text-dim);letter-spacing:.04em}
+  .region-section{display:none;animation:fadeUp .35s ease}
+  .region-section.active{display:block}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  .region-header{display:flex;align-items:center;gap:1rem;margin-bottom:1.6rem;padding-bottom:.9rem;border-bottom:1px solid var(--card-border)}
+  .region-title{font-size:1.65rem;font-weight:700;color:var(--g6)}
+  .region-count{margin-right:auto;font-family:'Space Mono',monospace;font-size:.67rem;color:var(--text-dim);background:rgba(46,204,113,.07);border:1px solid var(--card-border);padding:.2rem .65rem;border-radius:1rem}
+  .events-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(295px,1fr));gap:1.3rem;margin-bottom:2rem}
+  .all-section-header{font-size:1.05rem;font-weight:700;color:var(--g6);margin:2rem 0 .9rem;padding-right:.6rem;border-right:3px solid var(--g6);display:flex;align-items:center;gap:.4rem}
+  .event-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:.9rem;overflow:hidden;transition:transform .28s,box-shadow .28s,border-color .28s;position:relative;backdrop-filter:blur(8px)}
+  .event-card:hover{transform:translateY(-5px);box-shadow:0 18px 50px rgba(46,204,113,.18);border-color:rgba(46,204,113,.55)}
+  .event-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--g5),var(--accent),var(--g5));opacity:0;transition:opacity .28s}
+  .event-card:hover::before{opacity:1}
+  .event-card.is-wknd{border-color:rgba(255,107,107,.42);background:linear-gradient(160deg,rgba(255,107,107,.06) 0%,var(--card-bg) 38%)}
+  .event-card.is-wknd::before{background:linear-gradient(90deg,var(--wknd),#ff9a9a,var(--wknd));opacity:1}
+  .event-card.is-wknd:hover{box-shadow:0 18px 50px rgba(255,107,107,.22);border-color:rgba(255,107,107,.7)}
+  .wknd-badge{position:absolute;top:.65rem;left:.65rem;font-family:'Space Mono',monospace;font-size:.56rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:var(--wknd);color:#fff;padding:.2rem .5rem;border-radius:.25rem;display:flex;align-items:center;gap:.25rem;box-shadow:0 2px 10px rgba(255,107,107,.55);z-index:2}
+  .card-cat{padding:.5rem 1rem;font-size:.62rem;font-family:'Space Mono',monospace;font-weight:700;letter-spacing:.13em;text-transform:uppercase;display:flex;align-items:center;gap:.4rem}
+  .cat-market{background:rgba(255,215,0,.11);color:var(--gold)}.cat-festival{background:rgba(255,107,107,.11);color:#ff9a9a}.cat-concert{background:rgba(130,80,255,.11);color:#b39dff}.cat-sport{background:rgba(255,140,66,.11);color:var(--warm)}.cat-art{background:rgba(82,217,135,.13);color:var(--g7)}.cat-comedy{background:rgba(0,220,255,.09);color:#66e0ff}.cat-film{background:rgba(180,60,255,.09);color:#da9aff}.cat-food{background:rgba(255,180,0,.11);color:#ffcc55}.cat-culture{background:rgba(46,204,113,.12);color:var(--accent)}.cat-race{background:rgba(255,60,0,.13);color:#ff8060}
+  .card-body{padding:.9rem 1rem .7rem}
+  .card-title{font-size:1rem;font-weight:700;color:var(--text);margin-bottom:.45rem;line-height:1.3}
+  .card-title.has-badge{padding-left:2rem}
+  .card-desc{font-size:.79rem;color:var(--text-dim);line-height:1.6;margin-bottom:.8rem}
+  .card-meta{display:grid;grid-template-columns:1fr 1fr;gap:.32rem;margin-bottom:.8rem}
+  .meta-item{display:flex;flex-direction:column;gap:.07rem;background:rgba(0,0,0,.22);border-radius:.4rem;padding:.38rem .52rem}
+  .meta-label{font-size:.55rem;font-family:'Space Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--g5);opacity:.85}
+  .meta-value{font-size:.77rem;font-weight:500;color:var(--text)}
+  .meta-item.full{grid-column:1/-1}
+  .is-wknd .meta-item.date-hi{background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.22)}
+  .is-wknd .meta-item.date-hi .meta-label{color:var(--wknd)}
+  .is-wknd .meta-item.date-hi .meta-value{color:#ffb0b0}
+  .card-footer{display:flex;align-items:center;justify-content:space-between;padding:.65rem 1rem;border-top:1px solid rgba(46,204,113,.08);background:rgba(0,0,0,.18)}
+  .rating-wrap{display:flex;align-items:center;gap:.45rem}
+  .rating-dots{display:flex;gap:3px}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--g2)}
+  .dot.on{background:var(--g6);box-shadow:0 0 5px rgba(46,204,113,.6)}.dot.top{background:var(--accent);box-shadow:0 0 7px rgba(0,255,136,.7)}.dot.wd{background:var(--wknd);box-shadow:0 0 6px var(--wknd-glow)}
+  .rating-score{font-family:'Space Mono',monospace;font-size:.88rem;font-weight:700;color:var(--accent)}
+  .is-wknd .rating-score{color:#ff9a9a}
+  .rating-lbl{font-size:.6rem;color:var(--text-dim)}
+  .price-badge{font-size:.72rem;font-weight:600;padding:.22rem .6rem;border-radius:1rem;background:rgba(46,204,113,.08);border:1px solid rgba(46,204,113,.2);color:var(--g7);white-space:nowrap}
+  .price-badge.free{background:rgba(255,215,0,.09);border-color:rgba(255,215,0,.28);color:var(--gold)}.price-badge.paid{background:rgba(130,80,255,.09);border-color:rgba(130,80,255,.28);color:#b39dff}
+  .event-card.hidden{display:none}
+  .last-updated{text-align:center;font-family:'Space Mono',monospace;font-size:.6rem;color:var(--text-dim);padding:.75rem;opacity:.6;border-top:1px solid var(--card-border)}
+  ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--g0)}::-webkit-scrollbar-thumb{background:var(--g4);border-radius:3px}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-badge">🗺 DFW METRO · DALLAS · TEXAS · WEEK_LABEL</div>
+  <h1>פעילויות השבוע</h1>
+  <p class="subtitle">פסטיבלים · שווקים · הופעות · מרוצים · ירידים</p>
+  <div class="week-tags">
+    <span class="wtag reg">📅 WEEK_RANGE</span>
+    <span class="wtag wknd">🔥 סופ"ש: WEEKEND</span>
+  </div>
+</header>
+<nav>
+  <button class="tab-btn active" onclick="showRegion('all',this)">🌆 הכל</button>
+  <button class="tab-btn" onclick="showRegion('plano',this)">📍 פלאנו</button>
+  <button class="tab-btn" onclick="showRegion('frisco',this)">📍 פריסקו</button>
+  <button class="tab-btn" onclick="showRegion('mckinney',this)">📍 מקיני</button>
+  <button class="tab-btn" onclick="showRegion('irving',this)">📍 ארווינג</button>
+  <button class="tab-btn" onclick="showRegion('dallas',this)">📍 דאלאס</button>
+</nav>
+<main>
+  <div class="filter-bar">
+    <span class="filter-label">סנן:</span>
+    <button class="filter-btn" onclick="setFilter('wknd',this)">🔥 סופ"ש</button>
+    <button class="filter-btn" onclick="setFilter(null,this)">✅ הכל</button>
+    <button class="filter-btn" onclick="setFilter('market',this)">🛒 שוק</button>
+    <button class="filter-btn" onclick="setFilter('concert',this)">🎸 הופעות</button>
+    <button class="filter-btn" onclick="setFilter('festival',this)">🎡 פסטיבלים</button>
+    <button class="filter-btn" onclick="setFilter('race',this)">🏁 מרוצים</button>
+    <button class="filter-btn" onclick="setFilter('sport',this)">⚽ ספורט</button>
+    <button class="filter-btn" onclick="setFilter('free',this)">🆓 חינם</button>
+  </div>
+  <div class="stats-bar">
+    <div class="stat-chip"><span class="stat-num" id="sTotal">0</span><span class="stat-lbl">אירועים</span></div>
+    <div class="stat-chip"><span class="stat-num" id="sWknd">0</span><span class="stat-lbl">🔥 סופ"ש</span></div>
+    <div class="stat-chip"><span class="stat-num" id="sFree">0</span><span class="stat-lbl">חינמיים</span></div>
+    <div class="stat-chip"><span class="stat-num" id="sTop">0</span><span class="stat-lbl">דירוג 9+</span></div>
+  </div>
+  <div id="view-all" class="region-section active"></div>
+  <div id="view-plano" class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">פלאנו</h2><span class="region-count" id="cnt-plano"></span></div><div class="events-grid" id="grid-plano"></div></div>
+  <div id="view-frisco" class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">פריסקו</h2><span class="region-count" id="cnt-frisco"></span></div><div class="events-grid" id="grid-frisco"></div></div>
+  <div id="view-mckinney" class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">מקיני</h2><span class="region-count" id="cnt-mckinney"></span></div><div class="events-grid" id="grid-mckinney"></div></div>
+  <div id="view-irving" class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">ארווינג</h2><span class="region-count" id="cnt-irving"></span></div><div class="events-grid" id="grid-irving"></div></div>
+  <div id="view-dallas" class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">דאלאס</h2><span class="region-count" id="cnt-dallas"></span></div><div class="events-grid" id="grid-dallas"></div></div>
+</main>
+<div class="last-updated" id="lastUpdated">עודכן: UPDATE_TIME</div>
+<script>
+EVENTS_JS
+
+function buildCard(e){
+  const isFree=e.price==='חינם'||e.price==='חינם!';
+  const wc=e.weekend?' is-wknd':'';
+  const badge=e.weekend?`<div class="wknd-badge">🔥 סופ"ש · ${e.whenLabel}</div>`:'';
+  const titleCls=e.weekend?'card-title has-badge':'card-title';
+  const priceCls=isFree?'free':(e.price&&(e.price.startsWith('מ-')||e.price.startsWith('$'))?'paid':'');
+  let dots='';
+  for(let i=1;i<=10;i++){const on=i<=e.rating;const cls=on?(e.rating>=9?'dot top':(e.weekend?'dot wd':'dot on')):'dot';dots+=`<div class="${cls}"></div>`;}
+  return `<div class="event-card${wc}" data-region="${e.region}" data-cat="${e.cat}" data-wknd="${e.weekend?1:0}" data-free="${isFree?1:0}">
+    ${badge}<div class="card-cat cat-${e.cat}">${e.catLabel}</div>
+    <div class="card-body">
+      <div class="${titleCls}">${e.title}</div>
+      <div class="card-desc">${e.desc}</div>
+      <div class="card-meta">
+        <div class="meta-item${e.weekend?' date-hi':''}"><span class="meta-label">📅 מתי</span><span class="meta-value">${e.whenLabel}</span></div>
+        <div class="meta-item"><span class="meta-label">⏰ שעות</span><span class="meta-value">${e.hours}</span></div>
+        <div class="meta-item"><span class="meta-label">👥 מי</span><span class="meta-value">${e.who}</span></div>
+        <div class="meta-item"><span class="meta-label">💰 כניסה</span><span class="meta-value">${e.price}</span></div>
+        <div class="meta-item full"><span class="meta-label">📍 איפה</span><span class="meta-value">${e.where}</span></div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <div class="rating-wrap"><div><div class="rating-dots">${dots}</div><div class="rating-lbl">דירוג קהילתי</div></div><div class="rating-score">${e.rating}/10</div></div>
+      <span class="price-badge ${priceCls}">${e.price}</span>
+    </div>
+  </div>`;
+}
+
+const regionNames={plano:'פלאנו',frisco:'פריסקו',mckinney:'מקיני',irving:'ארווינג',dallas:'דאלאס'};
+const regionOrder=['plano','frisco','mckinney','irving','dallas'];
+
+function render(){
+  regionOrder.forEach(r=>{
+    const items=events.filter(e=>e.region===r);
+    document.getElementById(`grid-${r}`).innerHTML=items.map(buildCard).join('');
+    document.getElementById(`cnt-${r}`).textContent=`${items.length} אירועים`;
+  });
+  const av=document.getElementById('view-all');let html='';
+  regionOrder.forEach(r=>{
+    const items=events.filter(e=>e.region===r);
+    const wc=items.filter(e=>e.weekend).length;
+    const wb=wc?`<span style="font-size:.62rem;color:var(--wknd);background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.3);padding:.13rem .48rem;border-radius:1rem">${wc} בסופ"ש</span>`:'';
+    html+=`<div class="all-section-header">📍 ${regionNames[r]} ${wb}</div><div class="events-grid">${items.map(buildCard).join('')}</div>`;
+  });
+  av.innerHTML=html;
+  document.getElementById('sTotal').textContent=events.length;
+  document.getElementById('sWknd').textContent=events.filter(e=>e.weekend).length;
+  document.getElementById('sFree').textContent=events.filter(e=>e.price==='חינם'||e.price==='חינם!').length;
+  document.getElementById('sTop').textContent=events.filter(e=>e.rating>=9).length;
+}
+
+let curRegion='all',curFilter=null;
+function showRegion(r,btn){document.querySelectorAll('.region-section').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById(`view-${r}`).classList.add('active');if(btn)btn.classList.add('active');curRegion=r;applyFilter();}
+function setFilter(type,btn){document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('f-wknd','f-cat'));curFilter=curFilter===type?null:type;if(curFilter)btn.classList.add(type==='wknd'?'f-wknd':'f-cat');applyFilter();}
+function applyFilter(){document.querySelectorAll('.event-card').forEach(c=>{const rMatch=curRegion==='all'||c.dataset.region===curRegion;let fMatch=true;if(curFilter==='wknd')fMatch=c.dataset.wknd==='1';else if(curFilter==='free')fMatch=c.dataset.free==='1';else if(curFilter)fMatch=c.dataset.cat===curFilter;c.classList.toggle('hidden',!(rMatch&&fMatch));});}
+render();
+</script>
+</body>
+</html>"""
+
+def build_html(events_js: str) -> str:
+    today             = datetime.date.today()
+    days_since_monday = today.weekday()
+    week_start        = today - datetime.timedelta(days=days_since_monday)
+    week_end          = week_start + datetime.timedelta(days=6)
+    saturday          = week_start + datetime.timedelta(days=5)
+    sunday            = week_start + datetime.timedelta(days=6)
+
+    HE_MONTHS = ["","ינואר","פברואר","מרץ","אפריל","מאי","יוני",
+                 "יולי","אוגוסט","ספטמבר","אוקטובר","נובמבר","דצמבר"]
+    def fmt(d): return f"{d.day} {HE_MONTHS[d.month]}"
+
+    html = HTML_TEMPLATE
+    html = html.replace("WEEK_LABEL",  f"שבוע {fmt(week_start)}–{fmt(week_end)}")
+    html = html.replace("WEEK_RANGE",  f"שבוע: {fmt(week_start)}–{fmt(week_end)} {today.year}")
+    html = html.replace("WEEKEND",     f"שבת {fmt(saturday)} + ראשון {fmt(sunday)}")
+    html = html.replace("UPDATE_TIME", datetime.datetime.now().strftime("%d/%m/%Y %H:%M"))
+    html = html.replace("EVENTS_JS",   events_js)
+    return html
+
+# ── לוג ──────────────────────────────────────────────
+def log(msg: str):
+    ts   = datetime.datetime.now().strftime("[%Y-%m-%d %H:%M:%S]")
+    line = f"{ts} {msg}"
+    print(line)
+    with open(LOG_PATH, "a", encoding="utf-8") as f:
+        f.write(line + "\n")
+
+# ── Main ──────────────────────────────────────────────
+def main():
+    log("▶ DFW Events Portal — עדכון שבועי")
+    try:
+        api_key = os.environ.get("ANTHROPIC_API_KEY")
+        if not api_key:
+            raise ValueError("ANTHROPIC_API_KEY לא מוגדר! הגדר כ-Secret בהגדרות ה-repo ב-GitHub.")
+
+        log("  שולח בקשה ל-Anthropic API...")
+        client  = anthropic.Anthropic(api_key=api_key)
+        message = client.messages.create(
+            model      = MODEL,
+            max_tokens = 4000,
+            messages   = [{"role": "user", "content": build_prompt()}]
+        )
+        events_js = message.content[0].text.strip()
+        log(f"  התקבל תגובה ({len(events_js)} תווים)")
+
+        html = build_html(events_js)
+        OUTPUT_PATH.write_text(html, encoding="utf-8")
+        log(f"  ✅ נשמר בהצלחה: {OUTPUT_PATH}")
+
+    except Exception as e:
+        log(f"  ❌ שגיאה: {e}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()

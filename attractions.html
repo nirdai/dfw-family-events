@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DFW — טיולים קבועים</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{--g0:#091510;--g2:#0f3320;--g4:#1a7a3e;--g5:#22a352;--g6:#2ecc71;--g7:#52d987;--g8:#85e8a8;--accent:#00ff88;--gold:#ffd700;--warm:#ff8c42;--text:#dff5ea;--text-dim:#7bbf94;--card-bg:rgba(13,36,22,0.92);--card-border:rgba(46,204,113,0.2)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Rubik',sans-serif;background:var(--g0);color:var(--text);min-height:100vh;direction:rtl}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 50% at 15% 5%,rgba(34,163,82,.13) 0%,transparent 55%),radial-gradient(ellipse 50% 70% at 85% 85%,rgba(0,255,136,.07) 0%,transparent 55%),repeating-linear-gradient(0deg,transparent,transparent 60px,rgba(46,204,113,.022) 60px,rgba(46,204,113,.022) 61px),repeating-linear-gradient(90deg,transparent,transparent 60px,rgba(46,204,113,.022) 60px,rgba(46,204,113,.022) 61px);pointer-events:none;z-index:0}
+
+  /* HEADER */
+  header{position:relative;z-index:10;padding:2.5rem 2rem 1.5rem;text-align:center;border-bottom:1px solid var(--card-border)}
+  .back-btn{display:inline-flex;align-items:center;gap:.5rem;font-family:'Space Mono',monospace;font-size:.7rem;color:var(--text-dim);background:rgba(46,204,113,.06);border:1px solid var(--card-border);padding:.35rem .9rem;border-radius:2rem;cursor:pointer;text-decoration:none;margin-bottom:1.2rem;transition:all .2s}
+  .back-btn:hover{border-color:var(--g6);color:var(--g6)}
+  .header-badge{display:inline-block;font-family:'Space Mono',monospace;font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);background:rgba(255,215,0,.07);border:1px solid rgba(255,215,0,.25);padding:.3rem 1rem;border-radius:2rem;margin-bottom:1rem}
+  h1{font-size:clamp(2rem,5vw,3.8rem);font-weight:900;line-height:1;background:linear-gradient(135deg,var(--gold) 0%,var(--accent) 60%,var(--g8) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.4rem}
+  .subtitle{font-size:.95rem;color:var(--text-dim);font-weight:300}
+
+  /* STATS BAR */
+  .stats-bar{display:flex;gap:.7rem;justify-content:center;margin-top:1rem;flex-wrap:wrap}
+  .stat-chip{background:rgba(46,204,113,.06);border:1px solid var(--card-border);border-radius:.5rem;padding:.4rem .85rem;display:flex;flex-direction:column;align-items:center;gap:.05rem}
+  .stat-num{font-family:'Space Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--accent)}
+  .stat-lbl{font-size:.58rem;color:var(--text-dim)}
+  .stat-chip.visited-chip .stat-num{color:var(--gold)}
+
+  /* NAV */
+  nav{position:sticky;top:0;z-index:20;background:rgba(9,21,16,.96);backdrop-filter:blur(14px);border-bottom:1px solid var(--card-border)}
+  .nav-row{display:flex;justify-content:center;gap:.5rem;padding:.7rem 1rem;flex-wrap:wrap}
+  .nav-row.filter-row{padding:.55rem 1rem;border-top:1px solid rgba(255,255,255,.04)}
+  .cat-btn{font-family:'Rubik',sans-serif;font-size:.82rem;font-weight:500;padding:.4rem 1rem;border:1px solid var(--card-border);border-radius:2rem;background:transparent;color:var(--text-dim);cursor:pointer;transition:all .22s;white-space:nowrap}
+  .cat-btn:hover{border-color:var(--g6);color:var(--g6);background:rgba(46,204,113,.05)}
+  .cat-btn.active{background:var(--g6);border-color:var(--g6);color:var(--g0);font-weight:700;box-shadow:0 0 18px rgba(46,204,113,.45)}
+  /* visited filter buttons */
+  .vis-btn{font-family:'Rubik',sans-serif;font-size:.78rem;font-weight:500;padding:.35rem .9rem;border:1px solid var(--card-border);border-radius:2rem;background:transparent;color:var(--text-dim);cursor:pointer;transition:all .22s;white-space:nowrap}
+  .vis-btn:hover{border-color:var(--gold);color:var(--gold)}
+  .vis-btn.active-vis{background:rgba(255,215,0,.12);border-color:var(--gold);color:var(--gold);font-weight:700}
+  .vis-btn.active-unvis{background:rgba(46,204,113,.1);border-color:var(--g6);color:var(--g6);font-weight:700}
+
+  /* MAIN */
+  main{position:relative;z-index:5;max-width:1300px;margin:0 auto;padding:2rem 1.5rem 5rem}
+  .section-header{font-size:1.1rem;font-weight:700;color:var(--g6);margin:2.5rem 0 1.2rem;padding-right:.7rem;border-right:3px solid var(--g6);display:flex;align-items:center;gap:.5rem}
+  .attractions-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.4rem;margin-bottom:2rem}
+
+  /* CARD */
+  .attr-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:1rem;overflow:hidden;transition:transform .28s,box-shadow .28s,border-color .28s;position:relative;backdrop-filter:blur(8px)}
+  .attr-card:hover{transform:translateY(-5px);box-shadow:0 18px 50px rgba(46,204,113,.18);border-color:rgba(46,204,113,.55)}
+  .attr-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--g5),var(--accent),var(--g5));opacity:0;transition:opacity .28s}
+  .attr-card:hover::before{opacity:1}
+  /* visited state */
+  .attr-card.been-there{border-color:rgba(255,215,0,.45);background:linear-gradient(160deg,rgba(255,215,0,.05) 0%,var(--card-bg) 35%)}
+  .attr-card.been-there::before{background:linear-gradient(90deg,var(--gold),#ffe88a,var(--gold));opacity:1}
+
+  .attr-type{padding:.5rem 1rem;font-size:.62rem;font-family:'Space Mono',monospace;font-weight:700;letter-spacing:.13em;text-transform:uppercase;display:flex;align-items:center;gap:.4rem}
+  .type-zoo     {background:rgba(34,163,82,.15); color:var(--g7)}
+  .type-aquarium{background:rgba(0,150,255,.13);  color:#66bbff}
+  .type-safari  {background:rgba(255,180,0,.12);  color:#ffcc55}
+  .type-nature  {background:rgba(82,217,135,.13); color:var(--accent)}
+  .type-culture {background:rgba(200,150,255,.12);color:#ddaaff}
+  .type-race    {background:rgba(255,80,0,.13);   color:#ff9966}
+
+  .attr-body{padding:1rem 1.1rem .8rem}
+  .attr-name{font-size:1.05rem;font-weight:700;color:var(--text);margin-bottom:.35rem;line-height:1.3}
+  .attr-desc{font-size:.8rem;color:var(--text-dim);line-height:1.65;margin-bottom:.9rem}
+  .attr-meta{display:grid;grid-template-columns:1fr 1fr;gap:.35rem;margin-bottom:.9rem}
+  .meta-item{display:flex;flex-direction:column;gap:.07rem;background:rgba(0,0,0,.22);border-radius:.4rem;padding:.4rem .55rem}
+  .meta-label{font-size:.55rem;font-family:'Space Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--g5);opacity:.85}
+  .meta-value{font-size:.78rem;font-weight:500;color:var(--text)}
+  .meta-item.full{grid-column:1/-1}
+
+  /* FOOTER */
+  .attr-footer{display:flex;align-items:center;justify-content:space-between;padding:.6rem 1.1rem;border-top:1px solid rgba(46,204,113,.08);background:rgba(0,0,0,.18);gap:.5rem}
+  .rating-wrap{display:flex;align-items:center;gap:.45rem;flex:1}
+  .rating-dots{display:flex;gap:3px}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--g2)}
+  .dot.on{background:var(--g6);box-shadow:0 0 5px rgba(46,204,113,.6)}
+  .dot.top{background:var(--accent);box-shadow:0 0 7px rgba(0,255,136,.7)}
+  .rating-score{font-family:'Space Mono',monospace;font-size:.88rem;font-weight:700;color:var(--accent)}
+  .rating-lbl{font-size:.6rem;color:var(--text-dim)}
+  .price-badge{font-size:.72rem;font-weight:600;padding:.22rem .6rem;border-radius:1rem;background:rgba(46,204,113,.08);border:1px solid rgba(46,204,113,.2);color:var(--g7);white-space:nowrap}
+  .price-badge.free{background:rgba(255,215,0,.09);border-color:rgba(255,215,0,.28);color:var(--gold)}
+
+  /* BEEN THERE BUTTON */
+  .been-btn{display:flex;align-items:center;gap:.35rem;font-family:'Rubik',sans-serif;font-size:.75rem;font-weight:600;padding:.3rem .75rem;border-radius:1.5rem;border:1px solid var(--card-border);background:transparent;color:var(--text-dim);cursor:pointer;transition:all .22s;white-space:nowrap;flex-shrink:0}
+  .been-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(255,215,0,.08)}
+  .been-btn.checked{background:rgba(255,215,0,.15);border-color:var(--gold);color:var(--gold);box-shadow:0 0 12px rgba(255,215,0,.25)}
+  .been-btn .check-icon{font-size:.9rem;transition:transform .2s}
+  .been-btn.checked .check-icon{transform:scale(1.2)}
+
+  .attr-card.hidden{display:none}
+  .last-updated{text-align:center;font-family:'Space Mono',monospace;font-size:.6rem;color:var(--text-dim);padding:.75rem;opacity:.6;border-top:1px solid var(--card-border)}
+  ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--g0)}::-webkit-scrollbar-thumb{background:var(--g4);border-radius:3px}
+</style>
+</head>
+<body>
+<header>
+  <a class="back-btn" href="index.html">&#x2190; חזרה לאירועים</a>
+  <div class="header-badge">&#x1F5FA; DFW METRO &middot; PLANO &middot; TEXAS</div>
+  <h1>טיולים קבועים</h1>
+  <p class="subtitle">גני חיות &middot; אקווריומים &middot; סאפארי &middot; טבע &middot; תרבות &mdash; פתוחים כל השנה</p>
+  <div class="stats-bar">
+    <div class="stat-chip"><span class="stat-num" id="sTot">0</span><span class="stat-lbl">סה"כ מקומות</span></div>
+    <div class="stat-chip visited-chip"><span class="stat-num" id="sVis">0</span><span class="stat-lbl">&#x2714; היינו</span></div>
+    <div class="stat-chip"><span class="stat-num" id="sLeft">0</span><span class="stat-lbl">עוד לגלות</span></div>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-row">
+    <button class="cat-btn active" onclick="filterCat('all',this)">&#x1F33F; הכל</button>
+    <button class="cat-btn" onclick="filterCat('zoo',this)">&#x1F981; גן חיות</button>
+    <button class="cat-btn" onclick="filterCat('aquarium',this)">&#x1F420; אקווריום</button>
+    <button class="cat-btn" onclick="filterCat('safari',this)">&#x1F992; סאפארי</button>
+    <button class="cat-btn" onclick="filterCat('nature',this)">&#x1F33F; טבע</button>
+    <button class="cat-btn" onclick="filterCat('culture',this)">&#x1F3F0; תרבות</button>
+    <button class="cat-btn" onclick="filterCat('race',this)">&#x1F40E; מרוצים</button>
+  </div>
+  <div class="nav-row filter-row">
+    <span style="font-size:.7rem;color:var(--text-dim);align-self:center">סנן לפי ביקור:</span>
+    <button class="vis-btn" id="btnAll" onclick="filterVisit('all',this)">&#x1F5FA; הכל</button>
+    <button class="vis-btn" id="btnVis" onclick="filterVisit('visited',this)">&#x2714; היינו</button>
+    <button class="vis-btn" id="btnUnvis" onclick="filterVisit('unvisited',this)">&#x1F4CD; עוד לא היינו</button>
+  </div>
+</nav>
+
+<main>
+  <div class="section-header">&#x1F5FA; אטרקציות קבועות באזור DFW</div>
+  <div class="attractions-grid" id="grid"></div>
+</main>
+<div class="last-updated">עודכן: מאי 2026 &mdash; הסימון נשמר במכשיר שלך</div>
+
+<script>
+const A = [
+  {id:1,type:"zoo",tl:"&#x1F981; גן חיות",name:"Dallas Zoo",
+   desc:"הגן הגדול ביותר בטקסס &mdash; 106 דונם, 2,000+ חיות מ-406 מינים. קיים מ-1888. האטרקציות הפופולריות: האכלת ג'ירפות, מפגש ציפורדות, תחנת מחקר גורילות והרפטוריום.",
+   dist:"20 מייל מפלאנו",drive:"~30 דק",hours:"יום-שישי 9:00&ndash;17:00",
+   price:"$22 מבוגר / $17 ילד (3-11)",address:"650 S R.L. Thornton Fwy, Dallas TX 75203",
+   tip:"הגיעו בוקר מוקדם לפני החום. ג'ירפות הכי פעילות בבוקר.",rating:9},
+
+  {id:2,type:"zoo",tl:"&#x1F981; גן חיות",name:"Fort Worth Zoo",
+   desc:"מדורג עקביות כאחד מ-5 גני החיות הטובים בארה\"ב. 7,000+ חיות, שמורת פילים ענקית, טנזניה הסוואנה ועולם הפינגווינים. שקט יותר מדאלאס.",
+   dist:"35 מייל מפלאנו",drive:"~45 דק",hours:"שני-שבת 10:00&ndash;17:00 | ראשון 11:00&ndash;17:00",
+   price:"$20 מבוגר / $15 ילד | חניה $5",address:"1989 Colonial Pkwy, Fort Worth TX 76110",
+   tip:"בואו בבוקר &mdash; חיות גדולות מסתתרות בחום אחה\"צ.",rating:10},
+
+  {id:3,type:"aquarium",tl:"&#x1F420; אקווריום",name:"SEA LIFE Grapevine Aquarium",
+   desc:"45,000 רגל רבוע, 30+ תצוגות, מנהרת 360 מעלות היחידה בטקסס. כריש, קרני ים, צבי ים בשיקום ופינת מגע אינטראקטיבית. בתוך Grapevine Mills Mall.",
+   dist:"25 מייל מפלאנו",drive:"~35 דק",hours:"שני-שישי 10:00&ndash;18:00 | שבת 10:00&ndash;20:00 | ראשון 11:00&ndash;19:00",
+   price:"מ-$26.99 (זול יותר אונליין)",address:"3000 Grapevine Mills Pkwy, Grapevine TX 76051",
+   tip:"קנו אונליין &mdash; הרבה יותר זול. משולב מצוין עם LEGOLAND בסמוך.",rating:8},
+
+  {id:4,type:"aquarium",tl:"&#x1F420; אקווריום",name:"Dallas World Aquarium",
+   desc:"לא רק אקווריום &mdash; יער גשם מרובה קומות עם קנגורואים, עצלנים, ציפורי טוקן, קרוקודילים ועוד. מאות מינים בסביבה כפולה: ים ויבשה.",
+   dist:"22 מייל מפלאנו",drive:"~30 דק",hours:"יום-שישי 9:00&ndash;17:00",
+   price:"$24.95 מבוגר / $16.95 ילד (3-12)",address:"1801 N Griffin St, Dallas TX 75202",
+   tip:"תנו 2+ שעות &mdash; יש הרבה יותר ממה שנראה מבחוץ.",rating:9},
+
+  {id:5,type:"aquarium",tl:"&#x1F420; אקווריום",name:"SeaQuest Aquarium &mdash; Fort Worth",
+   desc:"אקווריום אינטראקטיבי עם 1,200 חיות מ-300 מינים. האכלה ידנית ומגע עם בעלי חיים. מתאים במיוחד לגיל 3-10.",
+   dist:"35 מייל מפלאנו",drive:"~45 דק",hours:"כל יום 10:00&ndash;20:00",
+   price:"מ-$22 אונליין",address:"Ridgmar Mall, 1888 Green Oaks Rd, Fort Worth TX 76116",
+   tip:"קנו אונליין לחסכון. חוויה טובה לילדים קטנים &mdash; הרבה מגע ישיר.",rating:7},
+
+  {id:6,type:"safari",tl:"&#x1F992; סאפארי",name:"Fossil Rim Wildlife Center",
+   desc:"1,800 דונם של אפריקה בטקסס. מסלול נהיגה 7.2 מייל בין 1,100+ חיות חופשיות &mdash; ג'ירפות, קרנפים, צ'יטות, זאבים. אפשר להאכיל מהחלון.",
+   dist:"70 מייל מפלאנו",drive:"~75 דק",hours:"כל יום 8:30&ndash;16:30",
+   price:"$28&ndash;$40 מבוגר / $20&ndash;$28 ילד",address:"2299 County Rd 2008, Glen Rose TX 76043",
+   tip:"קנו אוכל חיות בכניסה. מומלץ לשלב עם Dinosaur Valley State Park בסמוך.",rating:10},
+
+  {id:7,type:"safari",tl:"&#x1F992; סאפארי",name:"Sharkarosa Wildlife Ranch",
+   desc:"חווה פרטית של 126 דונם עם 130 חיות &mdash; נמרים, שרקנים, אריות, פנתרים. ניתן לקנות האכלה ישירה. ארגון ללא מטרת רווח שמציל חיות בסכנה.",
+   dist:"55 מייל מפלאנו",drive:"~65 דק",hours:"שישי-ראשון 9:00&ndash;17:00",
+   price:"מ-$20 מבוגר / $15 ילד",address:"10720 FM 922, Pilot Point TX 76258",
+   tip:"הזמינו מראש &mdash; המקום קטן ומגביל מספר מבקרים.",rating:9},
+
+  {id:8,type:"nature",tl:"&#x1F33F; טבע ועוד",name:"Heard Natural Science Museum",
+   desc:"מוזיאון מדע ושמורת טבע ב-289 דונם. שבילי טבע, גן פרפרים חי עם 400+ פרפרים, תצוגות חיות בר ותוכניות STEM. Dragon Trails &mdash; דרקונים אנימטרוניים עד יוני 2026!",
+   dist:"14 מייל מפלאנו",drive:"~20 דק",hours:"שני-שבת 9:00&ndash;17:00 | ראשון 12:00&ndash;17:00",
+   price:"$10 ילד / $14 מבוגר",address:"1 Nature Place, McKinney TX 75069",
+   tip:"גן הפרפרים לבדו שווה את הביקור. בואו בבוקר &mdash; פרפרים פעילים יותר בשעות קרירות.",rating:9},
+
+  {id:9,type:"culture",tl:"&#x1F3F0; כפר אירופאי",name:"Adriatica Village &mdash; מקיני",
+   desc:"פרויקט $350 מיליון של 45 דונם שמדמה את סופפטאר שבקרואטיה. רחובות מרוצפים, מגדל פעמון, אגם, קפלת Bella Donna על האגם, מסעדות, חנויות ו-The Guitar Sanctuary.",
+   dist:"14 מייל מפלאנו",drive:"~20 דק",hours:"רוב עסקים 10:00&ndash;21:00 | מסעדות עד מאוחר בסוף שבוע",
+   price:"חינם (אוכל/קניות בתשלום)",address:"6602 Mediterranean Dr, McKinney TX 75070",
+   tip:"מושלם לסוף שבוע ערב. חניה חינמית. כשהאור יורד נראה ממש אירופאי. הקפלה על האגם &mdash; אחד הצילומים הכי יפים ב-DFW.",rating:9},
+
+  {id:10,type:"nature",tl:"&#x1F996; פרק דינוסאורים",name:"Dinosaur Valley State Park &mdash; גלן רוז",
+   desc:"עקבות דינוסאורים אמיתיות בנהר מלפני 110 מיליון שנה &mdash; הטובות בעולם! 1,500 דונם של שבילי היקינג, שחייה בנהר וקמפינג. מושלם לשלב עם Fossil Rim שנמצא 5 דקות משם.",
+   dist:"70 מייל מפלאנו",drive:"~75 דק",hours:"כל יום 6:00&ndash;22:00 | משרד 8:30&ndash;16:30",
+   price:"$8 ליום (+13) | ילדים 12- חינם",address:"1629 Park Rd 59, Glen Rose TX 76043",
+   tip:"הזמינו מקודם באונליין &mdash; הפרק מגיע לקפסיטה בסוף שבוע. בואו בבוקר קריר לפני החום.",rating:10},
+
+  {id:11,type:"culture",tl:"&#x2694; סעודת ימי ביניים",name:"Medieval Times Dinner &amp; Tournament &mdash; דאלאס",
+   desc:"2 שעות בטירת אבנים: סעודה 4 מנות בלי סכו\"ם, ירידת חניתות, קרבות חרבות ובז נשרים חיים. 6 פרשים מתחרים ואתה קורא לאחד מהם.",
+   dist:"22 מייל מפלאנו",drive:"~30 דק",hours:"שישי 19:30 | שבת 17:00 ו-20:00 | ראשון 14:00 ו-17:00",
+   price:"$76.95 מבוגר / $46.95 ילד | קוד 15MT ל-15% הנחה",address:"2021 N Stemmons Fwy, Dallas TX 75207",
+   tip:"קוד 15MT = 15% הנחה. משפחה של 4 עם הקוד = ~$210. חניה חינמית. ילדים 3- בחינם.",rating:9},
+
+  {id:12,type:"race",tl:"&#x1F40E; מרוצי סוסים",name:"Lone Star Park &mdash; Grand Prairie",
+   desc:"מסלול מרוצי הסוסים הגדול בטקסס &mdash; 315 דונם, טריבון 8,000 מקומות ב-7 קומות. עונת Thoroughbred אפריל&ndash;יולי. מוזיקה חיה בין מרוצים, מסעדת Silks ו-48 Penthouse Suite.",
+   dist:"28 מייל מפלאנו",drive:"~35 דק",hours:"חמישי-ראשון בעונת | Bar &amp; Book: 7 ימים בשבוע",
+   price:"מ-$5 | חניה חינמית",address:"1000 Lone Star Pkwy, Grand Prairie TX 75050",
+   tip:"בואו בעונת אביב (אפריל&ndash;יולי). Bar &amp; Book פתוח כל השנה להימורים מרחבי העולם.",rating:8},
+
+  {id:13,type:"nature",tl:"&#x1F985; מקלט חתולים גדולים",name:"In-Sync Exotics Wildlife Rescue",
+   desc:"מקלט ללא מטרת רווח לחתולים גדולים &mdash; אריות, נמרים, פנתרים ועוד. סיורים מודרכים עם סיפור האישי של כל חיה. לא גן חיות רגיל &mdash; מגע אישי אמיתי.",
+   dist:"25 מייל מפלאנו",drive:"~30 דק",hours:"שבת-ראשון 11:00&ndash;18:00 | סגור בימות שבוע",
+   price:"סיור מודרך &mdash; ראה insyncexotics.org",address:"3430 Skyview Dr, Wylie TX 75098",
+   tip:"הזמינו מראש &mdash; מקומות מוגבלים. הסיור כ-שעה אבל בלתי נשכח.",rating:9},
+
+  {id:14,type:"nature",tl:"&#x1F995; קמפינג + דינוסאורים",name:"Dinosaur Valley RV Park &mdash; גלן רוז",
+   desc:"קמפינג גרנד צמוד ל-Dinosaur Valley State Park. 5 קבינות מרוהטות עם מטבח מלא ליד נהר Paluxy. שתי בריכות, ג'קוזי, מגרש משחקים, בית חווה (Barnyard), Frontier Fort לילדים וערבי סרטים.",
+   dist:"70 מייל מפלאנו",drive:"~75 דק",hours:"כל השנה | משרד: א-ה 9-17 | שבת 9-19",
+   price:"קבינות מ-$100 ללילה | RV מ-$45 | אוהלים מ-$30",address:"1099 Park Rd 59, Glen Rose TX 76043",
+   tip:"שלבו: בוקר Fossil Rim, אחה\"צ Dinosaur Valley, ערב בקבינה. הזמינו מוקדם &mdash; מתמלא בסוף שבוע.",rating:9},
+
+  {id:15,type:"nature",tl:"&#x1F3DE; שמורת טבע",name:"Arbor Hills Nature Preserve &mdash; פלאנו",
+   desc:"שמורת טבע 200 דונם בלב פלאנו &mdash; חינם לגמרי! 3 מייל שבילים סלולים + 3 מייל עפר + מסלול אופניים 2.8 מייל. מגדל תצפית עם נוף פנורמי, גן משחקים, נחלונות ואזורי פיקניק.",
+   dist:"3 מייל מפלאנו",drive:"~7 דק",hours:"א-ב + ד-ש 5:00&ndash;23:00 | רביעי 14:00&ndash;23:00",
+   price:"חינם! חניה חינמית",address:"6701 W Parker Rd, Plano TX 75093",
+   tip:"רביעי סגור עד 14:00 לתחזוקה. בואו שעת הזהב לצילומים מהמגדל. ידידותי לילדים, כלבים ואופניים.",rating:9},
+
+  {id:16,type:"nature",tl:"&#x1F3CA; אגם לרחציה",name:"Ray Roberts Lake State Park &mdash; Pilot Point",
+   desc:"29,000 דונם של אגם וטבע צפונית ל-DFW. חוף חול לרחציה, גן משחקים, מגרש ווליבול, 20 מייל שבילים, בריכת דיג לילדים וקמפינג. יחידת Isle du Bois הכי פופולרית. אסור בקבוקי זכוכית!",
+   dist:"45 מייל מפלאנו",drive:"~55 דק",hours:"כל יום 6:00&ndash;22:00",
+   price:"$7 מבוגר (+13) | ילדים 12- חינם",address:"100 PW 4137, Pilot Point TX 76258",
+   tip:"אסור בקבוקי זכוכית! הזמינו מקודם בסוף שבוע &mdash; מגיע לקפסיטה. החוף ב-Isle du Bois הכי שווה עם ילדים.",rating:9},
+
+  {id:17,type:"safari",tl:"&#x1F992; חוויית חיות מופלאות",name:"Oak Meadow Ranch &mdash; Valley View",
+   desc:"חווה פעילה עם חיות אקזוטיות: למורים, עצלנים, קנגורואים, ג'ירפות, גמלים, לוטרות וקופים. אפשר להאכיל, לגעת ולצלם. יש סוויטת Giraffe Barn &mdash; לינה עם נוף ישיר לג'ירפות!",
+   dist:"55 מייל מפלאנו",drive:"~65 דק",hours:"ראה אתר oakmeadowranch.com",
+   price:"Wildlife Experience: $299/אדם | לינה מ-$250/לילה",address:"440 Red Top Road, Valley View TX 76272",
+   tip:"הזמינו מראש &mdash; חוויות Wildlife מתמלאות מהר. שלבו עם Ray Roberts Lake באותו אזור.",rating:10},
+
+  {id:18,type:"culture",tl:"&#x1F37A; מבשלת בירה בשדה",name:"Revolver Brewing &mdash; Granbury",
+   desc:"מבשלת בירה טקסנית משפחתית עם דשא עצום בשדה הפתוח. שבת: מוזיקה חיה, סיור מבשלה, דוכני אוכל, Cornhole ענק, Giant Jenga ו-Horseshoes. $15 לשותים עם 6 דגימות 8oz. ילדים בחינם, ידידותי לכלבים!",
+   dist:"50 מייל מפלאנו",drive:"~60 דק",hours:"שבת 11:00&ndash;19:00 | חמישי 17:00&ndash;21:00",
+   price:"שותים: $15 (21+) | ילדים ונהגים: חינם",address:"5650 Matlock Rd, Granbury TX 76049",
+   tip:"בואו לפני 16:00 לקבל 6 דגימות. מושלם לשלב עם Fossil Rim ו-Dinosaur Valley באותו כיוון.",rating:9}
+];
+
+// ============================================================
+// VISITED STATE — stored in localStorage
+// ============================================================
+const STORAGE_KEY = 'dfw_visited_v1';
+
+function loadVisited() {
+  try { return new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')); }
+  catch(e) { return new Set(); }
+}
+
+function saveVisited(set) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify([...set])); } catch(e) {}
+}
+
+let visited = loadVisited();
+
+function toggleVisited(id, btn, card) {
+  if (visited.has(id)) {
+    visited.delete(id);
+    btn.classList.remove('checked');
+    btn.innerHTML = '<span class="check-icon">&#x2B55;</span> לא היינו';
+    card.classList.remove('been-there');
+  } else {
+    visited.add(id);
+    btn.classList.add('checked');
+    btn.innerHTML = '<span class="check-icon">&#x2714;</span> היינו!';
+    card.classList.add('been-there');
+  }
+  saveVisited(visited);
+  updateStats();
+  applyVisitFilter();
+}
+
+// ============================================================
+// BUILD CARD
+// ============================================================
+function buildCard(a) {
+  const isFree = a.price.includes('חינם');
+  const isVis = visited.has(a.id);
+  let dots = '';
+  for(let i=1;i<=10;i++) dots += '<div class="dot '+(i<=a.rating?(a.rating>=9?'top':'on'):'')+'"></div>';
+
+  return '<div class="attr-card'+(isVis?' been-there':'')+'" data-type="'+a.type+'" data-id="'+a.id+'">'
+    +'<div class="attr-type type-'+a.type+'">'+a.tl+'</div>'
+    +'<div class="attr-body">'
+    +'<div class="attr-name">'+a.name+'</div>'
+    +'<div class="attr-desc">'+a.desc+'</div>'
+    +'<div class="attr-meta">'
+    +'<div class="meta-item"><span class="meta-label">&#x1F4CD; מרחק</span><span class="meta-value">'+a.dist+'</span></div>'
+    +'<div class="meta-item"><span class="meta-label">&#x1F697; נסיעה</span><span class="meta-value">'+a.drive+'</span></div>'
+    +'<div class="meta-item"><span class="meta-label">&#x23F0; שעות</span><span class="meta-value">'+a.hours+'</span></div>'
+    +'<div class="meta-item"><span class="meta-label">&#x1F4B0; מחיר</span><span class="meta-value">'+a.price+'</span></div>'
+    +'<div class="meta-item full"><span class="meta-label">&#x1F4CD; כתובת</span><span class="meta-value">'+a.address+'</span></div>'
+    +'<div class="meta-item full" style="background:rgba(255,215,0,.06);border:1px solid rgba(255,215,0,.15)">'
+    +'<span class="meta-label" style="color:var(--gold)">&#x1F4A1; טיפ</span>'
+    +'<span class="meta-value" style="color:#ffe88a">'+a.tip+'</span></div>'
+    +'</div></div>'
+    +'<div class="attr-footer">'
+    +'<div class="rating-wrap"><div><div class="rating-dots">'+dots+'</div><div class="rating-lbl">דירוג קהילתי</div></div>'
+    +'<div class="rating-score">'+a.rating+'/10</div></div>'
+    +'<span class="price-badge'+(isFree?' free':'')+'">'+a.price.split('/')[0].trim()+'</span>'
+    +'<button class="been-btn'+(isVis?' checked':'')+'" onclick="toggleVisited('+a.id+',this,this.closest(\'.attr-card\'))">'
+    +'<span class="check-icon">'+(isVis?'&#x2714;':'&#x2B55;')+'</span>'
+    +(isVis?' היינו!':' לא היינו')
+    +'</button>'
+    +'</div></div>';
+}
+
+// ============================================================
+// FILTER LOGIC
+// ============================================================
+let curCat = 'all';
+let curVisit = 'all';
+
+function filterCat(cat, btn) {
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  curCat = cat;
+  applyFilters();
+}
+
+function filterVisit(mode, btn) {
+  document.querySelectorAll('.vis-btn').forEach(b => {
+    b.classList.remove('active-vis','active-unvis');
+  });
+  if (curVisit === mode) {
+    curVisit = 'all';
+    document.getElementById('btnAll').classList.add('active-vis');
+  } else {
+    curVisit = mode;
+    if (mode === 'visited') btn.classList.add('active-vis');
+    else if (mode === 'unvisited') btn.classList.add('active-unvis');
+  }
+  applyFilters();
+}
+
+function applyFilters() {
+  document.querySelectorAll('.attr-card').forEach(c => {
+    const id = parseInt(c.dataset.id);
+    const catOk = curCat === 'all' || c.dataset.type === curCat;
+    const visOk = curVisit === 'all'
+      || (curVisit === 'visited' && visited.has(id))
+      || (curVisit === 'unvisited' && !visited.has(id));
+    c.classList.toggle('hidden', !(catOk && visOk));
+  });
+}
+
+function applyVisitFilter() {
+  applyFilters();
+}
+
+function updateStats() {
+  document.getElementById('sTot').textContent = A.length;
+  document.getElementById('sVis').textContent = visited.size;
+  document.getElementById('sLeft').textContent = A.length - visited.size;
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.getElementById('grid').innerHTML = A.map(buildCard).join('');
+document.getElementById('btnAll').classList.add('active-vis');
+updateStats();
+</script>
+</body>
+</html>
