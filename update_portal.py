@@ -3,24 +3,24 @@ DFW Family Events Portal — Auto-Updater
 ========================================
 רץ אוטומטית כל יום שני ב-07:00 (שעון מרכז/America-Chicago, בקירוב)
 דרך GitHub Actions — לא תלוי במחשב מקומי דלוק.
-פונה ל-Anthropic API, מקבל אירועים מעודכנים לשבוע הנוכחי,
+פונה ל-Google Gemini API (טיר חינמי), מקבל אירועים מעודכנים לשבוע הנוכחי,
 וכותב את index.html החדש בשורש ה-repo.
 
 איך זה רץ עכשיו:
     - .github/workflows/weekly-update.yml מפעיל את הסקריפט הזה בכל שני
-    - מפתח ה-API נשמר כ-Secret בשם ANTHROPIC_API_KEY בהגדרות ה-repo ב-GitHub
+    - מפתח ה-API נשמר כ-Secret בשם GEMINI_API_KEY בהגדרות ה-repo ב-GitHub
       (Settings → Secrets and variables → Actions)
     - אחרי שהסקריפט רץ, ה-workflow עושה git commit + push לשינויים
       (אם היו שינויים ב-index.html)
     - אפשר גם להריץ ידנית מלשונית Actions → Weekly DFW Events Update → Run workflow
 
 הרצה ידנית מקומית לבדיקה (אופציונלי):
-    pip install anthropic
-    set ANTHROPIC_API_KEY=sk-ant-...   (Windows cmd)  /  $env:ANTHROPIC_API_KEY="sk-ant-..." (PowerShell)
+    pip install google-genai
+    set GEMINI_API_KEY=...   (Windows cmd)  /  $env:GEMINI_API_KEY="..." (PowerShell)
     python update_portal.py
 """
 
-import anthropic
+from google import genai
 import datetime
 import pathlib
 import sys
@@ -30,7 +30,7 @@ import os
 # נתיבים יחסיים לשורש ה-repo — כך שהסקריפט עובד גם מקומית וגם ב-GitHub Actions
 OUTPUT_PATH = pathlib.Path("index.html")
 LOG_PATH    = pathlib.Path("update_log.txt")
-MODEL       = "claude-sonnet-4-6"  # ⚠️ ודא שזה שם מודל תקף בזמן ההרצה
+MODEL       = "gemini-2.5-flash"  # נמצא בטיר החינמי של Gemini API — ודא שזה עדיין המצב בזמן ההרצה
 
 REGIONS = [
     "פלאנו (Plano)",
@@ -310,18 +310,23 @@ def log(msg: str):
 def main():
     log("▶ DFW Events Portal — עדכון שבועי")
     try:
-        api_key = os.environ.get("ANTHROPIC_API_KEY")
+        api_key = os.environ.get("GEMINI_API_KEY")
         if not api_key:
-            raise ValueError("ANTHROPIC_API_KEY לא מוגדר! הגדר כ-Secret בהגדרות ה-repo ב-GitHub.")
+            raise ValueError("GEMINI_API_KEY לא מוגדר! הגדר כ-Secret בהגדרות ה-repo ב-GitHub.")
 
-        log("  שולח בקשה ל-Anthropic API...")
-        client  = anthropic.Anthropic(api_key=api_key)
-        message = client.messages.create(
-            model      = MODEL,
-            max_tokens = 4000,
-            messages   = [{"role": "user", "content": build_prompt()}]
+        log("  שולח בקשה ל-Gemini API...")
+        client   = genai.Client(api_key=api_key)
+        response = client.models.generate_content(
+            model    = MODEL,
+            contents = build_prompt()
         )
-        events_js = message.content[0].text.strip()
+        events_js = response.text.strip()
+        # Gemini לפעמים עוטף תשובות קוד ב-```js ... ``` — מסירים אם קיים
+        if events_js.startswith("```"):
+            events_js = events_js.split("\n", 1)[1] if "\n" in events_js else events_js
+            events_js = events_js.rsplit("```", 1)[0].strip()
+            if events_js.startswith("js"):
+                events_js = events_js[2:].strip()
         log(f"  התקבל תגובה ({len(events_js)} תווים)")
 
         html = build_html(events_js)
