@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DFW Family Events — 5 בספטמבר–5 באוקטובר 2026</title>
+<title>DFW Family Week — פעילויות השבוע</title>
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root{--g0:#091510;--g2:#0f3320;--g4:#1a7a3e;--g5:#22a352;--g6:#2ecc71;--g7:#52d987;--g8:#85e8a8;--accent:#00ff88;--gold:#ffd700;--warm:#ff8c42;--wknd:#ff6b6b;--wknd-glow:rgba(255,107,107,0.3);--text:#dff5ea;--text-dim:#7bbf94;--card-bg:rgba(13,36,22,0.92);--card-border:rgba(46,204,113,0.2)}
@@ -19,32 +19,10 @@
   .wtag.reg{color:var(--g7);background:rgba(46,204,113,.08);border:1px solid rgba(46,204,113,.25)}
   .wtag.wknd{color:var(--wknd);background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.35);animation:pulseTag 2.5s ease-in-out infinite}
   @keyframes pulseTag{0%,100%{box-shadow:0 0 0 0 rgba(255,107,107,.2)}50%{box-shadow:0 0 0 6px rgba(255,107,107,0)}}
-  .date-strip-wrap{position:relative;z-index:15;background:rgba(9,21,16,.98);border-bottom:1px solid var(--card-border);padding:.9rem 1.2rem}
-  .date-strip-label{font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim);text-align:center;margin-bottom:.65rem}
-  .date-strip{display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap}
-  .date-btn{display:flex;flex-direction:column;align-items:center;gap:.15rem;padding:.45rem .7rem;border:1px solid var(--card-border);border-radius:.6rem;background:transparent;color:var(--text-dim);cursor:pointer;transition:all .2s;min-width:52px}
-  .date-btn:hover{border-color:var(--g6);color:var(--g6);background:rgba(46,204,113,.06)}
-  .date-btn.active-date{background:var(--g6);border-color:var(--g6);color:var(--g0);box-shadow:0 0 16px rgba(46,204,113,.5)}
-  .date-btn.active-date.is-wknd-btn{background:var(--wknd);border-color:var(--wknd);box-shadow:0 0 16px var(--wknd-glow);color:#fff}
-  .date-btn.is-wknd-btn:not(.active-date){border-color:rgba(255,107,107,.4);color:var(--wknd)}
-  .date-btn.is-wknd-btn:not(.active-date):hover{background:rgba(255,107,107,.08)}
-  .date-day{font-family:'Space Mono',monospace;font-size:.56rem;letter-spacing:.08em;text-transform:uppercase}
-  .date-num{font-size:1.1rem;font-weight:700;line-height:1}
-  .date-month{font-family:'Space Mono',monospace;font-size:.52rem;opacity:.75}
-  .date-count{font-size:.5rem;font-family:'Space Mono',monospace;background:rgba(46,204,113,.15);border-radius:.25rem;padding:.05rem .25rem;margin-top:.05rem;color:var(--g6)}
-  .active-date .date-count{background:rgba(0,0,0,.2);color:var(--g0)}
-  .active-date.is-wknd-btn .date-count{color:#fff}
-  .date-clear{font-size:.7rem;font-family:'Space Mono',monospace;padding:.4rem .8rem;border:1px solid rgba(255,255,255,.12);border-radius:.4rem;background:transparent;color:var(--text-dim);cursor:pointer;transition:all .2s;white-space:nowrap;align-self:center}
-  .date-clear:hover{border-color:var(--accent);color:var(--accent)}
-  .active-date-banner{display:none;text-align:center;font-family:'Space Mono',monospace;font-size:.68rem;padding:.45rem;background:rgba(46,204,113,.08);border-bottom:1px solid rgba(46,204,113,.15);color:var(--g7);letter-spacing:.08em}
-  .active-date-banner.wknd-banner{background:rgba(255,107,107,.08);border-color:rgba(255,107,107,.2);color:#ff9a9a}
-  .active-date-banner.show{display:block}
   nav{position:sticky;top:0;z-index:20;display:flex;justify-content:center;gap:.5rem;padding:.85rem 1rem;background:rgba(9,21,16,.96);backdrop-filter:blur(14px);border-bottom:1px solid var(--card-border);flex-wrap:wrap}
-  .tab-btn{font-family:'Rubik',sans-serif;font-size:.78rem;font-weight:500;padding:.45rem 1rem;border:1px solid var(--card-border);border-radius:2rem;background:transparent;color:var(--text-dim);cursor:pointer;transition:all .22s;white-space:nowrap}
+  .tab-btn{font-family:'Rubik',sans-serif;font-size:.82rem;font-weight:500;padding:.45rem 1.1rem;border:1px solid var(--card-border);border-radius:2rem;background:transparent;color:var(--text-dim);cursor:pointer;transition:all .22s;white-space:nowrap}
   .tab-btn:hover{border-color:var(--g6);color:var(--g6);background:rgba(46,204,113,.05)}
-  .tab-btn .dist{font-size:.62rem;opacity:.55;font-weight:400}
   .tab-btn.active{background:var(--g6);border-color:var(--g6);color:var(--g0);font-weight:700;box-shadow:0 0 18px rgba(46,204,113,.45)}
-  .tab-btn.active .dist{opacity:.75}
   main{position:relative;z-index:5;max-width:1380px;margin:0 auto;padding:1.8rem 1.4rem 5rem}
   .filter-bar{display:flex;gap:.5rem;margin-bottom:1.6rem;flex-wrap:wrap;align-items:center}
   .filter-label{font-size:.7rem;color:var(--text-dim)}
@@ -61,7 +39,6 @@
   @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
   .region-header{display:flex;align-items:center;gap:1rem;margin-bottom:1.6rem;padding-bottom:.9rem;border-bottom:1px solid var(--card-border)}
   .region-title{font-size:1.65rem;font-weight:700;color:var(--g6)}
-  .region-drive{font-size:.82rem;font-weight:400;color:#7bbf94;opacity:.8;margin-right:.5rem;flex-shrink:0}
   .region-count{margin-right:auto;font-family:'Space Mono',monospace;font-size:.67rem;color:var(--text-dim);background:rgba(46,204,113,.07);border:1px solid var(--card-border);padding:.2rem .65rem;border-radius:1rem}
   .events-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(295px,1fr));gap:1.3rem;margin-bottom:2rem}
   .all-section-header{font-size:1.05rem;font-weight:700;color:var(--g6);margin:2rem 0 .9rem;padding-right:.6rem;border-right:3px solid var(--g6);display:flex;align-items:center;gap:.4rem}
@@ -74,22 +51,7 @@
   .event-card.is-wknd:hover{box-shadow:0 18px 50px rgba(255,107,107,.22);border-color:rgba(255,107,107,.7)}
   .wknd-badge{position:absolute;top:.65rem;left:.65rem;font-family:'Space Mono',monospace;font-size:.56rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:var(--wknd);color:#fff;padding:.2rem .5rem;border-radius:.25rem;display:flex;align-items:center;gap:.25rem;box-shadow:0 2px 10px rgba(255,107,107,.55);z-index:2}
   .card-cat{padding:.5rem 1rem;font-size:.62rem;font-family:'Space Mono',monospace;font-weight:700;letter-spacing:.13em;text-transform:uppercase;display:flex;align-items:center;gap:.4rem}
-  .cat-market{background:rgba(255,215,0,.11);color:var(--gold)}
-  .cat-festival{background:rgba(255,107,107,.11);color:#ff9a9a}
-  .cat-concert{background:rgba(130,80,255,.11);color:#b39dff}
-  .cat-sport{background:rgba(255,140,66,.11);color:var(--warm)}
-  .cat-baseball{background:rgba(255,100,50,.13);color:#ff9966}
-  .cat-mlb{background:rgba(20,100,200,.15);color:#66aaff}
-  .cat-golf{background:rgba(100,200,100,.13);color:#90ee90}
-  .cat-horror{background:rgba(120,0,180,.15);color:#cc88ff}
-  .cat-theater{background:rgba(255,150,50,.11);color:#ffaa66}
-  .cat-food{background:rgba(255,180,0,.11);color:#ffcc55}
-  .cat-art{background:rgba(82,217,135,.13);color:var(--g7)}
-  .cat-race{background:rgba(255,60,0,.13);color:#ff8060}
-  .cat-rodeo{background:rgba(180,120,40,.13);color:#d4a04a}
-  .cat-comedy{background:rgba(0,220,255,.09);color:#66e0ff}
-  .cat-film{background:rgba(180,60,255,.09);color:#da9aff}
-  .cat-culture{background:rgba(46,204,113,.12);color:var(--accent)}
+  .cat-market{background:rgba(255,215,0,.11);color:var(--gold)}.cat-festival{background:rgba(255,107,107,.11);color:#ff9a9a}.cat-concert{background:rgba(130,80,255,.11);color:#b39dff}.cat-sport{background:rgba(255,140,66,.11);color:var(--warm)}.cat-art{background:rgba(82,217,135,.13);color:var(--g7)}.cat-comedy{background:rgba(0,220,255,.09);color:#66e0ff}.cat-film{background:rgba(180,60,255,.09);color:#da9aff}.cat-food{background:rgba(255,180,0,.11);color:#ffcc55}.cat-culture{background:rgba(46,204,113,.12);color:var(--accent)}.cat-race{background:rgba(255,60,0,.13);color:#ff8060}
   .card-body{padding:.9rem 1rem .7rem}
   .card-title{font-size:1rem;font-weight:700;color:var(--text);margin-bottom:.45rem;line-height:1.3}
   .card-title.has-badge{padding-left:2rem}
@@ -106,500 +68,179 @@
   .rating-wrap{display:flex;align-items:center;gap:.45rem}
   .rating-dots{display:flex;gap:3px}
   .dot{width:7px;height:7px;border-radius:50%;background:var(--g2)}
-  .dot.on{background:var(--g6);box-shadow:0 0 5px rgba(46,204,113,.6)}
-  .dot.top{background:var(--accent);box-shadow:0 0 7px rgba(0,255,136,.7)}
-  .dot.wd{background:var(--wknd);box-shadow:0 0 6px var(--wknd-glow)}
+  .dot.on{background:var(--g6);box-shadow:0 0 5px rgba(46,204,113,.6)}.dot.top{background:var(--accent);box-shadow:0 0 7px rgba(0,255,136,.7)}.dot.wd{background:var(--wknd);box-shadow:0 0 6px var(--wknd-glow)}
   .rating-score{font-family:'Space Mono',monospace;font-size:.88rem;font-weight:700;color:var(--accent)}
   .is-wknd .rating-score{color:#ff9a9a}
   .rating-lbl{font-size:.6rem;color:var(--text-dim)}
   .price-badge{font-size:.72rem;font-weight:600;padding:.22rem .6rem;border-radius:1rem;background:rgba(46,204,113,.08);border:1px solid rgba(46,204,113,.2);color:var(--g7);white-space:nowrap}
-  .price-badge.free{background:rgba(255,215,0,.09);border-color:rgba(255,215,0,.28);color:var(--gold)}
-  .price-badge.paid{background:rgba(130,80,255,.09);border-color:rgba(130,80,255,.28);color:#b39dff}
-  /* BEEN THERE BUTTON */
-  .event-card.been-there{border-color:rgba(255,215,0,.45) !important;background:linear-gradient(160deg,rgba(255,215,0,.05) 0%,var(--card-bg) 35%) !important}
-  .event-card.been-there::before{background:linear-gradient(90deg,var(--gold),#ffe88a,var(--gold)) !important;opacity:1 !important}
-  .been-btn{display:inline-flex;align-items:center;gap:.3rem;font-family:'Rubik',sans-serif;font-size:.72rem;font-weight:600;padding:.25rem .65rem;border-radius:1.5rem;border:1px solid var(--card-border);background:transparent;color:var(--text-dim);cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0}
-  .been-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(255,215,0,.08)}
-  .been-btn.checked{background:rgba(255,215,0,.15);border-color:var(--gold);color:var(--gold)}
-  .event-card.hidden{display:none !important}
+  .price-badge.free{background:rgba(255,215,0,.09);border-color:rgba(255,215,0,.28);color:var(--gold)}.price-badge.paid{background:rgba(130,80,255,.09);border-color:rgba(130,80,255,.28);color:#b39dff}
+  .event-card.hidden{display:none}
   .last-updated{text-align:center;font-family:'Space Mono',monospace;font-size:.6rem;color:var(--text-dim);padding:.75rem;opacity:.6;border-top:1px solid var(--card-border)}
   ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--g0)}::-webkit-scrollbar-thumb{background:var(--g4);border-radius:3px}
 </style>
 </head>
 <body>
 <header>
-  <div class="header-badge">🗺 DFW METRO · DALLAS · TEXAS · ספטמבר–אוקטובר 2026</div>
-  <h1>פעילויות השבועיים הקרובים</h1>
-  <p class="subtitle">ספורט · מרוצים · הופעות · פסטיבלים · שווקים · תיאטרון · ירידים</p>
+  <div class="header-badge">🗺 DFW METRO · DALLAS · TEXAS · שבוע 31 אוגוסט–6 ספטמבר</div>
+  <h1>פעילויות השבוע</h1>
+  <p class="subtitle">פסטיבלים · שווקים · הופעות · מרוצים · ירידים</p>
   <div class="week-tags">
-    <span class="wtag wknd">🎉 Labor Day: שני 7 בספטמבר</span>
-    <span class="wtag reg">📅 שבוע: 8–13 בספטמבר</span>
-    <span class="wtag wknd">🔥 סופ"ש: 17–20 בספטמבר (GrapeFest + Balloon Fest)</span>
-    <span class="wtag reg">📅 שבוע: 21–24 בספטמבר</span>
-    <span class="wtag wknd">🎡 25/9: נפתח State Fair of Texas</span>
+    <span class="wtag reg">📅 שבוע: 31 אוגוסט–6 ספטמבר 2026</span>
+    <span class="wtag wknd">🔥 סופ"ש: שבת 5 ספטמבר + ראשון 6 ספטמבר</span>
   </div>
 </header>
-
-<div class="date-strip-wrap">
-  <div class="date-strip-label">📅 סנן לפי יום ספציפי</div>
-  <div class="date-strip" id="dateStrip"></div>
-</div>
-<div class="active-date-banner" id="activeDateBanner"></div>
-
 <nav>
   <button class="tab-btn active" onclick="showRegion('all',this)">🌆 הכל</button>
-  <button class="tab-btn" onclick="showRegion('plano',this)">פלאנו</button>
-  <button class="tab-btn" onclick="showRegion('richardson',this)">ריצ׳רדסון</button>
-  <button class="tab-btn" onclick="showRegion('allen',this)">אלן</button>
-  <button class="tab-btn" onclick="showRegion('addison',this)">אדיסון</button>
-  <button class="tab-btn" onclick="showRegion('frisco',this)">פריסקו</button>
-  <button class="tab-btn" onclick="showRegion('mckinney',this)">מקיני</button>
-  <button class="tab-btn" onclick="showRegion('thecolony',this)">The Colony</button>
-  <button class="tab-btn" onclick="showRegion('lewisville',this)">לואיסוויל</button>
-  <button class="tab-btn" onclick="showRegion('flowermound',this)">פלאואר מאונד</button>
-  <button class="tab-btn" onclick="showRegion('dallas',this)">דאלאס</button>
-  <button class="tab-btn" onclick="showRegion('irving',this)">ארווינג</button>
-  <button class="tab-btn" onclick="showRegion('grapevine',this)">גרייפוויין</button>
+  <button class="tab-btn" onclick="showRegion('plano',this)">📍 פלאנו</button>
+  <button class="tab-btn" onclick="showRegion('frisco',this)">📍 פריסקו</button>
+  <button class="tab-btn" onclick="showRegion('mckinney',this)">📍 מקיני</button>
+  <button class="tab-btn" onclick="showRegion('irving',this)">📍 ארווינג</button>
+  <button class="tab-btn" onclick="showRegion('dallas',this)">📍 דאלאס</button>
 </nav>
-
 <main>
   <div class="filter-bar">
     <span class="filter-label">סנן:</span>
     <button class="filter-btn" onclick="setFilter('wknd',this)">🔥 סופ"ש</button>
     <button class="filter-btn" onclick="setFilter(null,this)">✅ הכל</button>
-    <button class="filter-btn" onclick="setFilter('mlb',this)">⚾ MLB</button>
-    <button class="filter-btn" onclick="setFilter('baseball',this)">⚾ בייסבול</button>
-    <button class="filter-btn" onclick="setFilter('sport',this)">⚽ ספורט</button>
-    <button class="filter-btn" onclick="setFilter('rodeo',this)">🤠 רודיאו</button>
-    <button class="filter-btn" onclick="setFilter('race',this)">🏁 מרוצים</button>
-    <button class="filter-btn" onclick="setFilter('golf',this)">⛳ גולף</button>
+    <button class="filter-btn" onclick="setFilter('market',this)">🛒 שוק</button>
     <button class="filter-btn" onclick="setFilter('concert',this)">🎸 הופעות</button>
     <button class="filter-btn" onclick="setFilter('festival',this)">🎡 פסטיבלים</button>
-    <button class="filter-btn" onclick="setFilter('theater',this)">🎭 תיאטרון</button>
-    <button class="filter-btn" onclick="setFilter('market',this)">🛒 שוק</button>
-    <button class="filter-btn" onclick="setFilter('food',this)">🍴 אוכל</button>
-    <button class="filter-btn" onclick="setFilter('horror',this)">👻 הורור</button>
+    <button class="filter-btn" onclick="setFilter('race',this)">🏁 מרוצים</button>
+    <button class="filter-btn" onclick="setFilter('sport',this)">⚽ ספורט</button>
     <button class="filter-btn" onclick="setFilter('free',this)">🆓 חינם</button>
   </div>
   <div class="stats-bar">
-    <div class="stat-chip"><span class="stat-num" id="sTotal">0</span><span class="stat-lbl">מוצגים</span></div>
+    <div class="stat-chip"><span class="stat-num" id="sTotal">0</span><span class="stat-lbl">אירועים</span></div>
     <div class="stat-chip"><span class="stat-num" id="sWknd">0</span><span class="stat-lbl">🔥 סופ"ש</span></div>
     <div class="stat-chip"><span class="stat-num" id="sFree">0</span><span class="stat-lbl">חינמיים</span></div>
     <div class="stat-chip"><span class="stat-num" id="sTop">0</span><span class="stat-lbl">דירוג 9+</span></div>
-    <button onclick="window.open('attractions.html','_blank')" style="margin-right:auto;font-family:'Rubik',sans-serif;font-size:.8rem;font-weight:600;padding:.55rem 1.1rem;border:1px solid rgba(255,215,0,.35);border-radius:.5rem;background:rgba(255,215,0,.08);color:var(--gold);cursor:pointer;transition:all .2s;white-space:nowrap" onmouseover="this.style.background='rgba(255,215,0,.18)'" onmouseout="this.style.background='rgba(255,215,0,.08)'">🗺 טיולים קבועים</button>
   </div>
-
   <div id="view-all" class="region-section active"></div>
-  <style>.region-dist{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--text-dim);background:rgba(46,204,113,.07);border:1px solid var(--card-border);padding:.2rem .6rem;border-radius:1rem;white-space:nowrap;margin-right:auto;margin-left:.5rem}</style>
-  <div id="view-plano"   class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">פלאנו</h2><span class="region-drive">🏠 כאן</span><span class="region-count" id="cnt-plano"></span></div><div class="events-grid" id="grid-plano"></div></div>
-  <div id="view-richardson" class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">ריצ׳רדסון</h2><span class="region-drive">~10 דק׳ · 5 מייל</span><span class="region-count" id="cnt-richardson"></span></div><div class="events-grid" id="grid-richardson"></div></div>
-  <div id="view-allen"  class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">אלן</h2><span class="region-drive">~12 דק׳ · 8 מייל</span><span class="region-count" id="cnt-allen"></span></div><div class="events-grid" id="grid-allen"></div></div>
-  <div id="view-addison" class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">אדיסון</h2><span class="region-drive">~15 דק׳ · 9 מייל</span><span class="region-count" id="cnt-addison"></span></div><div class="events-grid" id="grid-addison"></div></div>
-  <div id="view-frisco"  class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">פריסקו</h2><span class="region-drive">~18 דק׳ · 12 מייל</span><span class="region-count" id="cnt-frisco"></span></div><div class="events-grid" id="grid-frisco"></div></div>
-  <div id="view-mckinney" class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">מקיני</h2><span class="region-drive">~20 דק׳ · 14 מייל</span><span class="region-count" id="cnt-mckinney"></span></div><div class="events-grid" id="grid-mckinney"></div></div>
-  <div id="view-thecolony" class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">The Colony</h2><span class="region-drive">~20 דק׳ · 15 מייל</span><span class="region-count" id="cnt-thecolony"></span></div><div class="events-grid" id="grid-thecolony"></div></div>
-  <div id="view-lewisville" class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">לואיסוויל</h2><span class="region-drive">~25 דק׳ · 18 מייל</span><span class="region-count" id="cnt-lewisville"></span></div><div class="events-grid" id="grid-lewisville"></div></div>
-  <div id="view-flowermound" class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">פלאואר מאונד</h2><span class="region-drive">~28 דק׳ · 20 מייל</span><span class="region-count" id="cnt-flowermound"></span></div><div class="events-grid" id="grid-flowermound"></div></div>
-  <div id="view-dallas"  class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">דאלאס / פורט וורת׳</h2><span class="region-drive">~30 דק׳ · 20 מייל</span><span class="region-count" id="cnt-dallas"></span></div><div class="events-grid" id="grid-dallas"></div></div>
-  <div id="view-irving"  class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">ארווינג</h2><span class="region-drive">~30 דק׳ · 22 מייל</span><span class="region-count" id="cnt-irving"></span></div><div class="events-grid" id="grid-irving"></div></div>
-  <div id="view-grapevine" class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">גרייפוויין</h2><span class="region-drive">~35 דק׳ · 25 מייל</span><span class="region-count" id="cnt-grapevine"></span></div><div class="events-grid" id="grid-grapevine"></div></div>
+  <div id="view-plano" class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">פלאנו</h2><span class="region-count" id="cnt-plano"></span></div><div class="events-grid" id="grid-plano"></div></div>
+  <div id="view-frisco" class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">פריסקו</h2><span class="region-count" id="cnt-frisco"></span></div><div class="events-grid" id="grid-frisco"></div></div>
+  <div id="view-mckinney" class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">מקיני</h2><span class="region-count" id="cnt-mckinney"></span></div><div class="events-grid" id="grid-mckinney"></div></div>
+  <div id="view-irving" class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">ארווינג</h2><span class="region-count" id="cnt-irving"></span></div><div class="events-grid" id="grid-irving"></div></div>
+  <div id="view-dallas" class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">דאלאס</h2><span class="region-count" id="cnt-dallas"></span></div><div class="events-grid" id="grid-dallas"></div></div>
 </main>
-<div class="last-updated">עודכן: 05/09/2026 — 5 בספטמבר–5 באוקטובר 2026 | 44 אירועים | דגש על Labor Day (7/9) | מבוסס על חיפוש אונליין בזמן אמת</div>
-
+<div class="last-updated" id="lastUpdated">עודכן: 05/09/2026 19:41</div>
 <script>
 const events = [
-
-  // ===== PLANO =====
-  { id:1, region:'plano', cat:'festival', catLabel:'🏮 פסטיבל פנסים', weekend:true,
-    dates:['2026-09-05'],
-    title:'Water Lantern Festival 2026 — Haggard Park',
-    desc:'שיגור פנסים צפים על פני האגם עם מוזיקה חיה, אוכל וצילום מקצועי. חוויה קסומה וויזואלית לכל המשפחה.',
-    who:'כל הגילאים', whenLabel:'שבת 5 בספטמבר', hours:'ערב',
-    where:'Haggard Park, Plano', price:'$30.99–$57.99', rating:8 },
-
-  { id:2, region:'plano', cat:'festival', catLabel:'🏊 Labor Day — סגירת עונה', weekend:true,
-    dates:['2026-09-07'],
-    title:'Texas Pool Closing Weekend — Labor Day',
-    desc:'מסיבת יום העבודה בבריכה: משחקי בריכה קלאסיים, תחרות קפיצות "cannonball" עם פרסים, גרילים ופיקניק. סגירת הבריכה לעונה בכיף.',
-    who:'כל המשפחה', whenLabel:'שני 7 בספטמבר (Labor Day)', hours:'12:00–18:00',
-    where:'The Texas Pool, Plano', price:'$10', rating:9 },
-
-  { id:3, region:'plano', cat:'market', catLabel:'🛒 שוק שבתי', weekend:true,
-    dates:['2026-09-05','2026-09-12','2026-09-19','2026-09-26'],
-    title:'Plano Farmers Market — Willow Bend',
-    desc:'שוק שבועי: דבש, תוצרת טרייה, מאפים, מלאכות יד. נגיש וידידותי לכלבים.',
-    who:'כל המשפחה', whenLabel:'שבתות כל החודש', hours:'10:00–14:00',
-    where:'The Shops at Willow Bend, Plano', price:'חינם', rating:8 },
-
-  { id:4, region:'plano', cat:'market', catLabel:'🤠 שוק דיסקו-קאווגירל', weekend:true,
-    dates:['2026-09-06'],
-    title:'Downtown Plano Disco Cowgirl Market',
-    desc:'שוק וינטג\'-מערבי עם דוכני מוכרים מקומיים ו-"sip-and-shop" בהשראת דיסקו-קאווגירל.',
-    who:'כל הגילאים', whenLabel:'ראשון 6 בספטמבר', hours:'אחה"צ',
-    where:'Downtown Plano Arts District', price:'חינם', rating:7 },
-
-  { id:5, region:'plano', cat:'concert', catLabel:'🎸 מסיבת שנות ה-90', weekend:false,
-    dates:['2026-09-09'],
-    title:'Labor Day Throwback Party With Live 90 — Legacy Hall',
-    desc:'חגיגת מוזיקת שנות ה-90 — גראנג\', פופ והיפ-הופ. ערב נוסטלגי גדול ב-Legacy Hall.',
-    who:'מבוגרים', whenLabel:'רביעי 9 בספטמבר', hours:'ערב',
-    where:'Legacy Hall, Plano', price:'עד $109', rating:7 },
-
-  { id:6, region:'plano', cat:'festival', catLabel:'🎈 פסטיבל כדורים פורחים', weekend:true,
-    dates:['2026-09-17','2026-09-18','2026-09-19','2026-09-20'],
-    title:'2026 Plano Balloon Festival',
-    desc:'פסטיבל כדורים פורחים ענקי עם שיגורים, הופעות מקומיות ואווירה פסטיבלית. אחד האירועים הגדולים באזור.',
-    who:'כל המשפחה', whenLabel:'חמישי–ראשון 17–20 בספטמבר', hours:'ראה לוח',
-    where:'Oak Point Event Field, Plano', price:'$5–$10', rating:9 },
-
-  { id:7, region:'plano', cat:'culture', catLabel:'🚂 תערוכת רכבות', weekend:true,
-    dates:['2026-09-26','2026-09-27'],
-    title:'Fall Plano Train Show 2026',
-    desc:'תערוכת רכבות מודל אינטראקטיבית ומשפחתית עם מסילות מרהיבות.',
-    who:'כל הגילאים', whenLabel:'שבת–ראשון 26–27 בספטמבר', hours:'ראה לוח',
-    where:'Plano Event Center', price:'חינם', rating:7 },
-
-  // ===== RICHARDSON =====
-  { id:8, region:'richardson', cat:'market', catLabel:'🌙 שוק לילה', weekend:true,
-    dates:['2026-09-11'],
-    title:'CityLine Night Market — ספטמבר',
-    desc:'שוק לילה חודשי חינמי עם 45+ דוכני יד-שנייה ואומנות, ומוזיקה חיה.',
-    who:'כל הגילאים', whenLabel:'שישי 11 בספטמבר', hours:'17:00–21:00',
-    where:'CityLine Plaza, Richardson', price:'חינם', rating:8 },
-
-  { id:9, region:'richardson', cat:'concert', catLabel:'🎤 ABBA Tribute', weekend:true,
-    dates:['2026-09-18'],
-    title:'Waterloo — ABBA Tribute Live',
-    desc:'הופעת מחווה מקצועית ל-ABBA באולם הבמה המוביל של ריצ\'רדסון.',
-    who:'כל הגילאים', whenLabel:'שישי 18 בספטמבר', hours:'19:30',
-    where:'Eisemann Center, Richardson', price:'מ-$35', rating:8 },
-
-  { id:10, region:'richardson', cat:'concert', catLabel:'🎺 תזמורת קהילתית', weekend:true,
-    dates:['2026-09-19'],
-    title:'Richardson Community Band — Fall Concert',
-    desc:'קונצרט חינמי של התזמורת הקהילתית — יצירות קלאסיות, פטריוטיות ופופולריות.',
-    who:'כל הגילאים', whenLabel:'שבת 19 בספטמבר', hours:'19:30',
-    where:'Eisemann Center, Richardson', price:'חינם', rating:7 },
-
-  { id:11, region:'richardson', cat:'concert', catLabel:'🎻 פתיחת עונה', weekend:true,
-    dates:['2026-09-26'],
-    title:'Richardson Symphony Orchestra — Fall Season Opener',
-    desc:'תזמורת מובילה באזור DFW פותחת את העונה. ערב מוזיקלי איכותי ב-Eisemann.',
-    who:'כל הגילאים', whenLabel:'שבת 26 בספטמבר', hours:'19:30',
-    where:'Eisemann Center, Richardson', price:'מ-$25', rating:8 },
-
-  { id:12, region:'richardson', cat:'festival', catLabel:'⛪ פסטיבל קהילתי', weekend:true,
-    dates:['2026-09-26'],
-    title:'St. Paulpalooza',
-    desc:'פסטיבל קהילתי שנתי עם אוכל, בידור ומשחקים לכל המשפחה.',
-    who:'כל המשפחה', whenLabel:'שבת 26 בספטמבר', hours:'16:00–21:00',
-    where:'St. Paul the Apostle Catholic Church, Richardson', price:'חינם', rating:7 },
-
-  // ===== ALLEN =====
-  { id:13, region:'allen', cat:'market', catLabel:'🛒 שוק בוטיק', weekend:true,
-    dates:['2026-09-05','2026-09-12','2026-09-19','2026-09-26'],
-    title:'Cottage Farmers Market — Allen Heritage Village',
-    desc:'שוק חוצות בוטיקי עם מוצרי אמנים ותוצרת מקומית באווירה כפרית.',
-    who:'כל הגילאים', whenLabel:'שבתות כל החודש', hours:'בוקר–אחה"צ',
-    where:'Allen Heritage Village', price:'חינם', rating:7 },
-
-  { id:14, region:'allen', cat:'concert', catLabel:'🎵 קונצרט חינם', weekend:true,
-    dates:['2026-09-05','2026-09-12','2026-09-19','2026-09-26'],
-    title:'Concerts by the Creek — Watters Creek',
-    desc:'קונצרטים חינמיים כל שבת בערב על הדשא, כולל מוזיקה חיה של Love Handle בפתיחת החודש.',
-    who:'כל הגילאים', whenLabel:'שבתות כל החודש', hours:'19:00–21:00',
-    where:'Watters Creek Village Green, Allen', price:'חינם!', rating:8 },
-
-  { id:15, region:'allen', cat:'market', catLabel:'🧸 יריד צעצועים', weekend:true,
-    dates:['2026-09-06'],
-    title:'North Dallas Toy Show',
-    desc:'130+ שולחנות עם צעצועי וינטג\' ומודרניים, קומיקס ואספנות. גן עדן לאספנים ולילדים.',
-    who:'כל הגילאים', whenLabel:'ראשון 6 בספטמבר', hours:'בוקר–אחה"צ',
-    where:'Courtyard by Marriott Dallas Allen', price:'ראה כרטיסים באתר', rating:7 },
-
-  { id:16, region:'allen', cat:'market', catLabel:'🍺 שוק דיסקו-קאווגירל', weekend:true,
-    dates:['2026-09-06'],
-    title:'Disco Cowgirl Market — Armor Brewing',
-    desc:'שוק ספקים בהשראת דיסקו-מערבי במפעל הבירה המקומי — בוטיקים, מוצרי יד ומשקאות אומן.',
-    who:'כל הגילאים (18+ לשתייה)', whenLabel:'ראשון 6 בספטמבר', hours:'אחה"צ',
-    where:'Armor Brewing Co., Allen', price:'חינם (שתייה בתשלום)', rating:7 },
-
-  // ===== ADDISON =====
-  { id:17, region:'addison', cat:'festival', catLabel:'🍺 Oktoberfest', weekend:true,
-    dates:['2026-09-18','2026-09-19','2026-09-20','2026-09-21'],
-    title:'Addison Oktoberfest 2026',
-    desc:'אחת מחגיגות האוקטוברפסט האותנטיות ביותר מחוץ למינכן — בירה גרמנית, אוכל, להקות אומפה חיות ומרוץ דצשונדים.',
-    who:'כל הגילאים', whenLabel:'שישי–שני 18–21 בספטמבר', hours:'ראה לוח',
-    where:'Addison Circle Park, Addison', price:'חינם כניסה', rating:9 },
-
-  { id:18, region:'addison', cat:'food', catLabel:'🍴 שבוע המסעדות (מסתיים)', weekend:false,
-    dates:['2026-09-05','2026-09-06','2026-09-07'],
-    title:'DFW Restaurant Week — סוף עונה באדיסון',
-    desc:'הסופ"ש האחרון של שבוע המסעדות של DFW (מסתיים 7/9) — הזדמנות אחרונה לתפריטים מוזלים ב-200+ מסעדות אדיסון.',
-    who:'כל הגילאים', whenLabel:'עד 7 בספטמבר (Labor Day)', hours:'ראה תפריטים באתר',
-    where:'מסעדות ברחבי Addison Circle', price:'$29 צהריים / $49–59 ערב', rating:8 },
-
-  // ===== FRISCO =====
-  { id:19, region:'frisco', cat:'market', catLabel:'🌾 שוק טרי', weekend:true,
-    dates:['2026-09-05','2026-09-06','2026-09-12','2026-09-13','2026-09-19','2026-09-20','2026-09-26','2026-09-27'],
-    title:'Frisco Fresh Market — Downtown Frisco',
-    desc:'90+ דוכנים, תוצרת טרייה, שפים ומוזיקה חיה. שבת+ראשון כל שבוע.',
-    who:'כל המשפחה', whenLabel:'שבת+ראשון כל שבוע', hours:'שבת 8:00–16:00 | ראשון 10:00–16:00',
-    where:'9215 John W Elliott Dr, Frisco', price:'חינם', rating:9 },
-
-  { id:20, region:'frisco', cat:'baseball', catLabel:'⚾ פלייאוף AA!', weekend:true,
-    dates:['2026-09-17','2026-09-18','2026-09-20'],
-    title:'Frisco RoughRiders — פלייאוף בית (Riders Field)',
-    desc:'הרוחריידרס זכו באליפות המחצית הראשונה וממשיכים לפלייאוף! משחקי בית בסדרת המחצית (17-18/9) ומשחק 1 של הגמר (20/9) אם יעפילו. אווירה חשמלית.',
-    who:'כל הגילאים', whenLabel:'חמישי-שישי 17–18 + ראשון 20 בספטמבר', hours:'ראה לוח Riders Field',
-    where:'Riders Field, 7300 RoughRiders Trail, Frisco', price:'ראה כרטיסים באתר', rating:9 },
-
-  { id:21, region:'frisco', cat:'market', catLabel:'🎪 שוק פשפשים', weekend:true,
-    dates:['2026-09-19'],
-    title:'Flea Style Market At The Star',
-    desc:'שוק פשפשים חינמי ברחבת The Star, מרכז האימונים של Dallas Cowboys. דוכני יד-שנייה ואומנות.',
-    who:'כל הגילאים', whenLabel:'שבת 19 בספטמבר', hours:'10:00–16:00',
-    where:'Tostitos Championship Plaza, The Star, Frisco', price:'חינם', rating:7 },
-
-  { id:22, region:'frisco', cat:'culture', catLabel:'🐶 כלבים בבריכה', weekend:true,
-    dates:['2026-09-12'],
-    title:'Paws in the Pool — Frisco Water Park',
-    desc:'לפני סגירת הבריכה לעונה — יום מיוחד שבו כלבים יכולים ליהנות מהבריכה. נדרש כרטיס מראש.',
-    who:'בעלי כלבים', whenLabel:'שבת 12 בספטמבר', hours:'8:30 / 10:30 / 12:30',
-    where:'Frisco Water Park', price:'ראה כרטיסים באתר', rating:7 },
-
-  // ===== MCKINNEY =====
-  { id:23, region:'mckinney', cat:'market', catLabel:'🛒 שוק שבתי', weekend:true,
-    dates:['2026-09-05','2026-09-12','2026-09-19','2026-09-26'],
-    title:'McKinney Farmers Market — Chestnut Square',
-    desc:'המוערך ביותר בטקסס: בשר, ירקות, מאפים, אמנות ומוזיקה חיה.',
-    who:'כל הגילאים', whenLabel:'שבתות כל החודש', hours:'8:00–12:00',
-    where:'315 S Chestnut St, McKinney', price:'חינם', rating:9 },
-
-  { id:24, region:'mckinney', cat:'culture', catLabel:'🍺 כיתת מבשלים', weekend:true,
-    dates:['2026-09-05'],
-    title:'TUPPS Brewery Brewmaster Education Class',
-    desc:'כיתת חינוך חודשית על תהליך הבישול עם טעימות ישירות מהמבשל.',
-    who:'21+', whenLabel:'שבת 5 בספטמבר', hours:'11:00–12:00',
-    where:'TUPPS Brewery, McKinney', price:'ראה כרטיסים באתר', rating:7 },
-
-  { id:25, region:'mckinney', cat:'market', catLabel:'🤠 ימי מסחר', weekend:true,
-    dates:['2026-09-18','2026-09-19','2026-09-20'],
-    title:'McKinney Monday Trade Days',
-    desc:'יריד מסחר וינטג\' ואספנות מסורתי בטקסס — דוכנים רבים בכל רחבי האתר.',
-    who:'כל הגילאים', whenLabel:'שישי–ראשון 18–20 בספטמבר', hours:'כל היום',
-    where:'McKinney Trade Days grounds', price:'חינם כניסה', rating:8 },
-
-  { id:26, region:'mckinney', cat:'festival', catLabel:'🍺 Oktoberfest שנה 19', weekend:true,
-    dates:['2026-09-25','2026-09-26','2026-09-27'],
-    title:'McKinney Oktoberfest — 19th Annual',
-    desc:'חגיגת אוקטוברפסט שנתית בדאונטאון ההיסטורי של מקיני — בירה, אוכל גרמני ומוזיקה חיה.',
-    who:'כל הגילאים', whenLabel:'שישי–ראשון 25–27 בספטמבר', hours:'ראה לוח',
-    where:'Historic Downtown McKinney', price:'חינם', rating:8 },
-
-  // ===== THE COLONY (Grandscape) =====
-  { id:27, region:'thecolony', cat:'market', catLabel:'🍲 שוק בינלאומי', weekend:true,
-    dates:['2026-09-06'],
-    title:'The Melting Pot Market — Grandscape',
-    desc:'80+ ספקים, DJ חי ותרבויות שונות ב-The Lawn at Grandscape.',
-    who:'כל הגילאים', whenLabel:'ראשון 6 בספטמבר', hours:'14:00–20:00',
-    where:'The Lawn at Grandscape, The Colony', price:'חינם', rating:8 },
-
-  { id:28, region:'thecolony', cat:'concert', catLabel:'🎸 Country Close Up', weekend:true,
-    dates:['2026-09-23'],
-    title:'Country Close Up — Grandscape',
-    desc:'ערב קאנטרי חי אינטימי בהופעה בחוץ ב-Grandscape.',
-    who:'כל הגילאים', whenLabel:'רביעי 23 בספטמבר', hours:'19:00–21:00',
-    where:'Grandscape, The Colony', price:'חינם', rating:7 },
-
-  { id:29, region:'thecolony', cat:'market', catLabel:'🌸 שוק נשות עסקים', weekend:true,
-    dates:['2026-09-27'],
-    title:'The Bloom Bazaar — שוק נשי כולו',
-    desc:'שוק ייחודי שכל הדוכנים בו בבעלות נשים — אופנה, אמנות ומוצרי בוטיק.',
-    who:'כל הגילאים', whenLabel:'ראשון 27 בספטמבר', hours:'14:00–20:00',
-    where:'Grandscape, The Colony', price:'חינם', rating:7 },
-
-  // ===== LEWISVILLE =====
-  { id:30, region:'lewisville', cat:'festival', catLabel:'🤠 Western Days', weekend:true,
-    dates:['2026-09-25'],
-    title:'Western Days Festival 2026',
-    desc:'פסטיבל רחוב בהשראה מערבית ב-Old Town Lewisville ההיסטורי — בידור, אוכל ומוזיקה. כניסה חינם.',
-    who:'כל המשפחה', whenLabel:'שישי 25 בספטמבר', hours:'16:00–23:30',
-    where:'Old Town Lewisville', price:'חינם', rating:8 },
-
-  { id:31, region:'lewisville', cat:'sport', catLabel:'🏃 מרוץ צדקה', weekend:true,
-    dates:['2026-09-26'],
-    title:'Hopeful Hearts 5K/1M Stampede',
-    desc:'מרוץ צדקה למען משפחות נזקקות באזור. אפשרות ל-5 ק"מ או 1 מייל.',
-    who:'כל הגילאים', whenLabel:'שבת 26 בספטמבר', hours:'7:00–9:30',
-    where:'Christian Community Action, Lewisville', price:'ראה הרשמה באתר', rating:7 },
-
-  // ===== FLOWER MOUND =====
-  { id:32, region:'flowermound', cat:'film', catLabel:'🎬 סרטים בפארק', weekend:true,
-    dates:['2026-09-11','2026-09-18','2026-09-25'],
-    title:'Movies in the Park — Heritage Park',
-    desc:'סדרת קולנוע בחוץ חינמית עם משאיות אוכל. שלוש הקרנות נותרות בסדרה החודש.',
-    who:'כל המשפחה', whenLabel:'שישי בערב — 11, 18, 25 בספטמבר', hours:'19:30',
-    where:'Heritage Park, Flower Mound', price:'חינם', rating:7 },
-
-  { id:33, region:'flowermound', cat:'festival', catLabel:'🦆 מרוץ ברווזי גומי', weekend:true,
-    dates:['2026-09-19'],
-    title:'9th Annual Rhythms at the River Walk & Duck Derby',
-    desc:'30,000+ ברווזי גומי במרוץ על פני ה-River Walk, פלוס מוזיקה חיה. אחד האירועים המצחיקים והמשפחתיים ביותר בחודש.',
-    who:'כל המשפחה', whenLabel:'שבת 19 בספטמבר', hours:'10:00–14:00',
-    where:'River Walk at Central Park, Flower Mound', price:'חינם', rating:9 },
-
-  // ===== DALLAS / ארלינגטון / פורט וורת׳ =====
-  { id:34, region:'dallas', cat:'culture', catLabel:'🐂 Legacy of the Longhorn — Labor Day', weekend:true,
-    dates:['2026-09-07'],
-    title:'Legacy of the Longhorn — Fort Worth Stockyards (Labor Day)',
-    desc:'מצעד הבקר האגדי של פרות הלונגהורן ברחוב Exchange Ave ההיסטורי, במיוחד ביום העבודה. חוויה טקסנית קלאסית וחינמית לצפייה.',
-    who:'כל הגילאים', whenLabel:'שני 7 בספטמבר (Labor Day)', hours:'12:30',
-    where:'Fort Worth Stockyards, 131 E Exchange Ave', price:'חינם לצפייה', rating:8 },
-
-  { id:35, region:'dallas', cat:'rodeo', catLabel:'🤠 רודיאו שבועי', weekend:true,
-    dates:['2026-09-04','2026-09-05','2026-09-11','2026-09-12','2026-09-18','2026-09-19','2026-09-25','2026-09-26'],
-    title:'Stockyards Championship Rodeo — Fort Worth',
-    desc:'רודיאו שבועי אגדי ב-Stockyards ההיסטורי. קרבות רכיבה על פרות וסוסים, אווירה מערב-טקסנית קלאסית.',
-    who:'כל הגילאים', whenLabel:'כל שישי–שבת', hours:'19:30',
-    where:'Cowtown Coliseum, Fort Worth', price:'מ-$20', rating:9 },
-
-  { id:36, region:'dallas', cat:'concert', catLabel:'🎷 פסטיבל ג\'אז — סיום', weekend:true,
-    dates:['2026-09-05','2026-09-06'],
-    title:'Riverfront Jazz Festival — Fair Park (סוף השבוע)',
-    desc:'סופ"ש הסיום של פסטיבל הג\'אז עם כוכבים כמו Gladys Knight, Samara Joy, Rose Royce ו-Brian McKnight. ג\'אז, פופ, סול ו-R&B.',
-    who:'כל הגילאים', whenLabel:'שבת–ראשון 5–6 בספטמבר', hours:'ראה לוח',
-    where:'Fair Park (Automobile & Centennial Buildings), Dallas', price:'ראה כרטיסים באתר', rating:9 },
-
-  { id:37, region:'dallas', cat:'concert', catLabel:'🎬 DSO — הארי פוטר', weekend:true,
-    dates:['2026-09-05','2026-09-06'],
-    title:'DSO: Harry Potter and the Half-Blood Prince in Concert',
-    desc:'הסרט המלא על המסך הגדול עם הפסקול המבוצע חי על ידי התזמורת הסימפונית של דאלאס. סוף שבוע ההופעות האחרון.',
-    who:'כל הגילאים (מומלץ 8+)', whenLabel:'שבת–ראשון 5–6 בספטמבר', hours:'ראה לוח Meyerson',
-    where:'Morton H. Meyerson Symphony Center, Dallas', price:'מ-$35', rating:8 },
-
-  { id:38, region:'dallas', cat:'festival', catLabel:'🏊 Labor Day פארטי (21+)', weekend:true,
-    dates:['2026-09-07'],
-    title:'End of Summer Labor Day Pool Party — Lorenzo Hotel',
-    desc:'מסיבת בריכה 21+ עם 18 די-ג\'יי מוזיקת האוס, אווירת בריכה ואוכל ומשקאות. סגירת קיץ גדולה במלון בוטיק בדאונטאון.',
-    who:'21+', whenLabel:'שני 7 בספטמבר (Labor Day)', hours:'13:00–22:00',
-    where:'Lorenzo Hotel Pool, Downtown Dallas', price:'מ-$23', rating:7 },
-
-  { id:39, region:'dallas', cat:'festival', catLabel:'🎡 היריד הגדול של טקסס!', weekend:true,
-    dates:['2026-09-25','2026-09-26','2026-09-27','2026-09-28','2026-09-29','2026-09-30','2026-10-01','2026-10-02','2026-10-03','2026-10-04','2026-10-05'],
-    title:'State Fair of Texas 2026 — נפתח!',
-    desc:'האירוע השנתי הגדול בטקסס נפתח! 24 יום של פעילויות פארק שעשועים, אוכל מטוגן ייחודי, תערוכות, קרקסים וכל מה שאהוב על ילדים. ממשיך עד 18 באוקטובר.',
-    who:'כל המשפחה', whenLabel:'נפתח שישי 25 בספטמבר (ממשיך עד 18 אוקטובר)', hours:'ראה לוח Fair Park',
-    where:'Fair Park, Dallas', price:'ראה כרטיסים באתר', rating:10 },
-
-  { id:40, region:'dallas', cat:'art', catLabel:'🎃 דלועים בארבורטום', weekend:true,
-    dates:['2026-09-19','2026-09-20','2026-09-26','2026-09-27','2026-10-01','2026-10-02','2026-10-03','2026-10-04','2026-10-05'],
-    title:'Autumn at the Arboretum — Pumpkin Village "Harvest Hues"',
-    desc:'100,000+ דלועים ודגלים ברחבי הגן, עם עיצוב Pumpkin Village בהשראת באסקיה, רות\'קו ופולוק. נפתח 19 בספטמבר וממשיך עד 1 בנובמבר.',
-    who:'כל המשפחה', whenLabel:'נפתח שבת 19 בספטמבר', hours:'9:00–17:00',
-    where:'Dallas Arboretum, 8525 Garland Rd, Dallas', price:'כלול בכרטיס הגן', rating:9 },
-
-  // ===== IRVING =====
-  { id:41, region:'irving', cat:'market', catLabel:'🛒 שוק איכרים', weekend:true,
-    dates:['2026-09-06','2026-09-13','2026-09-20','2026-09-27'],
-    title:'Irving Farmers Market — Las Colinas',
-    desc:'שוק איכרים שבועי בלב Las Colinas: תוצרת טרייה, מאפים ומלאכות יד.',
-    who:'כל המשפחה', whenLabel:'ראשונים כל החודש', hours:'10:00–14:00',
-    where:'501 E Las Colinas Blvd, Irving', price:'חינם', rating:7 },
-
-  { id:42, region:'irving', cat:'concert', catLabel:'🎤 Myles Smith', weekend:true,
-    dates:['2026-09-06'],
-    title:'Myles Smith — Toyota Music Factory',
-    desc:'הזמר הבריטי המתפרץ מופיע עם אלבום הבכורה שלו. אווירה אינטימית באמפיתאטרון החוץ של Irving.',
-    who:'כל הגילאים', whenLabel:'ראשון 6 בספטמבר', hours:'19:30',
-    where:'The Pavilion at Toyota Music Factory, Irving', price:'ראה כרטיסים באתר', rating:7 },
-
-  // ===== GRAPEVINE =====
-  { id:43, region:'grapevine', cat:'festival', catLabel:'🍇 GrapeFest — 40 שנה!', weekend:true,
-    dates:['2026-09-17','2026-09-18','2026-09-19','2026-09-20'],
-    title:'GrapeFest 40th Annual — A Texas Wine Experience',
-    desc:'פסטיבל היין הגדול בטקסס חוגג 40 שנה! טעימות יין, אוכל, מוזיקה חיה ותחרות דריכת ענבים. אחד האירועים הכי גדולים בגרייפוויין.',
-    who:'כל הגילאים (טעימות 21+)', whenLabel:'חמישי–ראשון 17–20 בספטמבר', hours:'ראה לוח',
-    where:'Historic Main Street & Silver Lake Park, Grapevine', price:'ראה כרטיסים באתר', rating:10 },
-
-  { id:44, region:'grapevine', cat:'culture', catLabel:'🍷 Grapevine Wine', weekend:false,
-    dates:['2026-09-05','2026-09-06','2026-09-07','2026-09-08','2026-09-09','2026-09-10','2026-09-11','2026-09-12','2026-09-13','2026-09-14','2026-09-15','2026-09-16'],
-    title:'Grapevine Wineries & Historic Downtown — כל יום',
-    desc:'גרייפוויין היא "בירת היין של טקסס" — 8 יקבים בהליכה ברחוב Main Street ההיסטורי. פתוח כל יום, גם לפני ואחרי GrapeFest.',
-    who:'מבוגרים בעיקר', whenLabel:'כל יום', hours:'ראה כל יקב בנפרד',
-    where:'Historic Main Street, Grapevine TX', price:'טעימות מ-$15', rating:9 }
+  {
+    id: 1,
+    region: "dallas",
+    cat: "festival",
+    catLabel: "🎷 פסטיבל ג'אז",
+    weekend: true,
+    title: "פסטיבל הג'אז והבלוז של דאלאס (Riverfront Jazz Festival)",
+    desc: "חגיגת הג'אז והבלוז השנתית הגדולה של סוף שבוע יום העבודה. אמנים בינלאומיים, דוכני מזון משובחים ואווירה תרבותית תוססת לכל המשפחה.",
+    who: "כל הגילאים",
+    whenLabel: "שבת 05/09 - ראשון 06/09",
+    hours: "12:00-22:00",
+    where: "Kay Bailey Hutchison Convention Center, דאלאס",
+    price: "מ-$40",
+    rating: 9
+  },
+  {
+    id: 2,
+    region: "frisco",
+    cat: "sport",
+    catLabel: "⚾ ספורט וזיקוקים",
+    weekend: true,
+    title: "משחק בייסבול ומופע זיקוקים - Frisco RoughRiders",
+    desc: "חוויית בייסבול אמריקאית קלאסית לכל המשפחה באצטדיון Riders Field, כולל מופע זיקוקים מרהיב בסיום המשחק לכבוד סוף השבוע.",
+    who: "כל הגילאים",
+    whenLabel: "שבת 05/09",
+    hours: "19:05-22:00",
+    where: "Riders Field, פריסקו",
+    price: "מ-$15",
+    rating: 9
+  },
+  {
+    id: 3,
+    region: "dallas",
+    cat: "race",
+    catLabel: "🏎️ מרוץ מכוניות",
+    weekend: true,
+    title: "מרוץ עפר סוער ב-Texas Motor Speedway Dirt Track",
+    desc: "תחרות מכוניות מרוץ עפר (Dirt Track Racing) מרתקת עם מהירויות שיא, אדרנלין ורעש מנועים עוצמתי. חוויה יוצאת דופן לחובבי מוטוריקה.",
+    who: "גילאי 6 ומעלה",
+    whenLabel: "שבת 05/09",
+    hours: "18:00-22:30",
+    where: "Texas Motor Speedway Dirt Track, פורט וורת'",
+    price: "מ-$25",
+    rating: 8
+  },
+  {
+    id: 4,
+    region: "plano",
+    cat: "market",
+    catLabel: "🎶 שוק ויניל ווינטג'",
+    weekend: true,
+    title: "יריד תקליטי ויניל ואמנות בווינטג' פלאנו",
+    desc: "אירוע סוף שבוע ססגוני במרכז ההיסטורי של פלאנו. עשרות אספני תקליטי ויניל, בגדי וינטג', הופעות חיות של להקות מקומיות ודוכני אוכל.",
+    who: "כל הגילאים",
+    whenLabel: "שבת 05/09",
+    hours: "10:00-17:00",
+    where: "McCall Plaza, מרכז פלאנו",
+    price: "חינם",
+    rating: 8
+  },
+  {
+    id: 5,
+    region: "mckinney",
+    cat: "market",
+    catLabel: "🛍️ שוק עתיקות ועבודות יד",
+    weekend: true,
+    title: "יריד המסחר הענק של מקיני (Third Monday Trade Days)",
+    desc: "אחד משווקי הפשפשים והאמנות הוותיקים בטקסס! מאות דוכני אמנות, עתיקות, מוצרי עץ, מתקנים לילדים ואוכל דרומי משובח.",
+    who: "כל הגילאים",
+    whenLabel: "שבת 05/09 - ראשון 06/09",
+    hours: "08:00-17:00",
+    where: "Trades Day Park, מקיני",
+    price: "חינם (חנייה $5)",
+    rating: 9
+  },
+  {
+    id: 6,
+    region: "irving",
+    cat: "food",
+    catLabel: "🍔 פסטיבל אוכל ומוזיקה",
+    weekend: true,
+    title: "פסטיבל משאיות אוכל ומוזיקה חיה בארווינג",
+    desc: "חגיגה קולינרית בלב ארווינג עם עשרות משאיות אוכל מגוונות, הופעות רוק וקאנטרי חיות מתחת לכיפת השמיים ופעילויות יצירה לילדים.",
+    who: "כל הגילאים",
+    whenLabel: "ראשון 06/09",
+    hours: "14:00-21:00",
+    where: "Toyota Music Factory, ארווינג",
+    price: "חינם",
+    rating: 8
+  },
+  {
+    id: 7,
+    region: "dallas",
+    cat: "concert",
+    catLabel: "🎵 מופע מוזיקה למשפחות",
+    weekend: true,
+    title: "חגיגת מוזיקה ופיקניק סוף שבוע בגינות דאלאס",
+    desc: "מופעי מחווה מוזיקליים על מדשאות הגנים הבוטניים של דאלאס, הפעלות יצירה לילדים, ונוף מרהיב לאגם וייט רוק.",
+    who: "כל הגילאים",
+    whenLabel: "שבת 05/09 - ראשון 06/09",
+    hours: "09:00-17:00",
+    where: "Dallas Arboretum, דאלאס",
+    price: "מ-$12",
+    rating: 9
+  }
 ];
-
-const VISITED_KEY='dfw_visited_events_v1';
-let visitedEvents=new Set();
-try{visitedEvents=new Set(JSON.parse(localStorage.getItem(VISITED_KEY)||'[]'));}catch(e){}
-function saveVisitedEvents(){try{localStorage.setItem(VISITED_KEY,JSON.stringify([...visitedEvents]));}catch(e){}}
-function toggleBeenThere(id,btn,card){
-  if(visitedEvents.has(id)){visitedEvents.delete(id);btn.classList.remove('checked');btn.textContent='⭕ לא היינו';card.classList.remove('been-there');}
-  else{visitedEvents.add(id);btn.classList.add('checked');btn.textContent='✔ היינו!';card.classList.add('been-there');}
-  saveVisitedEvents();
-}
-
-// ============================================================
-const DAYS_HE=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
-const MONTHS_HE=['','ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
-const WEEKEND_DAYS=[5,6,0];
-let activeDate=null;
-
-function buildDateStrip(){
-  // בונים allDates כאן — אחרי כל events.push()
-  const datesSet=new Set();
-  events.forEach(e=>e.dates.forEach(d=>datesSet.add(d)));
-  const dates=[...datesSet].sort();
-  const strip=document.getElementById('dateStrip');
-  strip.innerHTML='';
-  dates.forEach(dateStr=>{
-    const d=new Date(dateStr+'T12:00:00');
-    const dow=d.getDay();
-    const isWknd=WEEKEND_DAYS.includes(dow);
-    const count=events.filter(e=>e.dates.includes(dateStr)).length;
-    const btn=document.createElement('button');
-    btn.className='date-btn'+(isWknd?' is-wknd-btn':'');
-    btn.dataset.date=dateStr;
-    btn.innerHTML=`<span class="date-day">${DAYS_HE[dow]}</span><span class="date-num">${d.getDate()}</span><span class="date-month">${MONTHS_HE[d.getMonth()+1]}</span><span class="date-count">${count}</span>`;
-    btn.onclick=()=>toggleDate(dateStr,btn);
-    strip.appendChild(btn);
-  });
-  const clr=document.createElement('button');
-  clr.className='date-clear';clr.textContent='✕ נקה';clr.onclick=clearDate;
-  strip.appendChild(clr);
-}
-
-function toggleDate(dateStr,btn){
-  if(activeDate===dateStr){clearDate();return}
-  activeDate=dateStr;
-  document.querySelectorAll('.date-btn').forEach(b=>b.classList.remove('active-date'));
-  btn.classList.add('active-date');
-  const d=new Date(dateStr+'T12:00:00');
-  const dow=d.getDay();
-  const isWknd=WEEKEND_DAYS.includes(dow);
-  const banner=document.getElementById('activeDateBanner');
-  banner.textContent=`📅 מציג: ${DAYS_HE[dow]} ${d.getDate()} ${MONTHS_HE[d.getMonth()+1]} — ${events.filter(e=>e.dates.includes(dateStr)).length} אירועים`;
-  banner.className='active-date-banner show'+(isWknd?' wknd-banner':'');
-  applyFilter();
-}
-
-function clearDate(){
-  activeDate=null;
-  document.querySelectorAll('.date-btn').forEach(b=>b.classList.remove('active-date'));
-  document.getElementById('activeDateBanner').className='active-date-banner';
-  applyFilter();
-}
 
 function buildCard(e){
   const isFree=e.price==='חינם'||e.price==='חינם!';
-  const wc=e.weekend?' is-wknd':'';const beenCls=visitedEvents.has(e.id)?' been-there':'';
+  const wc=e.weekend?' is-wknd':'';
   const badge=e.weekend?`<div class="wknd-badge">🔥 סופ"ש · ${e.whenLabel}</div>`:'';
   const titleCls=e.weekend?'card-title has-badge':'card-title';
-  const priceCls=isFree?'free':(e.price&&(e.price.startsWith('מ-')||e.price.startsWith('$')||e.price.startsWith('כ'))?'paid':'');
+  const priceCls=isFree?'free':(e.price&&(e.price.startsWith('מ-')||e.price.startsWith('$'))?'paid':'');
   let dots='';
   for(let i=1;i<=10;i++){const on=i<=e.rating;const cls=on?(e.rating>=9?'dot top':(e.weekend?'dot wd':'dot on')):'dot';dots+=`<div class="${cls}"></div>`;}
-  return `<div class="event-card${wc}${beenCls}" data-id="${e.id}" data-region="${e.region}" data-cat="${e.cat}" data-wknd="${e.weekend?1:0}" data-free="${isFree?1:0}">
+  return `<div class="event-card${wc}" data-region="${e.region}" data-cat="${e.cat}" data-wknd="${e.weekend?1:0}" data-free="${isFree?1:0}">
     ${badge}<div class="card-cat cat-${e.cat}">${e.catLabel}</div>
     <div class="card-body">
       <div class="${titleCls}">${e.title}</div>
@@ -615,15 +256,12 @@ function buildCard(e){
     <div class="card-footer">
       <div class="rating-wrap"><div><div class="rating-dots">${dots}</div><div class="rating-lbl">דירוג קהילתי</div></div><div class="rating-score">${e.rating}/10</div></div>
       <span class="price-badge ${priceCls}">${e.price}</span>
-      <button class="been-btn${visitedEvents.has(e.id)?' checked':''}" onclick="toggleBeenThere(${e.id},this,this.closest('.event-card'))">${visitedEvents.has(e.id)?'✔ היינו!':'⭕ לא היינו'}</button>
     </div>
   </div>`;
 }
 
-const regionNames={plano:'פלאנו',richardson:'ריצ׳רדסון (5 מייל · ~10 דק׳)',allen:'אלן (8 מייל · ~12 דק׳)',addison:'אדיסון (9 מייל · ~15 דק׳)',frisco:'פריסקו (12 מייל · ~18 דק׳)',mckinney:'מקיני (14 מייל · ~20 דק׳)',thecolony:'The Colony (15 מייל · ~20 דק׳)',lewisville:'לואיסוויל (18 מייל · ~25 דק׳)',flowermound:'פלאואר מאונד (20 מייל · ~28 דק׳)',dallas:'דאלאס (20 מייל · ~30 דק׳)',irving:'ארווינג (22 מייל · ~30 דק׳)',grapevine:'גרייפוויין (25 מייל · ~35 דק׳)'};
-const regionOrder=['plano','richardson','allen','addison','frisco','mckinney','thecolony','lewisville','flowermound','dallas','irving','grapevine'];
-
-let curRegion='all',curFilter=null;
+const regionNames={plano:'פלאנו',frisco:'פריסקו',mckinney:'מקיני',irving:'ארווינג',dallas:'דאלאס'};
+const regionOrder=['plano','frisco','mckinney','irving','dallas'];
 
 function render(){
   regionOrder.forEach(r=>{
@@ -634,65 +272,21 @@ function render(){
   const av=document.getElementById('view-all');let html='';
   regionOrder.forEach(r=>{
     const items=events.filter(e=>e.region===r);
-    html+=`<div class="all-section-header" id="hdr-${r}">📍 ${regionNames[r]} <span class="wknd-count" id="wc-${r}"></span></div><div class="events-grid">${items.map(buildCard).join('')}</div>`;
+    const wc=items.filter(e=>e.weekend).length;
+    const wb=wc?`<span style="font-size:.62rem;color:var(--wknd);background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.3);padding:.13rem .48rem;border-radius:1rem">${wc} בסופ"ש</span>`:'';
+    html+=`<div class="all-section-header">📍 ${regionNames[r]} ${wb}</div><div class="events-grid">${items.map(buildCard).join('')}</div>`;
   });
   av.innerHTML=html;
-  applyFilter();
+  document.getElementById('sTotal').textContent=events.length;
+  document.getElementById('sWknd').textContent=events.filter(e=>e.weekend).length;
+  document.getElementById('sFree').textContent=events.filter(e=>e.price==='חינם'||e.price==='חינם!').length;
+  document.getElementById('sTop').textContent=events.filter(e=>e.rating>=9).length;
 }
 
-function isVisible(card){
-  const id=parseInt(card.dataset.id);
-  const e=events.find(ev=>ev.id===id);
-  if(!e)return false;
-  if(activeDate&&!e.dates.includes(activeDate))return false;
-  if(curRegion!=='all'&&card.dataset.region!==curRegion)return false;
-  if(curFilter==='wknd'&&card.dataset.wknd!=='1')return false;
-  if(curFilter==='free'&&card.dataset.free!=='1')return false;
-  if(curFilter&&curFilter!=='wknd'&&curFilter!=='free'&&card.dataset.cat!==curFilter)return false;
-  return true;
-}
-
-function applyFilter(){
-  document.querySelectorAll('.event-card').forEach(c=>c.classList.toggle('hidden',!isVisible(c)));
-  updateStats();
-  regionOrder.forEach(r=>{
-    const cnt=document.getElementById(`cnt-${r}`);
-    const visible=document.querySelectorAll(`#grid-${r} .event-card:not(.hidden)`);
-    if(cnt)cnt.textContent=`${visible.length} אירועים`;
-    const wc=document.getElementById(`wc-${r}`);
-    const wkndCount=[...document.querySelectorAll(`#view-all .event-card[data-region="${r}"]:not(.hidden)`)].filter(c=>c.dataset.wknd==='1').length;
-    if(wc)wc.textContent=wkndCount?`${wkndCount} בסופ"ש`:'';
-    if(wc)wc.style.cssText=wkndCount?'font-size:.62rem;color:var(--wknd);background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.3);padding:.13rem .48rem;border-radius:1rem':'';
-  });
-}
-
-function updateStats(){
-  // סופרים מהמערך events ישירות — לא מה-DOM
-  const visibleIds=new Set();
-  document.querySelectorAll('#view-all .event-card:not(.hidden)').forEach(c=>visibleIds.add(parseInt(c.dataset.id)));
-  const evs=events.filter(e=>visibleIds.has(e.id));
-  document.getElementById('sTotal').textContent=visibleIds.size;
-  document.getElementById('sWknd').textContent=evs.filter(e=>e.weekend).length;
-  document.getElementById('sFree').textContent=evs.filter(e=>e.price==='\u05d7\u05d9\u05e0\u05dd'||e.price==='\u05d7\u05d9\u05e0\u05dd!').length;
-  document.getElementById('sTop').textContent=evs.filter(e=>e.rating>=9).length;
-}
-
-function showRegion(r,btn){
-  document.querySelectorAll('.region-section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById(`view-${r}`).classList.add('active');
-  if(btn)btn.classList.add('active');
-  curRegion=r;applyFilter();
-}
-
-function setFilter(type,btn){
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('f-wknd','f-cat'));
-  curFilter=curFilter===type?null:type;
-  if(curFilter)btn.classList.add(type==='wknd'?'f-wknd':'f-cat');
-  applyFilter();
-}
-
-buildDateStrip();
+let curRegion='all',curFilter=null;
+function showRegion(r,btn){document.querySelectorAll('.region-section').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById(`view-${r}`).classList.add('active');if(btn)btn.classList.add('active');curRegion=r;applyFilter();}
+function setFilter(type,btn){document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('f-wknd','f-cat'));curFilter=curFilter===type?null:type;if(curFilter)btn.classList.add(type==='wknd'?'f-wknd':'f-cat');applyFilter();}
+function applyFilter(){document.querySelectorAll('.event-card').forEach(c=>{const rMatch=curRegion==='all'||c.dataset.region===curRegion;let fMatch=true;if(curFilter==='wknd')fMatch=c.dataset.wknd==='1';else if(curFilter==='free')fMatch=c.dataset.free==='1';else if(curFilter)fMatch=c.dataset.cat===curFilter;c.classList.toggle('hidden',!(rMatch&&fMatch));});}
 render();
 </script>
 </body>
