@@ -6,11 +6,15 @@
 ## מיקום קבצים
 ```
 C:\DFIR\Personal\Code\TX\
-├── index.html        — פורטל אירועים שבועי ראשי
-├── attractions.html  — דף טיולים קבועים
-├── update_portal.py  — סקריפט עדכון אוטומטי (Task Scheduler, שני 7:00)
-└── DFW_Weekly_Update.xml — קובץ Task Scheduler
+├── index.html                    — פורטל אירועים שבועי ראשי (גם חי ב-GitHub Pages)
+├── attractions.html              — דף טיולים קבועים
+├── update_portal.py              — סקריפט עדכון אוטומטי (רץ ב-GitHub Actions, ראה "אחסון ופריסה" למטה)
+├── GITHUB_SETUP.md               — מדריך התקנה מלא (repo, Pages, Secret, בדיקה)
+├── update_log.txt                — לוג ריצות (נכתב אוטומטית ע"י הסקריפט)
+└── .github\workflows\
+    └── weekly-update.yml         — GitHub Actions workflow שמריץ את update_portal.py כל שני
 ```
+⚠️ `DFW_Weekly_Update.xml` (Task Scheduler הישן) הוחלף — ראה "אחסון ופריסה" למטה.
 
 ---
 
@@ -220,3 +224,38 @@ e.price === 'חינם' || e.price === 'חינם!'
 - **State Fair of Texas** — נפתח בדרך כלל בסוף ספטמבר (השנה 25/9), נמשך כ-24 יום עד אמצע אוקטובר, Fair Park
 - **Autumn at the Arboretum (Pumpkin Village)** — נפתח בדרך כלל ~19-20 בספטמבר, נמשך עד תחילת נובמבר
 - **Frisco RoughRiders** — אם זוכים באליפות מחצית, הפלייאוף מתחיל ~אמצע ספטמבר (בדוק "RoughRiders playoff tickets" כל שנה)
+
+---
+
+## אחסון ופריסה (09/2026) — GitHub Pages + GitHub Actions
+
+האתר עבר משלב "קובץ מקומי על המחשב" לאתר חי, זמין 24/7 ונגיש מכל מכשיר (כולל טלפון).
+
+### מה השתנה
+| מה | לפני | אחרי |
+|-----|------|------|
+| אחסון האתר | פתיחת `index.html` מקומית על המחשב | **GitHub Pages** — `https://nirdai.github.io/dfw-family-events/` |
+| מנוע ה-repo | לא היה Git | **GitHub repo:** `nirdai/dfw-family-events` (Public — נדרש ל-Pages בחינם) |
+| עדכון שבועי אוטומטי | Windows Task Scheduler מקומי (`DFW_Weekly_Update.xml`, שני 7:00, דורש שהמחשב דלוק) | **GitHub Actions** (`.github\workflows\weekly-update.yml`) — רץ בענן של GitHub, ~12:00 UTC (07:00 טקסס בשעון קיץ) בכל שני, לא תלוי במחשב האישי |
+| ספק ה-AI ליצירת אירועים | Anthropic API (`ANTHROPIC_API_KEY`, מודל `claude-sonnet-4-6`) — דרש כרטיס אשראי/תשלום | **Google Gemini API — טיר חינמי** (`GEMINI_API_KEY`), חבילת פייתון `google-genai` (`from google import genai`) |
+| שם המודל בפועל | claude-sonnet-4-6 | **`gemini-3.6-flash`** (הוחלף מ-`gemini-2.5-flash` אחרי ש-Google הפסיקו לתת גישה למשתמשים חדשים לדגם הזה — קיבלנו שגיאת 404 עם המלצה מפורשת לעבור ל-3.6-flash) |
+| הפעלה ידנית לבדיקה | הרצת הסקריפט ידנית ב-Python על המחשב | לשונית **Actions** ב-repo → Weekly DFW Events Update → **Run workflow** |
+
+### הגדרות קריטיות שהוגדרו ב-GitHub (לא בקוד — לזכור אם צריך לשחזר בעתיד)
+- **Secret:** `GEMINI_API_KEY` — תחת Settings → Secrets and variables → Actions ב-repo
+- **Pages:** Settings → Pages → Source: Deploy from a branch → Branch `main` → תיקייה `/ (root)`
+- מפתח ה-Gemini נוצר ב-https://aistudio.google.com/apikey (חינמי לגמרי, בלי כרטיס אשראי)
+
+### תקלות שנתקלנו בהן בדרך (למקרה שיחזרו)
+1. **`git push` נכשל עם "Repository not found"** — ה-repo לא נוצר עדיין בפועל ב-GitHub לפני ניסיון ה-push. פתרון: ליצור את ה-repo תחילה ב-github.com/new.
+2. **`git remote add origin` נכשל עם "remote origin already exists"** — היה כבר remote מהגדרה קודמת. פתרון: `git remote set-url origin <url>` במקום `add`.
+3. **לא ניתן היה לכתוב ישירות ל-`.github\workflows\` דרך כלי הגישה המרוחקת ל-מחשב** (תיקייה מוגנת) — נכתב לשורש התיקייה ונדרשה הזזה ידנית (`move`) ל-`.github\workflows\weekly-update.yml`.
+4. **סנכרון בין קובץ ה-workflow שהוזז ל-`.github\workflows\` לבין גרסאות מעודכנות** — כשעדכנו את ה-workflow (מ-Anthropic ל-Gemini) אחרי שהוא כבר הוזז, הגרסה החדשה נכתבה שוב לשורש בלבד ולא דרסה את זו שכבר הוזזה. גרם ל-`ModuleNotFoundError: No module named 'google'` (ה-workflow הישן עוד התקין `anthropic`, אבל הסקריפט כבר ציפה ל-`google-genai`). פתרון: לוודא תמיד ש-`.github\workflows\weekly-update.yml` עצמו מעודכן, לא רק עותק בשורש.
+5. **`ModuleNotFoundError: No module named 'google'`** — ראה תקלה 4 למעלה.
+6. **שגיאת 404 `models/gemini-2.5-flash is no longer available to new users`** — Google הפסיקו גישה חדשה לדגם הזה. פתרון: החלפה ל-`gemini-3.6-flash` (השם שה-API עצמו המליץ עליו בהודעת השגיאה).
+
+### איך מעדכנים את האתר בעתיד
+1. עריכת קבצים מקומית (`index.html`, `attractions.html`, `update_portal.py` וכו')
+2. `git add . && git commit -m "..." && git push`
+3. GitHub Pages מתעדכן אוטומטית תוך דקה-שתיים — אין צורך לגעת בהגדרות שוב
+4. אם `MODEL` ב-`update_portal.py` מפסיק לעבוד (כמו שקרה עם `gemini-2.5-flash`) — לבדוק את רשימת הדגמים החינמיים העדכנית ב-https://ai.google.dev/gemini-api/docs/pricing ולעדכן את המשתנה
