@@ -75,6 +75,12 @@
   .show-artist{font-size:.82rem;font-weight:600;color:var(--text)}
   .show-sub{font-size:.68rem;color:var(--text-dim);margin-top:.1rem}
   .show-cover{color:var(--warm);font-weight:600}
+  .show-time{color:var(--accent);font-weight:600}
+  .show-extra{color:var(--text-dim)}
+
+  /* VENUE LINK */
+  .venue-link{display:inline-flex;align-items:center;gap:.3rem;font-family:'Space Mono',monospace;font-size:.62rem;color:#b39dff;background:rgba(130,80,255,.08);border:1px solid rgba(130,80,255,.28);padding:.25rem .65rem;border-radius:1rem;text-decoration:none;transition:all .2s;white-space:nowrap}
+  .venue-link:hover{background:rgba(130,80,255,.18);border-color:#b39dff}
 
   /* FOOTER */
   .attr-footer{display:flex;align-items:center;justify-content:space-between;padding:.6rem 1.1rem;border-top:1px solid rgba(46,204,113,.08);background:rgba(0,0,0,.18);gap:.5rem}
@@ -138,111 +144,145 @@
 <script>
 const A = [
   {id:1,type:"amp",tl:"&#x1F3DF; אמפיתיאטרון",name:"Dos Equis Pavilion",
+   link:"https://do214.com/venues/dos-equis-pavilion",
    desc:"האמפיתיאטרון הגדול והמרכזי של דאלאס לסיבוב ההופעות הארציות של הקיץ. אמנים גדולים כמעט כל שבוע בעונה. יש גם דשא פתוח (Lawn) מאחורי אזור הישיבה המקורה, מושלם לשמיכה.",
    dist:"20 מייל מפלאנו",drive:"~30 דק",
-   price:"כרטיסי דשא (Lawn) מ-$25&ndash;$45",address:"3839 S Fitzhugh Ave, Dallas TX 75210",
+   price:"כרטיסי דשא (Lawn) מ-$25&ndash;$45, ישיבה מקורה יקר יותר",address:"3839 S Fitzhugh Ave, Dallas TX 75210",
+   seating:"Lawn = דשא פתוח, שבים באופן חופשי עם שמיכה/כיסא מתקפל; יש גם ישיבה מקורה מוקצית (יקרה יותר)",
    tip:"קנו כרטיס Lawn (הכי זול) והביאו שמיכה וכיסאות מתקפלים &mdash; חוקי האמפי מתירים זאת.",rating:9,
    shows:[
-     {date:"10/9",artist:"Mötley Crüe — The Return Of The Carnival Of Sins",genre:"רוק"},
-     {date:"11/9",artist:"Tim McGraw — Pawn Shop Guitar Tour",genre:"קאנטרי"},
-     {date:"12/9",artist:"Zeds Dead — Journey Of A Lifetime Tour",genre:"אלקטרוני / דאבסטep"},
-     {date:"16/9",artist:"Kehlani — World Tour",genre:"R&B / פופ"},
-     {date:"18/9",artist:"Billy Idol",genre:"רוק"}
+     {date:"10/9",time:"18:30",artist:"Mötley Crüe — The Return Of The Carnival Of Sins",genre:"רוק"},
+     {date:"11/9",time:"19:00",artist:"Tim McGraw — Pawn Shop Guitar Tour",genre:"קאנטרי"},
+     {date:"12/9",time:"18:55",artist:"Zeds Dead — Journey Of A Lifetime Tour",genre:"אלקטרוני / דאבסטep"},
+     {date:"16/9",time:"18:30",artist:"Kehlani — World Tour",genre:"R&B / פופ"},
+     {date:"18/9",time:"19:30",artist:"Billy Idol",genre:"רוק"}
    ]},
 
   {id:2,type:"amp",tl:"&#x1F3DF; אמפיתיאטרון",name:"The Pavilion at Toyota Music Factory",
+   link:"https://thepaviliontmf.com/",
    desc:"אמפיתיאטרון קטן ואינטימי יותר בלב מתחם Toyota Music Factory באירווינג, עם מגוון אמנים מקומיים ובינלאומיים כל השנה. דשא פתוח מאחורי המושבים, ומסביב פלאזה שלמה של מסעדות ובארים.",
    dist:"22 מייל מפלאנו",drive:"~30 דק",
-   price:"מ-$25 דשא, כרטיסי ישיבה מ-$45",address:"300 W Las Colinas Blvd, Irving TX 75039",
+   price:"מ-$25 דשא, כרטיסי ישיבה מ-$45 ומעלה",address:"300 W Las Colinas Blvd, Irving TX 75039",
+   seating:"דשא פתוח (GA, שבים לפי מקום פנוי) מאחורי אזור ישיבה מקורה מוקצה",
    tip:"אפשר לעשות ערב שלם &mdash; ארוחה בפלאזה לפני ההופעה, בלי צורך לנסוע שוב.",rating:8,
    shows:[
-     {date:"6/9",artist:"Myles Smith — My Mess, My Heart, My Life Tour",genre:"פופ / סול"},
-     {date:"9/9",artist:"NEEDTOBREATHE — The Long Surrender Tour",genre:"רוק נוצרי"},
-     {date:"10/9",artist:"Jimmy Eat World — 25 Years Of Bleed American",genre:"רוק אלטרנטיבי"},
-     {date:"11/9",artist:"Kany García — Puerta Abierta Tour",genre:"לטינית"},
-     {date:"12/9",artist:"Thee Sacred Souls, LA LOM & The Womack Sisters",genre:"R&B / סול"}
+     {date:"6/9",time:"19:15",artist:"Myles Smith — My Mess, My Heart, My Life Tour",genre:"פופ / סול"},
+     {date:"9/9",time:"19:00",artist:"NEEDTOBREATHE — The Long Surrender Tour",genre:"רוק נוצרי"},
+     {date:"10/9",time:"19:00",artist:"Jimmy Eat World — 25 Years Of Bleed American",genre:"רוק אלטרנטיבי"},
+     {date:"11/9",time:"19:00",artist:"Kany García — Puerta Abierta Tour",genre:"לטינית"},
+     {date:"12/9",time:"19:00",artist:"Thee Sacred Souls, LA LOM & The Womack Sisters",genre:"R&B / סול"}
    ]},
 
   {id:3,type:"lawn",tl:"&#x1F9FA; דשא ופיקניק",name:"Concerts by the Creek &mdash; Watters Creek",
-   desc:"קונצרטים חינמיים על הדשא הירוק במרכז Watters Creek Village Green. הביאו שמיכה או כיסאות מתקפלים &mdash; מסביב מסעדות וקפה.",
+   link:"https://www.watterscreek.com/event/35335-concerts-by-the-creek-fall-series",
+   desc:"קונצרטים חינמיים על הדשא הירוק במרכז Watters Creek Village Green. הביאו שמיכה או כיסאות מתקפלים &mdash; מסביב מסעדות וקפה. עונת הקיץ הסתיימה ב-5/9, אבל מיד אחריה מתחילה &quot;Fall Series&quot; שבועית עד סוף אוקטובר — לא פספסנו כלום, פשוט מדובר בשתי עונות נפרדות באותו מקום.",
    dist:"8 מייל מפלאנו",drive:"~12 דק",
    price:"חינם!",address:"Watters Creek Village Green, Allen TX 75013",
-   tip:"הסדרה מתמקדת באביב&ndash;קיץ; בספטמבר נשארו רק 2 מופעים לעונה &mdash; הגיעו כחצי שעה מוקדם לתפוס מקום על הדשא.",rating:7,
+   seating:"דשא פתוח — מביאים שמיכת פיקניק או כיסא מתקפל, יושבים בכל מקום פנוי על הדשא",
+   tip:"בסדרת הסתיו (Fall Series) יש מופע כל שבוע, שישי-שבת 19:00&ndash;21:00, ברצף עד סוף אוקטובר &mdash; הגיעו כחצי שעה מוקדם לתפוס מקום נוח.",rating:8,
    shows:[
-     {date:"5/9",artist:"Love Handle",genre:"רוק — להקת מסיבות/קאבר"},
-     {date:"26/9",artist:"Southern Couch Band",genre:"רוק קלאסי/וינטג' — להקת קאבר"}
-   ]},
+     {date:"5/9",time:"19:00&ndash;21:00",artist:"Love Handle (סיום עונת קיץ)",genre:"רוק — להקת מסיבות/קאבר"},
+     {date:"12/9",time:"19:00&ndash;21:00",artist:"Fall Series — להקה מתחלפת (ר' הערה)",genre:"מגוון"},
+     {date:"19/9",time:"19:00&ndash;21:00",artist:"Fall Series — להקה מתחלפת (ר' הערה)",genre:"מגוון"},
+     {date:"26/9",time:"19:00&ndash;21:00",artist:"Southern Couch Band",genre:"רוק קלאסי/וינטג' — להקת קאבר"},
+     {date:"3/10",time:"19:00&ndash;21:00",artist:"Fall Series — להקה מתחלפת (ר' הערה)",genre:"מגוון"},
+     {date:"10/10",time:"19:00&ndash;21:00",artist:"Fall Series — להקה מתחלפת (ר' הערה)",genre:"מגוון"},
+     {date:"17/10",time:"19:00&ndash;21:00",artist:"Fall Series — להקה מתחלפת (ר' הערה)",genre:"מגוון"},
+     {date:"24/10",time:"19:00&ndash;21:00",artist:"Fall Series — להקה מתחלפת (ר' הערה)",genre:"מגוון"}
+   ],
+   note:"הערה: ל-Fall Series כולה (7 מופעים) מתחלף רוסטר של 4 להקות שכבר אושרו לעונה — 80's Mix Tape, Radio Edit, High Octane Band, Last Exit Band — אבל ההתאמה המדויקת בין תאריך ללהקה עדיין לא פורסמה לכל השבועות; בדקו את דף האירוע הרשמי קרוב לתאריך."},
 
   {id:4,type:"lawn",tl:"&#x1F9FA; דשא ופיקניק",name:"Klyde Warren Park",
+   link:"https://www.klydewarrenpark.org/events-programming",
    desc:"פארק עירוני מעל כביש מהיר בלב דאלאס, עם דוכני אוכל טרקים (food trucks) כמעט כל יום. סדרת הופעות חינמית מצומצמת יותר מהצפוי בעונה הנוכחית.",
    dist:"20 מייל מפלאנו",drive:"~30 דק",
    price:"חינם! (אוכל מהטרקים בתשלום)",address:"2012 Woodall Rodgers Fwy, Dallas TX 75201",
+   seating:"דשא פתוח בפארק, אין ישיבה מוקצית — מביאים שמיכה",
    tip:"סדרת 'Dallas Sounds Amplified' מציגה אמן מקומי משתנה &mdash; שם האמן הספציפי מתפרסם קרוב למועד, עקבו אחרי דף הפארק.",rating:7,
    shows:[
-     {date:"18/9",artist:"Dallas Sounds Amplified — אמן מקומי (יתפרסם בקרוב)",genre:"לא צוין"},
-     {date:"25/9",artist:"Dallas Sounds Amplified — אמן מקומי (יתפרסם בקרוב)",genre:"לא צוין"}
+     {date:"18/9",time:"18:00&ndash;20:00",artist:"Dallas Sounds Amplified — אמן מקומי (יתפרסם בקרוב)",genre:"לא צוין"},
+     {date:"25/9",time:"18:00&ndash;20:00",artist:"Dallas Sounds Amplified — אמן מקומי (יתפרסם בקרוב)",genre:"לא צוין"}
    ]},
 
   {id:5,type:"lawn",tl:"&#x1F9FA; דשא ופיקניק",name:"Lexus Box Garden at Legacy Hall",
+   link:"https://www.legacyfoodhall.com/events/",
    desc:"גינת דשא מוצלת מאחורי Legacy Hall &mdash; פוד הול ענק עם עשרות דוכני אוכל. הלו״ז העשיר ביותר באזור: כמעט כל שבוע להקת מקור או להקת מחווה (טריביוט) מוכרת.",
    dist:"6 מייל מפלאנו",drive:"~10 דק",
-   price:"כניסה חינם לרוב האירועים (אוכל בתשלום בפנים)",address:"7800 Windrose Ave, Plano TX 75024",
+   price:"רוב המופעים בתשלום (BUY TICKETS), חלקם חינם (FREE GA) — ר' פירוט לכל תאריך; אוכל בתשלום בפנים",address:"7800 Windrose Ave, Plano TX 75024",
+   seating:"דלתות נפתחות שעה לפני &mdash; ישיבה חופשית על הדשא (GA), אין מקומות מוקצים",
    tip:"קחו אוכל מתוך Legacy Hall ותשבו על הדשא בחוץ &mdash; הכי נוח למשפחות עם ילדים.",rating:9,
    shows:[
-     {date:"11/9",artist:"24K Magic",genre:"פופ / R&B",cover:"מחווה ל-Bruno Mars"},
-     {date:"17/9",artist:"The Bellamy Brothers",genre:"קאנטרי"},
-     {date:"18/9",artist:"Departure ATX",genre:"רוק 70s/80s",cover:"מחווה ל-Journey"},
-     {date:"23/9",artist:"Firehouse",genre:"רוק 90s"},
-     {date:"25/9",artist:"Hard Night's Day",genre:"פופ",cover:"מחווה ל-The Beatles"},
-     {date:"26/9",artist:"Def Leggend",genre:"רוק 80s",cover:"מחווה ל-Def Leppard"}
+     {date:"11/9",time:"דלתות 19:00, הופעה 20:00",artist:"24K Magic",genre:"פופ / R&B",cover:"מחווה ל-Bruno Mars",extra:"בתשלום (BUY TICKETS)"},
+     {date:"17/9",time:"דלתות 19:00, הופעה 20:00",artist:"The Bellamy Brothers",genre:"קאנטרי",extra:"בתשלום (BUY TICKETS)"},
+     {date:"18/9",time:"דלתות 19:00, הופעה 20:00",artist:"Departure ATX",genre:"רוק 70s/80s",cover:"מחווה ל-Journey",extra:"בתשלום (BUY TICKETS)"},
+     {date:"23/9",time:"דלתות 19:00, הופעה 20:00",artist:"Firehouse",genre:"רוק 90s",extra:"בתשלום (BUY TICKETS)"},
+     {date:"25/9",time:"דלתות 19:00, הופעה 20:00",artist:"Hard Night's Day",genre:"פופ",cover:"מחווה ל-The Beatles",extra:"כניסה חינם! (FREE GA)"},
+     {date:"26/9",time:"דלתות 19:00, הופעה 20:00",artist:"Def Leggend",genre:"רוק 80s",cover:"מחווה ל-Def Leppard",extra:"בתשלום (BUY TICKETS)"}
    ]},
 
   {id:6,type:"lawn",tl:"&#x1F9FA; דשא ופיקניק",name:"The Lawn at Grandscape",
+   link:"https://www.grandscape.com/events/month/",
    desc:"דשא ענק במתחם Grandscape עם קונצרטים חינמיים על ה-Corona Stage, אירועי DJ ושווקים לאורך השנה. מוקף במסעדות ודוכני אוכל של המתחם.",
    dist:"15 מייל מפלאנו",drive:"~20 דק",
    price:"כניסה חינם ברוב האירועים",address:"The Lawn at Grandscape, The Colony TX 75056",
-   tip:"בדקו את grandscape.com/events לעדכונים &mdash; לרוב יש מופע אחד&ndash;שניים בחודש.",rating:7,
+   seating:"דשא פתוח מול הבמה (Corona Stage & Lawn) — ישיבה חופשית עם שמיכה/כיסא",
+   tip:"בדקו את grandscape.com/events לעדכונים &mdash; לרוב יש מופע אחד&ndash;שניים בחודש, ולעיתים גם באוקטובר.",rating:8,
    shows:[
-     {date:"3/9",artist:"CaliRumba",genre:"לטינית / רומבה"},
-     {date:"11/9",artist:"Graceland Ninjaz",genre:"רוק/פופ/היפ הופ — מדליי ולהיטים מ-5 עשורים (מיקס קאבר)"},
-     {date:"20/9",artist:"Nicholas Payton",genre:"ג'אז"}
+     {date:"3/9",time:"19:00&ndash;21:00",artist:"CaliRumba",genre:"לטינית / רומבה",extra:"חינם"},
+     {date:"11/9",time:"19:00",artist:"Graceland Ninjaz",genre:"רוק/פופ/היפ הופ — מדליי ולהיטים מ-5 עשורים (מיקס קאבר)",extra:"חינם"},
+     {date:"20/9",time:"19:00&ndash;21:00",artist:"Nicholas Payton",genre:"ג'אז",extra:"חינם"},
+     {date:"23/9",time:"19:00",artist:"Country Close Up",genre:"קאנטרי",extra:"חינם"},
+     {date:"24/9",time:"19:00",artist:"Caribbean Night",genre:"קריבית / world music",extra:"חינם"},
+     {date:"1/10",time:"19:00",artist:"Hip Hop Hooray",genre:"היפ הופ",extra:"חינם"},
+     {date:"2/10",time:"19:00",artist:"Barefoot Nation",genre:"לא צוין",extra:"חינם"},
+     {date:"8/10",time:"19:00",artist:"Back in Black",genre:"רוק — להקת קאבר",cover:"מחווה ל-AC/DC (סגנון)",extra:"חינם"}
    ]},
 
   {id:7,type:"lawn",tl:"&#x1F9FA; דשא ופיקניק",name:"Sundance Square Plaza",
-   desc:"כיכר עירונית פתוחה בלב פורט וורת' עם סדרת מוזיקה חיה קבועה בין רביעי לראשון (Sundance Square Music). מוקפת במסעדות.",
+   link:"https://sundancesquare.com/events/",
+   desc:"כיכר עירונית פתוחה בלב פורט וורת' עם סדרת מוזיקה חיה קבועה בין רביעי לראשון (Sundance Square Music), ובנוסף אירוע חודשי גדול יותר — Greater Sundance Night Market (שבת ראשונה בחודש) עם מוזיקה חיה, 70+ דוכנים וזיקוקים.",
    dist:"35 מייל מפלאנו",drive:"~45 דק",
-   price:"חינם!",address:"201 Main St, Fort Worth TX 76102",
-   tip:"הלו״ז המדויק לספטמבר&ndash;אוקטובר עדיין לא פורסם באתר &mdash; עקבו אחרי @sundancesquaremusic באינסטגרם לתאריכים ושמות הלהקות המתעדכנים שבוע&ndash;שבוע.",rating:6,
+   price:"חינם!",address:"201 Main St / 420 Main St, Fort Worth TX 76102",
+   seating:"כיכר עירונית פתוחה — ישיבה/עמידה חופשית, אין דשא (מרצפת), אפשר להביא כיסא מתקפל",
+   tip:"זה כנראה המקום שחיפשת: ה-Night Market החודשי היה אתמול (5/9) והבא הוא 3/10 &mdash; בדיוק &quot;הופעה על דשא/כיכר&quot; עם פער של כמעט חודש. ללו״ז השוטף (רביעי-ראשון) עקבו אחרי @sundancesquaremusic באינסטגרם.",rating:7,
    shows:[
-     {date:"רב'&ndash;א' (כל שבוע)",artist:"מוזיקה חיה מתחלפת — טרם פורסמו שמות ל-9&ndash;10/2026",genre:"מגוון"}
-   ]},
+     {date:"5/9",time:"17:00&ndash;22:00",artist:"Greater Sundance Night Market — מוזיקה חיה + זיקוקים (עבר אתמול)",genre:"מגוון"},
+     {date:"3/10",time:"17:00&ndash;22:00",artist:"Greater Sundance Night Market — מוזיקה חיה + זיקוקים",genre:"מגוון"}
+   ],
+   note:"בנוסף לשני התאריכים האלה יש גם סדרת מוזיקה שוטפת רביעי-ראשון באותה כיכר, אבל שמות הלהקות הספציפיים לא מתפרסמים מראש — רק דרך אינסטגרם קרוב למועד."},
 
   {id:8,type:"bar",tl:"&#x1F37B; בר ומוזיקה חיה",name:"Truck Yard Dallas (Lower Greenville)",
+   link:"https://www.truckyard.com/dallas/live-music",
    desc:"חצר ענקית עם עשרות דוכני אוכל טרקים קבועים, בית עץ, נדנדות ומוזיקה חיה. הלו״ז המפורסם מראש קצר יחסית ומתעדכן שוטף.",
    dist:"22 מייל מפלאנו",drive:"~30 דק",
    price:"כניסה חינם (אוכל/משקאות בתשלום)",address:"5624 Sears St, Dallas TX 75206",
+   seating:"חצר חיצונית פתוחה — שולחנות פיקניק ודשא, ישיבה חופשית ללא הזמנה",
    tip:"הבמה מנוהלת ע״י 13th Floor Music והלו״ז מתעדכן שוטף &mdash; בדקו truckyard.com/dallas/live-music קרוב למועד.",rating:7,
    shows:[
-     {date:"6/9",artist:"Alex Francisco Caruthers",genre:"לא צוין (מופע יום, 14:00&ndash;17:00)"}
+     {date:"6/9",time:"14:00&ndash;17:00",artist:"Alex Francisco Caruthers",genre:"לא צוין",extra:"מופע יום"}
    ]},
 
   {id:9,type:"bar",tl:"&#x1F37B; בר ומוזיקה חיה",name:"Truck Yard The Colony",
+   link:"https://do214.com/venues/truck-yard-the-colony",
    desc:"הגרסה הצפונית של Truck Yard, ליד Grandscape &mdash; אותו קונספט של דוכני אוכל, מוזיקה חיה ואווירה כפרית-אורבנית, קרוב משמעותית לפלאנו מהסניף בדאלאס. מתאר עצמו כמארח מוזיקה חיה חינמית כמעט כל יום, אך לו״ז מפורסם מראש מצומצם.",
    dist:"14 מייל מפלאנו",drive:"~20 דק",
    price:"כניסה חינם (אוכל/משקאות בתשלום)",address:"5959 Grove Ln, The Colony TX 75056",
+   seating:"חצר חיצונית פתוחה — ישיבה חופשית, שולחנות ודשא",
    tip:"אפשר לשלב עם ביקור ב-Grandscape ו-The Lawn באותו יום.",rating:7,
    shows:[
-     {date:"12/9",artist:"Trucktoberfest (אירוע מיוחד)",genre:"לא צוין"}
+     {date:"12/9",time:"11:00",artist:"Trucktoberfest (אירוע מיוחד)",genre:"לא צוין"}
    ]},
 
   {id:10,type:"bar",tl:"&#x1F37B; בר ומוזיקה חיה",name:"TUPPS Brewery",
+   link:"https://www.tuppsbrewery.com/upcoming-events",
    desc:"מבשלת בירה מקומית במקיני עם אולם ענק וחצר חיצונית (Outdoor Stage & Lawn), מארחת הופעות חיות באולם ובחוץ. ידידותי למשפחות בשעות היום.",
    dist:"14 מייל מפלאנו",drive:"~20 דק",
    price:"כניסה לרוב חינם (בירה/אוכל בתשלום, 21+ לשתייה)",address:"402 E Louisiana St, McKinney TX 75069",
+   seating:"6/9: חצר חיצונית/דשא (Outdoor Stage & Lawn); 18/9: אולם הבירה הפנימי (Outdoor Beer Hall) — שני המקרים ישיבה חופשית",
    tip:"בדקו את tuppsbrewery.com/upcoming-events לפני שמגיעים &mdash; הלוח מתעדכן באופן שוטף.",rating:7,
    shows:[
-     {date:"6/9",artist:"The Flannel Pajamas — Live on the Lawn",genre:"לא צוין"},
-     {date:"18/9",artist:"Mark Hudspeth",genre:"לא צוין"}
+     {date:"6/9",time:"19:00&ndash;22:00",artist:"The Flannel Pajamas — Live on the Lawn",genre:"לא צוין",extra:"חצר/דשא חיצוני"},
+     {date:"18/9",time:"19:00&ndash;22:00",artist:"Mark Hudspeth",genre:"לא צוין",extra:"אולם בירה פנימי"}
    ]}
 ];
 
@@ -285,13 +325,16 @@ function toggleVisited(id, btn, card) {
 function buildShows(a) {
   const rows = a.shows.map(s => {
     const coverHtml = s.cover ? '<div class="show-sub show-cover">&#x1F3B8; '+s.cover+'</div>' : '';
+    const timeHtml = s.time ? ' &middot; <span class="show-time">&#x23F0; '+s.time+'</span>' : '';
+    const extraHtml = s.extra ? ' &middot; <span class="show-extra">'+s.extra+'</span>' : '';
     return '<div class="show-row">'
       +'<div class="show-top"><span class="show-artist">'+s.artist+'</span><span class="show-date">'+s.date+'</span></div>'
-      +'<div class="show-sub">'+s.genre+'</div>'
+      +'<div class="show-sub">'+s.genre+timeHtml+extraHtml+'</div>'
       +coverHtml
       +'</div>';
   }).join('');
-  return '<div class="meta-item shows-box"><span class="meta-label">&#x1F3A4; הופעות קרובות</span>'+rows+'</div>';
+  const noteHtml = a.note ? '<div class="show-sub" style="margin-top:.4rem;padding-top:.35rem;border-top:1px solid rgba(130,80,255,.15)">&#x2139; '+a.note+'</div>' : '';
+  return '<div class="meta-item shows-box"><span class="meta-label">&#x1F3A4; הופעות קרובות</span>'+rows+noteHtml+'</div>';
 }
 
 // ============================================================
@@ -306,13 +349,14 @@ function buildCard(a) {
   return '<div class="attr-card'+(isVis?' been-there':'')+'" data-type="'+a.type+'" data-id="'+a.id+'">'
     +'<div class="attr-type type-'+a.type+'">'+a.tl+'</div>'
     +'<div class="attr-body">'
-    +'<div class="attr-name">'+a.name+'</div>'
+    +'<div class="attr-name">'+a.name+(a.link?' <a class="venue-link" href="'+a.link+'" target="_blank" rel="noopener">&#x1F517; אתר המקום</a>':'')+'</div>'
     +'<div class="attr-desc">'+a.desc+'</div>'
     +'<div class="attr-meta">'
     +'<div class="meta-item"><span class="meta-label">&#x1F4CD; מרחק</span><span class="meta-value">'+a.dist+'</span></div>'
     +'<div class="meta-item"><span class="meta-label">&#x1F697; נסיעה</span><span class="meta-value">'+a.drive+'</span></div>'
     +buildShows(a)
     +'<div class="meta-item full"><span class="meta-label">&#x1F4B0; מחיר</span><span class="meta-value">'+a.price+'</span></div>'
+    +(a.seating?'<div class="meta-item full"><span class="meta-label">&#x1FA91; ישיבה</span><span class="meta-value">'+a.seating+'</span></div>':'')
     +'<div class="meta-item full"><span class="meta-label">&#x1F4CD; כתובת</span><span class="meta-value">'+a.address+'</span></div>'
     +'<div class="meta-item full" style="background:rgba(255,215,0,.06);border:1px solid rgba(255,215,0,.15)">'
     +'<span class="meta-label" style="color:var(--gold)">&#x1F4A1; טיפ</span>'
