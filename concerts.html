@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DFW — הופעות ומוזיקה חיה</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{--g0:#091510;--g2:#0f3320;--g4:#1a7a3e;--g5:#22a352;--g6:#2ecc71;--g7:#52d987;--g8:#85e8a8;--accent:#00ff88;--gold:#ffd700;--warm:#ff8c42;--text:#dff5ea;--text-dim:#7bbf94;--card-bg:rgba(13,36,22,0.92);--card-border:rgba(46,204,113,0.2)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Rubik',sans-serif;background:var(--g0);color:var(--text);min-height:100vh;direction:rtl}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 50% at 15% 5%,rgba(34,163,82,.13) 0%,transparent 55%),radial-gradient(ellipse 50% 70% at 85% 85%,rgba(0,255,136,.07) 0%,transparent 55%),repeating-linear-gradient(0deg,transparent,transparent 60px,rgba(46,204,113,.022) 60px,rgba(46,204,113,.022) 61px),repeating-linear-gradient(90deg,transparent,transparent 60px,rgba(46,204,113,.022) 60px,rgba(46,204,113,.022) 61px);pointer-events:none;z-index:0}
+
+  /* HEADER */
+  header{position:relative;z-index:10;padding:2.5rem 2rem 1.5rem;text-align:center;border-bottom:1px solid var(--card-border)}
+  .back-btn{display:inline-flex;align-items:center;gap:.5rem;font-family:'Space Mono',monospace;font-size:.7rem;color:var(--text-dim);background:rgba(46,204,113,.06);border:1px solid var(--card-border);padding:.35rem .9rem;border-radius:2rem;cursor:pointer;text-decoration:none;margin-bottom:1.2rem;transition:all .2s}
+  .back-btn:hover{border-color:var(--g6);color:var(--g6)}
+  .header-badge{display:inline-block;font-family:'Space Mono',monospace;font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:#b39dff;background:rgba(130,80,255,.08);border:1px solid rgba(130,80,255,.3);padding:.3rem 1rem;border-radius:2rem;margin-bottom:1rem}
+  h1{font-size:clamp(2rem,5vw,3.8rem);font-weight:900;line-height:1;background:linear-gradient(135deg,#b39dff 0%,var(--accent) 60%,var(--g8) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.4rem}
+  .subtitle{font-size:.95rem;color:var(--text-dim);font-weight:300}
+
+  /* STATS BAR */
+  .stats-bar{display:flex;gap:.7rem;justify-content:center;margin-top:1rem;flex-wrap:wrap}
+  .stat-chip{background:rgba(46,204,113,.06);border:1px solid var(--card-border);border-radius:.5rem;padding:.4rem .85rem;display:flex;flex-direction:column;align-items:center;gap:.05rem}
+  .stat-num{font-family:'Space Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--accent)}
+  .stat-lbl{font-size:.58rem;color:var(--text-dim)}
+  .stat-chip.visited-chip .stat-num{color:var(--gold)}
+
+  /* NAV */
+  nav{position:sticky;top:0;z-index:20;background:rgba(9,21,16,.96);backdrop-filter:blur(14px);border-bottom:1px solid var(--card-border)}
+  .nav-row{display:flex;justify-content:center;gap:.5rem;padding:.7rem 1rem;flex-wrap:wrap}
+  .nav-row.filter-row{padding:.55rem 1rem;border-top:1px solid rgba(255,255,255,.04)}
+  .cat-btn{font-family:'Rubik',sans-serif;font-size:.82rem;font-weight:500;padding:.4rem 1rem;border:1px solid var(--card-border);border-radius:2rem;background:transparent;color:var(--text-dim);cursor:pointer;transition:all .22s;white-space:nowrap}
+  .cat-btn:hover{border-color:var(--g6);color:var(--g6);background:rgba(46,204,113,.05)}
+  .cat-btn.active{background:var(--g6);border-color:var(--g6);color:var(--g0);font-weight:700;box-shadow:0 0 18px rgba(46,204,113,.45)}
+  .vis-btn{font-family:'Rubik',sans-serif;font-size:.78rem;font-weight:500;padding:.35rem .9rem;border:1px solid var(--card-border);border-radius:2rem;background:transparent;color:var(--text-dim);cursor:pointer;transition:all .22s;white-space:nowrap}
+  .vis-btn:hover{border-color:var(--gold);color:var(--gold)}
+  .vis-btn.active-vis{background:rgba(255,215,0,.12);border-color:var(--gold);color:var(--gold);font-weight:700}
+  .vis-btn.active-unvis{background:rgba(46,204,113,.1);border-color:var(--g6);color:var(--g6);font-weight:700}
+
+  /* MAIN */
+  main{position:relative;z-index:5;max-width:1300px;margin:0 auto;padding:2rem 1.5rem 5rem}
+  .section-header{font-size:1.1rem;font-weight:700;color:var(--g6);margin:2.5rem 0 1.2rem;padding-right:.7rem;border-right:3px solid var(--g6);display:flex;align-items:center;gap:.5rem}
+  .attractions-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.4rem;margin-bottom:2rem}
+
+  /* CARD */
+  .attr-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:1rem;overflow:hidden;transition:transform .28s,box-shadow .28s,border-color .28s;position:relative;backdrop-filter:blur(8px)}
+  .attr-card:hover{transform:translateY(-5px);box-shadow:0 18px 50px rgba(46,204,113,.18);border-color:rgba(46,204,113,.55)}
+  .attr-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--g5),var(--accent),var(--g5));opacity:0;transition:opacity .28s}
+  .attr-card:hover::before{opacity:1}
+  .attr-card.been-there{border-color:rgba(255,215,0,.45);background:linear-gradient(160deg,rgba(255,215,0,.05) 0%,var(--card-bg) 35%)}
+  .attr-card.been-there::before{background:linear-gradient(90deg,var(--gold),#ffe88a,var(--gold));opacity:1}
+
+  .attr-type{padding:.5rem 1rem;font-size:.62rem;font-family:'Space Mono',monospace;font-weight:700;letter-spacing:.13em;text-transform:uppercase;display:flex;align-items:center;gap:.4rem}
+  .type-amp {background:rgba(130,80,255,.13); color:#b39dff}
+  .type-lawn{background:rgba(82,217,135,.13); color:var(--accent)}
+  .type-bar {background:rgba(255,140,66,.13); color:var(--warm)}
+
+  .attr-body{padding:1rem 1.1rem .8rem}
+  .attr-name{font-size:1.05rem;font-weight:700;color:var(--text);margin-bottom:.35rem;line-height:1.3}
+  .attr-desc{font-size:.8rem;color:var(--text-dim);line-height:1.65;margin-bottom:.9rem}
+  .attr-meta{display:grid;grid-template-columns:1fr 1fr;gap:.35rem;margin-bottom:.9rem}
+  .meta-item{display:flex;flex-direction:column;gap:.07rem;background:rgba(0,0,0,.22);border-radius:.4rem;padding:.4rem .55rem}
+  .meta-label{font-size:.55rem;font-family:'Space Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--g5);opacity:.85}
+  .meta-value{font-size:.78rem;font-weight:500;color:var(--text)}
+  .meta-item.full{grid-column:1/-1}
+
+  /* FOOTER */
+  .attr-footer{display:flex;align-items:center;justify-content:space-between;padding:.6rem 1.1rem;border-top:1px solid rgba(46,204,113,.08);background:rgba(0,0,0,.18);gap:.5rem}
+  .rating-wrap{display:flex;align-items:center;gap:.45rem;flex:1}
+  .rating-dots{display:flex;gap:3px}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--g2)}
+  .dot.on{background:var(--g6);box-shadow:0 0 5px rgba(46,204,113,.6)}
+  .dot.top{background:var(--accent);box-shadow:0 0 7px rgba(0,255,136,.7)}
+  .rating-score{font-family:'Space Mono',monospace;font-size:.88rem;font-weight:700;color:var(--accent)}
+  .rating-lbl{font-size:.6rem;color:var(--text-dim)}
+  .price-badge{font-size:.72rem;font-weight:600;padding:.22rem .6rem;border-radius:1rem;background:rgba(46,204,113,.08);border:1px solid rgba(46,204,113,.2);color:var(--g7);white-space:nowrap}
+  .price-badge.free{background:rgba(255,215,0,.09);border-color:rgba(255,215,0,.28);color:var(--gold)}
+
+  /* BEEN THERE BUTTON */
+  .been-btn{display:flex;align-items:center;gap:.35rem;font-family:'Rubik',sans-serif;font-size:.75rem;font-weight:600;padding:.3rem .75rem;border-radius:1.5rem;border:1px solid var(--card-border);background:transparent;color:var(--text-dim);cursor:pointer;transition:all .22s;white-space:nowrap;flex-shrink:0}
+  .been-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(255,215,0,.08)}
+  .been-btn.checked{background:rgba(255,215,0,.15);border-color:var(--gold);color:var(--gold);box-shadow:0 0 12px rgba(255,215,0,.25)}
+  .been-btn .check-icon{font-size:.9rem;transition:transform .2s}
+  .been-btn.checked .check-icon{transform:scale(1.2)}
+
+  .attr-card.hidden{display:none}
+  .last-updated{text-align:center;font-family:'Space Mono',monospace;font-size:.6rem;color:var(--text-dim);padding:.75rem;opacity:.6;border-top:1px solid var(--card-border)}
+  ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--g0)}::-webkit-scrollbar-thumb{background:var(--g4);border-radius:3px}
+</style>
+</head>
+<body>
+<header>
+  <a class="back-btn" href="index.html">&#x2190; חזרה לאירועים</a>
+  <a class="back-btn" href="attractions.html">&#x1F5FA; טיולים קבועים</a>
+  <div class="header-badge">&#x1F3B8; DFW METRO &middot; PLANO &middot; TEXAS</div>
+  <h1>הופעות ומוזיקה חיה</h1>
+  <p class="subtitle">אמפיתיאטרונים &middot; דשא ופיקניק &middot; ברים עם מוזיקה חיה &mdash; פעילים כל השנה</p>
+  <div class="stats-bar">
+    <div class="stat-chip"><span class="stat-num" id="sTot">0</span><span class="stat-lbl">סה"כ מקומות</span></div>
+    <div class="stat-chip visited-chip"><span class="stat-num" id="sVis">0</span><span class="stat-lbl">&#x2714; היינו</span></div>
+    <div class="stat-chip"><span class="stat-num" id="sLeft">0</span><span class="stat-lbl">עוד לגלות</span></div>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-row">
+    <button class="cat-btn active" onclick="filterCat('all',this)">&#x1F3B5; הכל</button>
+    <button class="cat-btn" onclick="filterCat('amp',this)">&#x1F3DF; אמפיתיאטרון</button>
+    <button class="cat-btn" onclick="filterCat('lawn',this)">&#x1F9FA; דשא ופיקניק</button>
+    <button class="cat-btn" onclick="filterCat('bar',this)">&#x1F37B; בר ומוזיקה חיה</button>
+  </div>
+  <div class="nav-row filter-row">
+    <span style="font-size:.7rem;color:var(--text-dim);align-self:center">סנן לפי ביקור:</span>
+    <button class="vis-btn" id="btnAll" onclick="filterVisit('all',this)">&#x1F5FA; הכל</button>
+    <button class="vis-btn" id="btnVis" onclick="filterVisit('visited',this)">&#x2714; היינו</button>
+    <button class="vis-btn" id="btnUnvis" onclick="filterVisit('unvisited',this)">&#x1F4CD; עוד לא היינו</button>
+  </div>
+</nav>
+
+<main>
+  <div class="section-header">&#x1F3B8; מקומות קבועים להופעות חיות באזור DFW</div>
+  <div class="attractions-grid" id="grid"></div>
+</main>
+<div class="last-updated">עודכן: ספטמבר 2026 &mdash; הסימון נשמר במכשיר שלך. לתאריכי הופעות מדויקים בדקו את אתר המקום.</div>
+
+<script>
+const A = [
+  {id:1,type:"amp",tl:"&#x1F3DF; אמפיתיאטרון",name:"Dos Equis Pavilion",
+   desc:"האמפיתיאטרון הגדול והמרכזי של דאלאס לסיבוב ההופעות הארציות של הקיץ &mdash; אמנים גדולים כמעט כל שבוע בעונה. יש גם דשא פתוח (Lawn) מאחורי אזור הישיבה המקורה, מושלם לשמיכה.",
+   dist:"20 מייל מפלאנו",drive:"~30 דק",hours:"הופעות מרץ&ndash;ספטמבר, כמעט כל שבוע בעונה",
+   price:"כרטיסי דשא (Lawn) מ-$25&ndash;$45",address:"3839 S Fitzhugh Ave, Dallas TX 75210",
+   tip:"קנו כרטיס Lawn (הכי זול) והביאו שמיכה וכיסאות מתקפלים &mdash; חוקי האמפי מתירים זאת.",rating:9},
+
+  {id:2,type:"amp",tl:"&#x1F3DF; אמפיתיאטרון",name:"The Pavilion at Toyota Music Factory",
+   desc:"אמפיתיאטרון קטן ואינטימי יותר בלב מתחם Toyota Music Factory באירווינג, עם מגוון אמנים מקומיים ובינלאומיים כל השנה. דשא פתוח מאחורי המושבים, ומסביב פלאזה שלמה של מסעדות ובארים.",
+   dist:"22 מייל מפלאנו",drive:"~30 דק",hours:"הופעות כמעט כל שבוע, כל השנה",
+   price:"מ-$25 דשא, כרטיסי ישיבה מ-$45",address:"300 W Las Colinas Blvd, Irving TX 75039",
+   tip:"אפשר לעשות ערב שלם &mdash; ארוחה בפלאזה לפני ההופעה, בלי צורך לנסוע שוב.",rating:8},
+
+  {id:3,type:"lawn",tl:"&#x1F9FA; דשא ופיקניק",name:"Concerts by the Creek &mdash; Watters Creek",
+   desc:"קונצרטים חינמיים על הדשא הירוק במרכז Watters Creek Village Green. הביאו שמיכה או כיסאות מתקפלים &mdash; מסביב מסעדות וקפה, ולפעמים גם דוכני אוכל מיוחדים.",
+   dist:"8 מייל מפלאנו",drive:"~12 דק",hours:"שבתות בערב, כמעט כל שבוע באביב&ndash;סתיו",
+   price:"חינם!",address:"Watters Creek Village Green, Allen TX 75013",
+   tip:"הגיעו כחצי שעה מוקדם לתפוס מקום נוח על הדשא קרוב לבמה.",rating:8},
+
+  {id:4,type:"lawn",tl:"&#x1F9FA; דשא ופיקניק",name:"Klyde Warren Park",
+   desc:"פארק עירוני מעל כביש מהיר בלב דאלאס, עם דוכני אוכל טרקים (food trucks) כמעט כל יום וסדרת קונצרטים/סרטים חינמית בעונה. מקום מצוין לשבת על הדשא עם כל המשפחה.",
+   dist:"20 מייל מפלאנו",drive:"~30 דק",hours:"food trucks כל יום; קונצרטים/סרטים חינמיים כמה פעמים בחודש בעונה",
+   price:"חינם! (אוכל מהטרקים בתשלום)",address:"2012 Woodall Rodgers Fwy, Dallas TX 75201",
+   tip:"תפסו שולחן פיקניק מוקדם &mdash; המקום מתמלא מהר בסופי שבוע נעימים.",rating:9},
+
+  {id:5,type:"lawn",tl:"&#x1F9FA; דשא ופיקניק",name:"Lexus Box Garden at Legacy Hall",
+   desc:"גינת דשא מוצלת מאחורי Legacy Hall &mdash; פוד הול ענק עם עשרות דוכני אוכל. מארחת הופעות חיות ואירועי מוזיקה כמה פעמים בחודש, כל השנה.",
+   dist:"6 מייל מפלאנו",drive:"~10 דק",hours:"הופעות ואירועים כמה פעמים בחודש",
+   price:"כניסה חינם לרוב האירועים (אוכל בתשלום בפנים)",address:"7800 Windrose Ave, Plano TX 75024",
+   tip:"קחו אוכל מתוך Legacy Hall ותשבו על הדשא בחוץ &mdash; הכי נוח למשפחות עם ילדים.",rating:8},
+
+  {id:6,type:"lawn",tl:"&#x1F9FA; דשא ופיקניק",name:"The Lawn at Grandscape",
+   desc:"דשא ענק במתחם Grandscape עם קונצרטים, אירועי DJ ושווקים לאורך השנה. מוקף במסעדות ודוכני אוכל של המתחם.",
+   dist:"15 מייל מפלאנו",drive:"~20 דק",hours:"אירועים/הופעות כמה פעמים בחודש",
+   price:"כניסה חינם ברוב האירועים",address:"The Lawn at Grandscape, The Colony TX 75056",
+   tip:"בדקו את לוח האירועים החודשי של Grandscape &mdash; כמעט תמיד יש משהו בסוף שבוע.",rating:8},
+
+  {id:7,type:"lawn",tl:"&#x1F9FA; דשא ופיקניק",name:"Sundance Square Plaza",
+   desc:"כיכר עירונית פתוחה בלב פורט וורת' עם סדרת הופעות חינמיות והקרנות על מסך ענק. מוקפת במסעדות ולעיתים דוכני אוכל מזדמנים.",
+   dist:"35 מייל מפלאנו",drive:"~45 דק",hours:"הופעות חינמיות כמה פעמים בחודש",
+   price:"חינם!",address:"201 Main St, Fort Worth TX 76102",
+   tip:"שלבו עם ביקור ב-Fort Worth Stockyards באותו יום &mdash; מרחק נסיעה קצר.",rating:7},
+
+  {id:8,type:"bar",tl:"&#x1F37B; בר ומוזיקה חיה",name:"Truck Yard Dallas (Lower Greenville)",
+   desc:"חצר ענקית עם עשרות דוכני אוכל טרקים קבועים, בית עץ, נדנדות ומוזיקה חיה כמעט כל שבוע. אווירה חופשית ומשפחתית עד שעות הערב.",
+   dist:"22 מייל מפלאנו",drive:"~30 דק",hours:"מוזיקה חיה כמעט כל שבוע",
+   price:"כניסה חינם (אוכל/משקאות בתשלום)",address:"5624 Sears St, Dallas TX 75206",
+   tip:"יש גם סניף ב-The Colony, קרוב יותר אם באים מפלאנו.",rating:8},
+
+  {id:9,type:"bar",tl:"&#x1F37B; בר ומוזיקה חיה",name:"Truck Yard The Colony",
+   desc:"הגרסה הצפונית של Truck Yard, ליד Grandscape &mdash; אותו קונספט של דוכני אוכל, מוזיקה חיה ואווירה כפרית-אורבנית, קרוב משמעותית לפלאנו מהסניף בדאלאס.",
+   dist:"14 מייל מפלאנו",drive:"~20 דק",hours:"מוזיקה חיה כמה פעמים בחודש",
+   price:"כניסה חינם (אוכל/משקאות בתשלום)",address:"5959 Grove Ln, The Colony TX 75056",
+   tip:"אפשר לשלב עם ביקור ב-Grandscape ו-The Lawn באותו יום.",rating:8},
+
+  {id:10,type:"bar",tl:"&#x1F37B; בר ומוזיקה חיה",name:"TUPPS Brewery",
+   desc:"מבשלת בירה מקומית במקיני עם אולם ענק וחצר חיצונית, מארחת הופעות חיות, פסטיבלי מוזיקה קטנים וכיתות בישול בירה. ידידותי למשפחות בשעות היום.",
+   dist:"14 מייל מפלאנו",drive:"~20 דק",hours:"הופעות ואירועים כמה פעמים בחודש &mdash; ראה לוח אירועים באתר",
+   price:"כניסה לרוב חינם (בירה/אוכל בתשלום, 21+ לשתייה)",address:"402 E Louisiana St, McKinney TX 75069",
+   tip:"בדקו את tuppsbrewery.com/upcoming-events לפני שמגיעים &mdash; הלוח מתעדכן באופן שוטף.",rating:8}
+];
+
+// ============================================================
+// VISITED STATE — stored in localStorage
+// ============================================================
+const STORAGE_KEY = 'dfw_visited_concerts_v1';
+
+function loadVisited() {
+  try { return new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')); }
+  catch(e) { return new Set(); }
+}
+
+function saveVisited(set) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify([...set])); } catch(e) {}
+}
+
+let visited = loadVisited();
+
+function toggleVisited(id, btn, card) {
+  if (visited.has(id)) {
+    visited.delete(id);
+    btn.classList.remove('checked');
+    btn.innerHTML = '<span class="check-icon">&#x2B55;</span> לא היינו';
+    card.classList.remove('been-there');
+  } else {
+    visited.add(id);
+    btn.classList.add('checked');
+    btn.innerHTML = '<span class="check-icon">&#x2714;</span> היינו!';
+    card.classList.add('been-there');
+  }
+  saveVisited(visited);
+  updateStats();
+  applyVisitFilter();
+}
+
+// ============================================================
+// BUILD CARD
+// ============================================================
+function buildCard(a) {
+  const isFree = a.price.includes('חינם');
+  const isVis = visited.has(a.id);
+  let dots = '';
+  for(let i=1;i<=10;i++) dots += '<div class="dot '+(i<=a.rating?(a.rating>=9?'top':'on'):'')+'"></div>';
+
+  return '<div class="attr-card'+(isVis?' been-there':'')+'" data-type="'+a.type+'" data-id="'+a.id+'">'
+    +'<div class="attr-type type-'+a.type+'">'+a.tl+'</div>'
+    +'<div class="attr-body">'
+    +'<div class="attr-name">'+a.name+'</div>'
+    +'<div class="attr-desc">'+a.desc+'</div>'
+    +'<div class="attr-meta">'
+    +'<div class="meta-item"><span class="meta-label">&#x1F4CD; מרחק</span><span class="meta-value">'+a.dist+'</span></div>'
+    +'<div class="meta-item"><span class="meta-label">&#x1F697; נסיעה</span><span class="meta-value">'+a.drive+'</span></div>'
+    +'<div class="meta-item full"><span class="meta-label">&#x23F0; מתי</span><span class="meta-value">'+a.hours+'</span></div>'
+    +'<div class="meta-item full"><span class="meta-label">&#x1F4B0; מחיר</span><span class="meta-value">'+a.price+'</span></div>'
+    +'<div class="meta-item full"><span class="meta-label">&#x1F4CD; כתובת</span><span class="meta-value">'+a.address+'</span></div>'
+    +'<div class="meta-item full" style="background:rgba(255,215,0,.06);border:1px solid rgba(255,215,0,.15)">'
+    +'<span class="meta-label" style="color:var(--gold)">&#x1F4A1; טיפ</span>'
+    +'<span class="meta-value" style="color:#ffe88a">'+a.tip+'</span></div>'
+    +'</div></div>'
+    +'<div class="attr-footer">'
+    +'<div class="rating-wrap"><div><div class="rating-dots">'+dots+'</div><div class="rating-lbl">דירוג קהילתי</div></div>'
+    +'<div class="rating-score">'+a.rating+'/10</div></div>'
+    +'<span class="price-badge'+(isFree?' free':'')+'">'+a.price.split('(')[0].split('/')[0].trim()+'</span>'
+    +'<button class="been-btn'+(isVis?' checked':'')+'" onclick="toggleVisited('+a.id+',this,this.closest(\'.attr-card\'))">'
+    +'<span class="check-icon">'+(isVis?'&#x2714;':'&#x2B55;')+'</span>'
+    +(isVis?' היינו!':' לא היינו')
+    +'</button>'
+    +'</div></div>';
+}
+
+// ============================================================
+// FILTER LOGIC
+// ============================================================
+let curCat = 'all';
+let curVisit = 'all';
+
+function filterCat(cat, btn) {
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  curCat = cat;
+  applyFilters();
+}
+
+function filterVisit(mode, btn) {
+  document.querySelectorAll('.vis-btn').forEach(b => {
+    b.classList.remove('active-vis','active-unvis');
+  });
+  if (curVisit === mode) {
+    curVisit = 'all';
+    document.getElementById('btnAll').classList.add('active-vis');
+  } else {
+    curVisit = mode;
+    if (mode === 'visited') btn.classList.add('active-vis');
+    else if (mode === 'unvisited') btn.classList.add('active-unvis');
+  }
+  applyFilters();
+}
+
+function applyFilters() {
+  document.querySelectorAll('.attr-card').forEach(c => {
+    const id = parseInt(c.dataset.id);
+    const catOk = curCat === 'all' || c.dataset.type === curCat;
+    const visOk = curVisit === 'all'
+      || (curVisit === 'visited' && visited.has(id))
+      || (curVisit === 'unvisited' && !visited.has(id));
+    c.classList.toggle('hidden', !(catOk && visOk));
+  });
+}
+
+function applyVisitFilter() {
+  applyFilters();
+}
+
+function updateStats() {
+  document.getElementById('sTot').textContent = A.length;
+  document.getElementById('sVis').textContent = visited.size;
+  document.getElementById('sLeft').textContent = A.length - visited.size;
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.getElementById('grid').innerHTML = A.map(buildCard).join('');
+document.getElementById('btnAll').classList.add('active-vis');
+updateStats();
+</script>
+</body>
+</html>
