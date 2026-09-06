@@ -108,22 +108,24 @@ const regionOrder = ['plano','richardson','allen','addison','frisco','mckinney',
 
 ---
 
-## concerts.html — הופעות ומוזיקה חיה (10 מקומות, נוסף 09/2026)
+## concerts.html — הופעות ומוזיקה חיה (10 מקומות, נוסף 09/2026, שודרג 09/2026 לתאריכים אמיתיים)
 
-דף במבנה זהה ל-attractions.html (אותו CSS, אותה לוגיקת מעקב "היינו"), אבל localStorage key נפרד: `dfw_visited_concerts_v1` (לא להתבלבל עם `dfw_visited_v1` של attractions).
+דף במבנה דומה ל-attractions.html (אותו CSS, אותה לוגיקת מעקב "היינו"), עם localStorage key נפרד: `dfw_visited_concerts_v1` (לא להתבלבל עם `dfw_visited_v1` של attractions).
 
-| # | שם | סוג | מרחק |
-|---|-----|------|-------|
-| 1 | Dos Equis Pavilion | amp | 20 מייל |
-| 2 | The Pavilion at Toyota Music Factory | amp | 22 מייל |
-| 3 | Concerts by the Creek — Watters Creek | lawn | 8 מייל |
-| 4 | Klyde Warren Park | lawn | 20 מייל |
-| 5 | Lexus Box Garden at Legacy Hall | lawn | 6 מייל |
-| 6 | The Lawn at Grandscape | lawn | 15 מייל |
-| 7 | Sundance Square Plaza | lawn | 35 מייל |
-| 8 | Truck Yard Dallas | bar | 22 מייל |
-| 9 | Truck Yard The Colony | bar | 14 מייל |
-| 10 | TUPPS Brewery | bar | 14 מייל |
+⚠️ **חשוב:** בניגוד לגרסה הראשונה (שהייתה רשימת מקומות סטטית בלבד), המשתמש דרש במפורש שלכל מקום יופיעו **ההופעות הקרובות בפועל**: תאריך, שם הלהקה/אמן, אפיון (אם זו להקת קאבר — של מי בדיוק), וסגנון המוזיקה. לכן כל אובייקט מקום ב-`A[]` כולל עכשיו שדה `shows: [{date, artist, genre, cover?}]` בנוסף לשדות הישנים (`dist, drive, price, address, tip, rating`). שדה `hours` (תדירות כללית) **הוסר** והוחלף ב-`shows` הקונקרטי. יש רינדור ייעודי `buildShows(a)` ש-CSS class `.shows-box` מציג כרשימת הופעות בתוך הכרטיס (תאריך + אמן + סגנון + שורת "מחווה ל-X" אם רלוונטי).
+
+| # | שם | סוג | מרחק | סטטוס נתונים (09/2026) |
+|---|-----|------|-------|------|
+| 1 | Dos Equis Pavilion | amp | 20 מייל | מלא — 5 הופעות (מקור: do214.com/venues) |
+| 2 | The Pavilion at Toyota Music Factory | amp | 22 מייל | מלא — 5 הופעות (מקור: do214.com + concertfix.com; thepaviliontmf.com עצמו לא נשלף — JS-heavy) |
+| 3 | Concerts by the Creek — Watters Creek | lawn | 8 מייל | חלקי — רק 2 מופעים לכל הסתיו (הסדרה מתמקדת באביב-קיץ) |
+| 4 | Klyde Warren Park | lawn | 20 מייל | חלקי — 2 תאריכים ידועים, שם האמן טרם פורסם (Dallas Sounds Amplified) |
+| 5 | Lexus Box Garden at Legacy Hall | lawn | 6 מייל | **מלא ועשיר ביותר** — 6 מופעים, כולל שמות מדויקים של להקות מחווה (Bruno Mars, Journey, Beatles, Def Leppard) — המקור הכי טוב לדרישת "אם עושה קאברים אז של מי" |
+| 6 | The Lawn at Grandscape | lawn | 15 מייל | מלא — 3 מופעים דרך grandscape.com/events/month |
+| 7 | Sundance Square Plaza | lawn | 35 מייל | **חסר** — אתר sundancesquare.com מחזיר נתונים ישנים (מאי 2026); הסדרה קיימת (רביעי-ראשון) אך בלי לו״ז ספטמבר/אוקטובר מפורסם. יש הפניה למשתמש לבדוק @sundancesquaremusic באינסטגרם. **לבדוק שוב בעדכון עתידי אם מתפרסם לו״ז.** |
+| 8 | Truck Yard Dallas | bar | 22 מייל | חלקי — רק אמן אחד ידוע (Alex Francisco Caruthers), בלי סגנון מוזיקה מפורסם |
+| 9 | Truck Yard The Colony | bar | 14 מייל | חלקי — רק אירוע אחד (Trucktoberfest), בלי סגנון מוזיקה |
+| 10 | TUPPS Brewery | bar | 14 מייל | חלקי — 2 מופעים (tuppsbrewery.com/upcoming-events), בלי ז'אנר מפורסם |
 
 ### קטגוריות concerts
 `amp` (אמפיתיאטרון) | `lawn` (דשא ופיקניק — אפשר לשבת עם שמיכה, יש food trucks) | `bar` (בר/מבשלה עם מוזיקה חיה)
@@ -131,6 +133,8 @@ const regionOrder = ['plano','richardson','allen','addison','frisco','mckinney',
 ⚠️ **הערה חשובה:** בזמן המחקר לבניית הדף נמצא ש-**Lava Cantina (The Colony) נסגר** (מופיע כ-CLOSED ב-Yelp, ספטמבר 2026) — לכן לא נכלל ברשימה, למרות שבעבר היה מועמד טבעי. אם בעתיד יבדקו את הרשימה מחדש, כדאי לוודא שהמקומות עדיין פעילים לפני שמוסיפים בחזרה.
 
 שני הדפים (attractions.html ו-concerts.html) מקושרים זה לזה עם back-btn בראש העמוד, וגם מ-index.html דרך כפתור בסטטס-בר ("🎸 הופעות ומוזיקה חיה" ליד "🗺 טיולים קבועים").
+
+⚠️ **מגבלה ידועה:** רשימת ה-`shows` היא **סטטית** (הוזנה ידנית ב-06/09/2026 מנתוני אתרי המקומות באותו רגע) — היא **לא** מתעדכנת אוטומטית כמו `index.html` (שרץ דרך `update_portal.py` כל שבוע). אם רוצים שהתאריכים יישארו רלוונטיים, יש שתי אפשרויות: (א) לעדכן ידנית מדי כמה שבועות בבקשה מהמשתמש, או (ב) להרחיב את `update_portal.py` כך שיכלול גם רענון של concerts.html — **לא לעשות זאת ביוזמה עצמית**, רק אם המשתמש מבקש זאת במפורש (כדי לא לחזור על טעות #7 למטה — סקריפט אוטומציה שדורס תוכן קיים בלי בדיקה מדוקדקת).
 
 ---
 
