@@ -277,6 +277,13 @@ function toggleVisited(id, btn, card) {
 }
 
 // ============================================================
+// esc(): הגנת-עומק מפני XSS — הנתונים כאן מוזנים ידנית (לא מ-LLM), אבל
+// בורחים מכל תו HTML לפני הזרקה ל-innerHTML כהרגל בטוח לכל טקסט חופשי,
+// כך שגם הדבקה/שגיאת עריכה עתידית בשדה טקסט לא תרוץ כקוד בדפדפן.
+function esc(s){
+  return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
 // BUILD CARD
 // ============================================================
 function buildCard(a) {
@@ -285,25 +292,25 @@ function buildCard(a) {
   let dots = '';
   for(let i=1;i<=10;i++) dots += '<div class="dot '+(i<=a.rating?(a.rating>=9?'top':'on'):'')+'"></div>';
 
-  return '<div class="attr-card'+(isVis?' been-there':'')+'" data-type="'+a.type+'" data-id="'+a.id+'">'
-    +'<div class="attr-type type-'+a.type+'">'+a.tl+'</div>'
+  return '<div class="attr-card'+(isVis?' been-there':'')+'" data-type="'+esc(a.type)+'" data-id="'+a.id+'">'
+    +'<div class="attr-type type-'+esc(a.type)+'">'+esc(a.tl)+'</div>'
     +'<div class="attr-body">'
-    +'<div class="attr-name">'+a.name+'</div>'
-    +'<div class="attr-desc">'+a.desc+'</div>'
+    +'<div class="attr-name">'+esc(a.name)+'</div>'
+    +'<div class="attr-desc">'+esc(a.desc)+'</div>'
     +'<div class="attr-meta">'
-    +'<div class="meta-item"><span class="meta-label">&#x1F4CD; מרחק</span><span class="meta-value">'+a.dist+'</span></div>'
-    +'<div class="meta-item"><span class="meta-label">&#x1F697; נסיעה</span><span class="meta-value">'+a.drive+'</span></div>'
-    +'<div class="meta-item"><span class="meta-label">&#x23F0; שעות</span><span class="meta-value">'+a.hours+'</span></div>'
-    +'<div class="meta-item"><span class="meta-label">&#x1F4B0; מחיר</span><span class="meta-value">'+a.price+'</span></div>'
-    +'<div class="meta-item full"><span class="meta-label">&#x1F4CD; כתובת</span><span class="meta-value">'+a.address+'</span></div>'
+    +'<div class="meta-item"><span class="meta-label">&#x1F4CD; מרחק</span><span class="meta-value">'+esc(a.dist)+'</span></div>'
+    +'<div class="meta-item"><span class="meta-label">&#x1F697; נסיעה</span><span class="meta-value">'+esc(a.drive)+'</span></div>'
+    +'<div class="meta-item"><span class="meta-label">&#x23F0; שעות</span><span class="meta-value">'+esc(a.hours)+'</span></div>'
+    +'<div class="meta-item"><span class="meta-label">&#x1F4B0; מחיר</span><span class="meta-value">'+esc(a.price)+'</span></div>'
+    +'<div class="meta-item full"><span class="meta-label">&#x1F4CD; כתובת</span><span class="meta-value">'+esc(a.address)+'</span></div>'
     +'<div class="meta-item full" style="background:rgba(255,215,0,.06);border:1px solid rgba(255,215,0,.15)">'
     +'<span class="meta-label" style="color:var(--gold)">&#x1F4A1; טיפ</span>'
-    +'<span class="meta-value" style="color:#ffe88a">'+a.tip+'</span></div>'
+    +'<span class="meta-value" style="color:#ffe88a">'+esc(a.tip)+'</span></div>'
     +'</div></div>'
     +'<div class="attr-footer">'
     +'<div class="rating-wrap"><div><div class="rating-dots">'+dots+'</div><div class="rating-lbl">דירוג קהילתי</div></div>'
     +'<div class="rating-score">'+a.rating+'/10</div></div>'
-    +'<span class="price-badge'+(isFree?' free':'')+'">'+a.price.split('/')[0].trim()+'</span>'
+    +'<span class="price-badge'+(isFree?' free':'')+'">'+esc(a.price.split('/')[0].trim())+'</span>'
     +'<button class="been-btn'+(isVis?' checked':'')+'" onclick="toggleVisited('+a.id+',this,this.closest(\'.attr-card\'))">'
     +'<span class="check-icon">'+(isVis?'&#x2714;':'&#x2B55;')+'</span>'
     +(isVis?' היינו!':' לא היינו')

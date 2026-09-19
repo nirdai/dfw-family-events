@@ -186,8 +186,8 @@
     <div class="stat-chip"><span class="stat-num" id="sWknd">0</span><span class="stat-lbl">🔥 סופ"ש</span></div>
     <div class="stat-chip"><span class="stat-num" id="sFree">0</span><span class="stat-lbl">חינמיים</span></div>
     <div class="stat-chip"><span class="stat-num" id="sTop">0</span><span class="stat-lbl">דירוג 9+</span></div>
-    <button onclick="window.open('attractions.html','_blank')" style="margin-right:auto;font-family:'Rubik',sans-serif;font-size:.8rem;font-weight:600;padding:.55rem 1.1rem;border:1px solid rgba(255,215,0,.35);border-radius:.5rem;background:rgba(255,215,0,.08);color:var(--gold);cursor:pointer;transition:all .2s;white-space:nowrap" onmouseover="this.style.background='rgba(255,215,0,.18)'" onmouseout="this.style.background='rgba(255,215,0,.08)'">🗺 טיולים קבועים</button>
-    <button onclick="window.open('concerts.html','_blank')" style="font-family:'Rubik',sans-serif;font-size:.8rem;font-weight:600;padding:.55rem 1.1rem;border:1px solid rgba(130,80,255,.35);border-radius:.5rem;background:rgba(130,80,255,.08);color:#b39dff;cursor:pointer;transition:all .2s;white-space:nowrap" onmouseover="this.style.background='rgba(130,80,255,.18)'" onmouseout="this.style.background='rgba(130,80,255,.08)'">🎸 הופעות ומוזיקה חיה</button>
+    <button onclick="window.open('attractions.html','_blank','noopener')" style="margin-right:auto;font-family:'Rubik',sans-serif;font-size:.8rem;font-weight:600;padding:.55rem 1.1rem;border:1px solid rgba(255,215,0,.35);border-radius:.5rem;background:rgba(255,215,0,.08);color:var(--gold);cursor:pointer;transition:all .2s;white-space:nowrap" onmouseover="this.style.background='rgba(255,215,0,.18)'" onmouseout="this.style.background='rgba(255,215,0,.08)'">🗺 טיולים קבועים</button>
+    <button onclick="window.open('concerts.html','_blank','noopener')" style="font-family:'Rubik',sans-serif;font-size:.8rem;font-weight:600;padding:.55rem 1.1rem;border:1px solid rgba(130,80,255,.35);border-radius:.5rem;background:rgba(130,80,255,.08);color:#b39dff;cursor:pointer;transition:all .2s;white-space:nowrap" onmouseover="this.style.background='rgba(130,80,255,.18)'" onmouseout="this.style.background='rgba(130,80,255,.08)'">🎸 הופעות ומוזיקה חיה</button>
   </div>
 
   <div id="view-all" class="region-section active"></div>
@@ -592,30 +592,33 @@ function clearDate(){
   applyFilter();
 }
 
+function esc(s){
+  return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
 function buildCard(e){
   const isFree=e.price==='חינם'||e.price==='חינם!';
   const wc=e.weekend?' is-wknd':'';const beenCls=visitedEvents.has(e.id)?' been-there':'';
-  const badge=e.weekend?`<div class="wknd-badge">🔥 סופ"ש · ${e.whenLabel}</div>`:'';
+  const badge=e.weekend?`<div class="wknd-badge">🔥 סופ"ש · ${esc(e.whenLabel)}</div>`:'';
   const titleCls=e.weekend?'card-title has-badge':'card-title';
   const priceCls=isFree?'free':(e.price&&(e.price.startsWith('מ-')||e.price.startsWith('$')||e.price.startsWith('כ'))?'paid':'');
   let dots='';
   for(let i=1;i<=10;i++){const on=i<=e.rating;const cls=on?(e.rating>=9?'dot top':(e.weekend?'dot wd':'dot on')):'dot';dots+=`<div class="${cls}"></div>`;}
-  return `<div class="event-card${wc}${beenCls}" data-id="${e.id}" data-region="${e.region}" data-cat="${e.cat}" data-wknd="${e.weekend?1:0}" data-free="${isFree?1:0}">
-    ${badge}<div class="card-cat cat-${e.cat}">${e.catLabel}</div>
+  return `<div class="event-card${wc}${beenCls}" data-id="${e.id}" data-region="${esc(e.region)}" data-cat="${esc(e.cat)}" data-wknd="${e.weekend?1:0}" data-free="${isFree?1:0}">
+    ${badge}<div class="card-cat cat-${esc(e.cat)}">${esc(e.catLabel)}</div>
     <div class="card-body">
-      <div class="${titleCls}">${e.title}</div>
-      <div class="card-desc">${e.desc}</div>
+      <div class="${titleCls}">${esc(e.title)}</div>
+      <div class="card-desc">${esc(e.desc)}</div>
       <div class="card-meta">
-        <div class="meta-item${e.weekend?' date-hi':''}"><span class="meta-label">📅 מתי</span><span class="meta-value">${e.whenLabel}</span></div>
-        <div class="meta-item"><span class="meta-label">⏰ שעות</span><span class="meta-value">${e.hours}</span></div>
-        <div class="meta-item"><span class="meta-label">👥 מי</span><span class="meta-value">${e.who}</span></div>
-        <div class="meta-item"><span class="meta-label">💰 כניסה</span><span class="meta-value">${e.price}</span></div>
-        <div class="meta-item full"><span class="meta-label">📍 איפה</span><span class="meta-value">${e.where}</span></div>
+        <div class="meta-item${e.weekend?' date-hi':''}"><span class="meta-label">📅 מתי</span><span class="meta-value">${esc(e.whenLabel)}</span></div>
+        <div class="meta-item"><span class="meta-label">⏰ שעות</span><span class="meta-value">${esc(e.hours)}</span></div>
+        <div class="meta-item"><span class="meta-label">👥 מי</span><span class="meta-value">${esc(e.who)}</span></div>
+        <div class="meta-item"><span class="meta-label">💰 כניסה</span><span class="meta-value">${esc(e.price)}</span></div>
+        <div class="meta-item full"><span class="meta-label">📍 איפה</span><span class="meta-value">${esc(e.where)}</span></div>
       </div>
     </div>
     <div class="card-footer">
       <div class="rating-wrap"><div><div class="rating-dots">${dots}</div><div class="rating-lbl">דירוג קהילתי</div></div><div class="rating-score">${e.rating}/10</div></div>
-      <span class="price-badge ${priceCls}">${e.price}</span>
+      <span class="price-badge ${priceCls}">${esc(e.price)}</span>
       <button class="been-btn${visitedEvents.has(e.id)?' checked':''}" onclick="toggleBeenThere(${e.id},this,this.closest('.event-card'))">${visitedEvents.has(e.id)?'✔ היינו!':'⭕ לא היינו'}</button>
     </div>
   </div>`;

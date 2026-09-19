@@ -26,12 +26,27 @@ import datetime
 import pathlib
 import sys
 import os
+import re
+import json
+from zoneinfo import ZoneInfo
+
+CHICAGO_TZ = ZoneInfo("America/Chicago")  # ל-UPDATE_TIME — ה-runner של GitHub Actions רץ ב-UTC
 
 # ── הגדרות ──────────────────────────────────────────
 # נתיבים יחסיים לשורש ה-repo — כך שהסקריפט עובד גם מקומית וגם ב-GitHub Actions
 OUTPUT_PATH = pathlib.Path("index.html")
 LOG_PATH    = pathlib.Path("update_log.txt")
 MODEL       = "gemini-3.6-flash"  # נמצא בטיר החינמי של Gemini API — ודא שזה עדיין המצב בזמן ההרצה
+
+# ── אבטחה: שדות מותרים ──────────────────────────────
+# 06/09/2026: בעבר הסקריפט ביקש מ-Gemini "קוד JavaScript" והדביק אותו
+# כמו שהוא לתוך index.html. זו בעיית אבטחה: כל טקסט שהמודל מחזיר
+# (כולל תגובה "פרוצה"/מוזרה, או תוכן רעיל שנשלף במקרה מהאינטרנט בזמן
+# חיפוש-בסיס של Gemini) היה נכתב *כקוד* על אתר ציבורי חי — פתח לXSS/
+# הזרקת סקריפט לכל מי שנכנס לאתר. מ-09/2026: מבקשים מ-Gemini JSON
+# בלבד (לא JS), מפרקים עם json.loads (אף פעם לא eval/exec), ומאמתים
+# כל שדה כנגד רשימת ערכים מותרים לפני שכותבים לקובץ.
+DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 # 12 האזורים, לפי סדר מרחק מפלאנו (הבית) — התוויות המדויקות מוצגות ב-nav וב-view-all
 REGIONS = [
@@ -49,11 +64,15 @@ REGIONS = [
     ("grapevine",   "גרייפוויין",         "~35 דק׳ · 25 מייל"),
 ]
 
+VALID_REGIONS = {code for code, _, _ in REGIONS}
+
 CATEGORIES = [
     "market", "festival", "concert", "sport", "baseball", "mlb",
     "golf", "horror", "theater", "food", "art", "race", "rodeo",
     "comedy", "film", "culture"
 ]
+
+VALID_CATS = set(CATEGORIES)
 
 # ── Prompt ──────────────────────────────────────────
 def build_prompt() -> str:
@@ -83,28 +102,28 @@ def build_prompt() -> str:
 - שדה weekend צריך להיות true אם לפחות אחד מהתאריכים חל בשבת/ראשון
 - שדה cat חייב להיות אחד בדיוק מהרשימה הזו: {cat_list}
 
-החזר בדיוק את קוד JavaScript הבא — מערך events בלבד, ללא backticks או הסברים, עם כמה שיותר אירועים (לפחות 25-40 אם אפשר, פרוסים על פני כל האזורים):
+החזר **JSON בלבד** (לא קוד JavaScript, לא הסברים, לא backticks) — מערך אחד בפורמט JSON תקני, עם כמה שיותר אירועים (לפחות 25-40 אם אפשר, פרוסים על פני כל האזורים). כל מפתח ו-string חייבים להיות במרכאות כפולות כנדרש ב-JSON תקני:
 
-const events = [
+[
   {{
-    id: 1,
-    region: "plano",
-    cat: "festival",
-    catLabel: "🎡 פסטיבל",
-    weekend: true,
-    dates: ["2026-09-12", "2026-09-13"],
-    title: "שם האירוע",
-    desc: "תיאור קצר ומשכנע בעברית — מה מיוחד, למה כדאי לבוא",
-    who: "כל הגילאים",
-    whenLabel: "שבת-ראשון 12-13 בספטמבר",
-    hours: "10:00-18:00",
-    where: "שם המקום, עיר",
-    price: "חינם",
-    rating: 8
-  }},
-];
+    "id": 1,
+    "region": "plano",
+    "cat": "festival",
+    "catLabel": "🎡 פסטיבל",
+    "weekend": true,
+    "dates": ["2026-09-12", "2026-09-13"],
+    "title": "שם האירוע",
+    "desc": "תיאור קצר ומשכנע בעברית — מה מיוחד, למה כדאי לבוא",
+    "who": "כל הגילאים",
+    "whenLabel": "שבת-ראשון 12-13 בספטמבר",
+    "hours": "10:00-18:00",
+    "where": "שם המקום, עיר",
+    "price": "חינם",
+    "rating": 8
+  }}
+]
 
-חשוב: החזר את הקוד JavaScript בלבד, מ-const events = [ עד סגירת ];
+חשוב: החזר רק את מערך ה-JSON עצמו, מ-[ עד סגירת ] — בלי שום טקסט נוסף לפני או אחרי, ובלי תגי קוד HTML/JavaScript בתוך שדות הטקסט (title/desc/who/whenLabel/hours/where/price) — טקסט חופשי בעברית/אנגלית בלבד.
 """
 
 # ── HTML Template (זהה במבנה לגרסה המקורית: date strip, 12 אזורים, been-there) ──
@@ -113,7 +132,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DFW Family Events — WEEK_LABEL</title>
+<title>DFW Family Events — __WEEK_LABEL__</title>
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root{--g0:#091510;--g2:#0f3320;--g4:#1a7a3e;--g5:#22a352;--g6:#2ecc71;--g7:#52d987;--g8:#85e8a8;--accent:#00ff88;--gold:#ffd700;--warm:#ff8c42;--wknd:#ff6b6b;--wknd-glow:rgba(255,107,107,0.3);--text:#dff5ea;--text-dim:#7bbf94;--card-bg:rgba(13,36,22,0.92);--card-border:rgba(46,204,113,0.2)}
@@ -238,12 +257,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 </head>
 <body>
 <header>
-  <div class="header-badge">🗺 DFW METRO · DALLAS · TEXAS · WEEK_LABEL</div>
+  <div class="header-badge">🗺 DFW METRO · DALLAS · TEXAS · __WEEK_LABEL__</div>
   <h1>פעילויות השבועיים הקרובים</h1>
   <p class="subtitle">ספורט · מרוצים · הופעות · פסטיבלים · שווקים · תיאטרון · ירידים</p>
   <div class="week-tags">
-    <span class="wtag reg">📅 WEEK_RANGE</span>
-    <span class="wtag wknd">🔥 סופ"ש הקרוב: WEEKEND</span>
+    <span class="wtag reg">📅 __WEEK_RANGE__</span>
+    <span class="wtag wknd">🔥 סופ"ש הקרוב: __WEEKEND_RANGE__</span>
   </div>
 </header>
 
@@ -255,7 +274,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
 <nav>
   <button class="tab-btn active" onclick="showRegion('all',this)">🌆 הכל</button>
-NAV_BUTTONS
+__NAV_BUTTONS__
 </nav>
 
 <main>
@@ -282,17 +301,17 @@ NAV_BUTTONS
     <div class="stat-chip"><span class="stat-num" id="sWknd">0</span><span class="stat-lbl">🔥 סופ"ש</span></div>
     <div class="stat-chip"><span class="stat-num" id="sFree">0</span><span class="stat-lbl">חינמיים</span></div>
     <div class="stat-chip"><span class="stat-num" id="sTop">0</span><span class="stat-lbl">דירוג 9+</span></div>
-    <button onclick="window.open('attractions.html','_blank')" style="margin-right:auto;font-family:'Rubik',sans-serif;font-size:.8rem;font-weight:600;padding:.55rem 1.1rem;border:1px solid rgba(255,215,0,.35);border-radius:.5rem;background:rgba(255,215,0,.08);color:var(--gold);cursor:pointer;transition:all .2s;white-space:nowrap" onmouseover="this.style.background='rgba(255,215,0,.18)'" onmouseout="this.style.background='rgba(255,215,0,.08)'">🗺 טיולים קבועים</button>
-    <button onclick="window.open('concerts.html','_blank')" style="font-family:'Rubik',sans-serif;font-size:.8rem;font-weight:600;padding:.55rem 1.1rem;border:1px solid rgba(130,80,255,.35);border-radius:.5rem;background:rgba(130,80,255,.08);color:#b39dff;cursor:pointer;transition:all .2s;white-space:nowrap" onmouseover="this.style.background='rgba(130,80,255,.18)'" onmouseout="this.style.background='rgba(130,80,255,.08)'">🎸 הופעות ומוזיקה חיה</button>
+    <button onclick="window.open('attractions.html','_blank','noopener')" style="margin-right:auto;font-family:'Rubik',sans-serif;font-size:.8rem;font-weight:600;padding:.55rem 1.1rem;border:1px solid rgba(255,215,0,.35);border-radius:.5rem;background:rgba(255,215,0,.08);color:var(--gold);cursor:pointer;transition:all .2s;white-space:nowrap" onmouseover="this.style.background='rgba(255,215,0,.18)'" onmouseout="this.style.background='rgba(255,215,0,.08)'">🗺 טיולים קבועים</button>
+    <button onclick="window.open('concerts.html','_blank','noopener')" style="font-family:'Rubik',sans-serif;font-size:.8rem;font-weight:600;padding:.55rem 1.1rem;border:1px solid rgba(130,80,255,.35);border-radius:.5rem;background:rgba(130,80,255,.08);color:#b39dff;cursor:pointer;transition:all .2s;white-space:nowrap" onmouseover="this.style.background='rgba(130,80,255,.18)'" onmouseout="this.style.background='rgba(130,80,255,.08)'">🎸 הופעות ומוזיקה חיה</button>
   </div>
 
   <div id="view-all" class="region-section active"></div>
   <style>.region-dist{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--text-dim);background:rgba(46,204,113,.07);border:1px solid var(--card-border);padding:.2rem .6rem;border-radius:1rem;white-space:nowrap;margin-right:auto;margin-left:.5rem}</style>
-REGION_SECTIONS
+__REGION_SECTIONS__
 </main>
-<div class="last-updated" id="lastUpdated">עודכן: UPDATE_TIME</div>
+<div class="last-updated" id="lastUpdated">עודכן: __UPDATE_TIME__</div>
 <script>
-EVENTS_JS
+__EVENTS_JS__
 
 const VISITED_KEY='dfw_visited_events_v1';
 let visitedEvents=new Set();
@@ -306,7 +325,7 @@ function toggleBeenThere(id,btn,card){
 
 const DAYS_HE=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
 const MONTHS_HE=['','ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
-const WEEKEND_DAYS=[5,6,0];
+const WKND_DOW=[5,6,0];
 let activeDate=null;
 
 function buildDateStrip(){
@@ -318,7 +337,7 @@ function buildDateStrip(){
   dates.forEach(dateStr=>{
     const d=new Date(dateStr+'T12:00:00');
     const dow=d.getDay();
-    const isWknd=WEEKEND_DAYS.includes(dow);
+    const isWknd=WKND_DOW.includes(dow);
     const count=events.filter(e=>e.dates.includes(dateStr)).length;
     const btn=document.createElement('button');
     btn.className='date-btn'+(isWknd?' is-wknd-btn':'');
@@ -339,7 +358,7 @@ function toggleDate(dateStr,btn){
   btn.classList.add('active-date');
   const d=new Date(dateStr+'T12:00:00');
   const dow=d.getDay();
-  const isWknd=WEEKEND_DAYS.includes(dow);
+  const isWknd=WKND_DOW.includes(dow);
   const banner=document.getElementById('activeDateBanner');
   banner.textContent=`📅 מציג: ${DAYS_HE[dow]} ${d.getDate()} ${MONTHS_HE[d.getMonth()+1]} — ${events.filter(e=>e.dates.includes(dateStr)).length} אירועים`;
   banner.className='active-date-banner show'+(isWknd?' wknd-banner':'');
@@ -353,37 +372,46 @@ function clearDate(){
   applyFilter();
 }
 
+// esc(): הגנת-עומק מפני XSS — ה-events מגיעים מ-update_portal.py שכבר מאמת
+// כל שדה מול רשימה-לבנה (region/cat/dates/rating) ומגביל אורך מחרוזות,
+// אבל שדות הטקסט החופשי (title/desc/וכו') הם עדיין טקסט "בר-קיימא" ולא
+// HTML — לכן בורחים כאן מכל תו HTML לפני הזרקה ל-innerHTML, כדי שאם
+// אירוע כלשהו יכלול תווי HTML הם יוצגו כטקסט רגיל ולא ירוצו כקוד.
+function esc(s){
+  return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
 function buildCard(e){
   const isFree=e.price==='חינם'||e.price==='חינם!';
   const wc=e.weekend?' is-wknd':'';const beenCls=visitedEvents.has(e.id)?' been-there':'';
-  const badge=e.weekend?`<div class="wknd-badge">🔥 סופ"ש · ${e.whenLabel}</div>`:'';
+  const badge=e.weekend?`<div class="wknd-badge">🔥 סופ"ש · ${esc(e.whenLabel)}</div>`:'';
   const titleCls=e.weekend?'card-title has-badge':'card-title';
   const priceCls=isFree?'free':(e.price&&(e.price.startsWith('מ-')||e.price.startsWith('$')||e.price.startsWith('כ'))?'paid':'');
   let dots='';
   for(let i=1;i<=10;i++){const on=i<=e.rating;const cls=on?(e.rating>=9?'dot top':(e.weekend?'dot wd':'dot on')):'dot';dots+=`<div class="${cls}"></div>`;}
-  return `<div class="event-card${wc}${beenCls}" data-id="${e.id}" data-region="${e.region}" data-cat="${e.cat}" data-wknd="${e.weekend?1:0}" data-free="${isFree?1:0}">
-    ${badge}<div class="card-cat cat-${e.cat}">${e.catLabel}</div>
+  return `<div class="event-card${wc}${beenCls}" data-id="${e.id}" data-region="${esc(e.region)}" data-cat="${esc(e.cat)}" data-wknd="${e.weekend?1:0}" data-free="${isFree?1:0}">
+    ${badge}<div class="card-cat cat-${esc(e.cat)}">${esc(e.catLabel)}</div>
     <div class="card-body">
-      <div class="${titleCls}">${e.title}</div>
-      <div class="card-desc">${e.desc}</div>
+      <div class="${titleCls}">${esc(e.title)}</div>
+      <div class="card-desc">${esc(e.desc)}</div>
       <div class="card-meta">
-        <div class="meta-item${e.weekend?' date-hi':''}"><span class="meta-label">📅 מתי</span><span class="meta-value">${e.whenLabel}</span></div>
-        <div class="meta-item"><span class="meta-label">⏰ שעות</span><span class="meta-value">${e.hours}</span></div>
-        <div class="meta-item"><span class="meta-label">👥 מי</span><span class="meta-value">${e.who}</span></div>
-        <div class="meta-item"><span class="meta-label">💰 כניסה</span><span class="meta-value">${e.price}</span></div>
-        <div class="meta-item full"><span class="meta-label">📍 איפה</span><span class="meta-value">${e.where}</span></div>
+        <div class="meta-item${e.weekend?' date-hi':''}"><span class="meta-label">📅 מתי</span><span class="meta-value">${esc(e.whenLabel)}</span></div>
+        <div class="meta-item"><span class="meta-label">⏰ שעות</span><span class="meta-value">${esc(e.hours)}</span></div>
+        <div class="meta-item"><span class="meta-label">👥 מי</span><span class="meta-value">${esc(e.who)}</span></div>
+        <div class="meta-item"><span class="meta-label">💰 כניסה</span><span class="meta-value">${esc(e.price)}</span></div>
+        <div class="meta-item full"><span class="meta-label">📍 איפה</span><span class="meta-value">${esc(e.where)}</span></div>
       </div>
     </div>
     <div class="card-footer">
       <div class="rating-wrap"><div><div class="rating-dots">${dots}</div><div class="rating-lbl">דירוג קהילתי</div></div><div class="rating-score">${e.rating}/10</div></div>
-      <span class="price-badge ${priceCls}">${e.price}</span>
+      <span class="price-badge ${priceCls}">${esc(e.price)}</span>
       <button class="been-btn${visitedEvents.has(e.id)?' checked':''}" onclick="toggleBeenThere(${e.id},this,this.closest('.event-card'))">${visitedEvents.has(e.id)?'✔ היינו!':'⭕ לא היינו'}</button>
     </div>
   </div>`;
 }
 
-const regionNames=REGION_NAMES_JS;
-const regionOrder=REGION_ORDER_JS;
+const regionNames=__REGION_NAMES_JS__;
+const regionOrder=__REGION_ORDER_JS__;
 
 let curRegion='all',curFilter=null;
 
@@ -489,24 +517,112 @@ def build_html(events_js: str) -> str:
     region_order_js  = "[" + ",".join(f"'{code}'" for code, _, _ in REGIONS) + "]"
 
     html = HTML_TEMPLATE
-    html = html.replace("NAV_BUTTONS",      nav_buttons)
-    html = html.replace("REGION_SECTIONS",  region_sections)
-    html = html.replace("REGION_NAMES_JS",  region_names_js)
-    html = html.replace("REGION_ORDER_JS",  region_order_js)
-    html = html.replace("WEEK_LABEL",  f"{fmt(week_start)}–{fmt(week_end)}")
-    html = html.replace("WEEK_RANGE",  f"שבוע: {fmt(week_start)}–{fmt(week_end)} {today.year}")
-    html = html.replace("WEEKEND",     f"שבת {fmt(saturday)} + ראשון {fmt(sunday)}")
-    html = html.replace("UPDATE_TIME", datetime.datetime.now().strftime("%d/%m/%Y %H:%M"))
-    html = html.replace("EVENTS_JS",   events_js)
+    # ⚠️ תיקון באג קריטי (09/2026): הפלייסהולדרים היו קודם מילים "חשופות"
+    # (למשל WEEKEND) בלי תיחום — ול-html.replace("WEEKEND", ...) אין מושג
+    # גבולות-מילה, אז הוא תפס גם את "WEEKEND" שבתוך הקבוע WEEKEND_DAYS
+    # שבקוד ה-JS, והפך אותו ל-"const שבת 19 ספטמבר..._DAYS=[5,6,0];" —
+    # שגיאת syntax שמפילה את כל ה-<script> (שום דבר לא רץ: לא render(),
+    # לא buildDateStrip(), לא הסינון) → **זה מה שגרם לאתר החי "להיתקע"
+    # בלי אירועים** בכל ריצה אוטומטית מאז שהתבנית המלאה חזרה (06/09/2026).
+    # התיקון: כל הפלייסהולדרים כאן מתוחמים ב-__..__ (למשל __WEEKEND_RANGE__),
+    # רצף שלא יכול להתנגש בטעות עם שם משתנה/קבוע אמיתי בקוד ה-JS.
+    html = html.replace("__NAV_BUTTONS__",      nav_buttons)
+    html = html.replace("__REGION_SECTIONS__",  region_sections)
+    html = html.replace("__REGION_NAMES_JS__",  region_names_js)
+    html = html.replace("__REGION_ORDER_JS__",  region_order_js)
+    html = html.replace("__WEEK_LABEL__",  f"{fmt(week_start)}–{fmt(week_end)}")
+    html = html.replace("__WEEK_RANGE__",  f"שבוע: {fmt(week_start)}–{fmt(week_end)} {today.year}")
+    html = html.replace("__WEEKEND_RANGE__", f"שבת {fmt(saturday)} + ראשון {fmt(sunday)}")
+    html = html.replace("__UPDATE_TIME__", datetime.datetime.now(CHICAGO_TZ).strftime("%d/%m/%Y %H:%M"))
+    html = html.replace("__EVENTS_JS__",   events_js)
     return html
 
 # ── לוג ──────────────────────────────────────────────
 def log(msg: str):
-    ts   = datetime.datetime.now().strftime("[%Y-%m-%d %H:%M:%S]")
+    ts   = datetime.datetime.now(CHICAGO_TZ).strftime("[%Y-%m-%d %H:%M:%S]")
     line = f"{ts} {msg}"
     print(line)
     with open(LOG_PATH, "a", encoding="utf-8") as f:
         f.write(line + "\n")
+
+# ── חילוץ JSON מתוך תשובת המודל ─────────────────────
+def extract_json_array(raw: str) -> str:
+    """
+    Gemini לפעמים עוטף את התשובה ב-```json ... ``` או מוסיף טקסט לפני/אחרי.
+    מחלצים רק את מערך ה-JSON (מה-'[' הראשון ל-']' התואם האחרון) —
+    לעולם לא מריצים את התוכן כקוד (אין eval/exec כאן, רק json.loads בהמשך).
+    """
+    s = raw.strip()
+    if s.startswith("```"):
+        s = s.split("\n", 1)[1] if "\n" in s else s
+        s = s.rsplit("```", 1)[0].strip()
+        if s.lower().startswith("json"):
+            s = s[4:].strip()
+    start = s.find("[")
+    end   = s.rfind("]")
+    if start == -1 or end == -1 or end < start:
+        raise ValueError("לא נמצא מערך JSON בתשובת המודל")
+    return s[start:end + 1]
+
+# ── אימות/סניטציה של האירועים שהתקבלו מהמודל ────────
+# עקרון: אף פעם לא סומכים על טקסט חופשי מ-LLM כ"קוד" (JS) שרץ על האתר —
+# רק כ"מידע" (JSON) שעובר בדיקת סוג/טווח/רשימה-לבנה לכל שדה. שדות טקסט
+# חופשיים (title/desc/וכו') מוגבלים באורך ומוברחים כמחרוזת רגילה; ה-HTML
+# escaping בפועל קורה בצד הלקוח (ב-JS של buildCard, ראה esc()) כהגנת-עומק
+# נוספת — כדי שגם אם שדה מכיל תווי HTML הם יוצגו כטקסט ולא ירוצו כקוד.
+REQUIRED_STR_FIELDS = ["catLabel", "title", "desc", "who", "whenLabel", "hours", "where", "price"]
+MAX_STR_LEN = 400
+
+def validate_events(data) -> list:
+    if not isinstance(data, list):
+        raise ValueError("התשובה אינה מערך JSON")
+    clean = []
+    seen_ids = set()
+    for i, e in enumerate(data):
+        if not isinstance(e, dict):
+            log(f"  ⚠️ פריט #{i} לא dict — הושמט")
+            continue
+        try:
+            eid = int(e["id"])
+            region = e["region"]
+            cat = e["cat"]
+            weekend = bool(e["weekend"])
+            dates = e["dates"]
+            rating = int(e["rating"])
+
+            if region not in VALID_REGIONS:
+                raise ValueError(f"region לא תקין: {region!r}")
+            if cat not in VALID_CATS:
+                raise ValueError(f"cat לא תקין: {cat!r}")
+            if not (1 <= rating <= 10):
+                raise ValueError(f"rating מחוץ לטווח: {rating!r}")
+            if not isinstance(dates, list) or not dates:
+                raise ValueError("dates חייב להיות מערך לא-ריק")
+            for d in dates:
+                if not isinstance(d, str) or not DATE_RE.match(d):
+                    raise ValueError(f"תאריך לא תקין: {d!r}")
+            if eid in seen_ids:
+                raise ValueError(f"id כפול: {eid}")
+
+            clean_e = {
+                "id": eid, "region": region, "cat": cat, "weekend": weekend,
+                "dates": dates, "rating": rating,
+            }
+            for field in REQUIRED_STR_FIELDS:
+                val = e.get(field, "")
+                if not isinstance(val, str):
+                    raise ValueError(f"{field} חייב להיות מחרוזת")
+                clean_e[field] = val[:MAX_STR_LEN]
+
+            seen_ids.add(eid)
+            clean.append(clean_e)
+        except (KeyError, ValueError, TypeError) as err:
+            log(f"  ⚠️ פריט #{i} נפסל ({err}) — הושמט")
+            continue
+
+    if len(clean) < 5:
+        raise ValueError(f"רק {len(clean)} אירועים תקינים עברו אימות — נראה כמו תשובה פגומה, מבטלים עדכון")
+    return clean
 
 # ── Main ──────────────────────────────────────────────
 def main():
@@ -522,16 +638,27 @@ def main():
             model    = MODEL,
             contents = build_prompt()
         )
-        events_js = response.text.strip()
-        # Gemini לפעמים עוטף תשובות קוד ב-```js ... ``` — מסירים אם קיים
-        if events_js.startswith("```"):
-            events_js = events_js.split("\n", 1)[1] if "\n" in events_js else events_js
-            events_js = events_js.rsplit("```", 1)[0].strip()
-            if events_js.startswith("js"):
-                events_js = events_js[2:].strip()
-        log(f"  התקבל תגובה ({len(events_js)} תווים)")
+        raw = (response.text or "").strip()
+        log(f"  התקבל תגובה ({len(raw)} תווים)")
+
+        json_str = extract_json_array(raw)
+        parsed   = json.loads(json_str)          # לעולם לא eval/exec — רק parsing נתונים
+        events   = validate_events(parsed)        # רשימה-לבנה לכל שדה
+        log(f"  ✅ {len(events)} אירועים עברו אימות מתוך {len(parsed)} שהתקבלו")
+
+        # JSON תקני הוא תת-קבוצה חוקית של JS — בטוח לשימוש כ-literal של מערך,
+        # ואין כאן שום דבר שהמודל "כתב" כקוד — רק ערכים שעברו אימות מעלה.
+        # ⚠️ עדיין חשוב: אם שדה טקסט חופשי מכיל את הרצף "</" (למשל "</script>"),
+        # זה יסגור בפועל את תג ה-<script> שעוטף את EVENTS_JS ב-HTML הסופי —
+        # לפני שקוד ה-JS בכלל רץ (אין קשר ל-esc() בצד הלקוח, זה קורה כבר
+        # בפענוח ה-HTML עצמו). לכן בורחים מ-"</" ל-"<\/" — Escape חוקי בתוך
+        # מחרוזת JSON, ומתפרש בחזרה בדיוק ל-"/" הרגיל ב-JSON.parse/JS.
+        events_json = json.dumps(events, ensure_ascii=False, indent=2).replace("</", "<\\/")
+        events_js = "const events = " + events_json + ";"
 
         html = build_html(events_js)
+        # לא דורסים את index.html הקיים אם משהו נכשל אחרי השלב הזה —
+        # ראה תקלה #7 ב-CLAUDE.md: תבנית/תוכן פגום שדרס בעבר גרסה תקינה חיה.
         OUTPUT_PATH.write_text(html, encoding="utf-8")
         log(f"  ✅ נשמר בהצלחה: {OUTPUT_PATH}")
 
