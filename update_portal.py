@@ -253,9 +253,40 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   .event-card.hidden{display:none !important}
   .last-updated{text-align:center;font-family:'Space Mono',monospace;font-size:.6rem;color:var(--text-dim);padding:.75rem;opacity:.6;border-top:1px solid var(--card-border)}
   ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--g0)}::-webkit-scrollbar-thumb{background:var(--g4);border-radius:3px}
+
+  /* BUG / LOG BUTTON + PANEL — מציג את הלוג של ריצת העדכון האוטומטי האחרונה */
+  .bug-btn{position:fixed;bottom:1.2rem;left:1.2rem;z-index:50;width:3rem;height:3rem;border-radius:50%;background:rgba(13,36,22,.92);border:1px solid rgba(46,204,113,.35);color:var(--g7);font-size:1.3rem;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.4);transition:all .2s;backdrop-filter:blur(8px)}
+  .bug-btn:hover{border-color:var(--accent);color:var(--accent);transform:scale(1.08)}
+  .bug-btn.has-errors{border-color:var(--wknd);color:var(--wknd);box-shadow:0 0 14px rgba(255,107,107,.45)}
+  .bug-overlay{display:none;position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);align-items:flex-end;justify-content:flex-start;padding:1.2rem}
+  .bug-overlay.open{display:flex}
+  .bug-panel{width:min(480px,92vw);max-height:70vh;display:flex;flex-direction:column;background:var(--g0);border:1px solid rgba(46,204,113,.3);border-radius:.9rem;box-shadow:0 20px 60px rgba(0,0,0,.55);overflow:hidden}
+  .bug-panel-head{display:flex;align-items:center;justify-content:space-between;padding:.8rem 1rem;border-bottom:1px solid var(--card-border);background:rgba(46,204,113,.05)}
+  .bug-panel-title{font-size:.85rem;font-weight:700;color:var(--g7);display:flex;align-items:center;gap:.4rem}
+  .bug-panel-close{background:transparent;border:none;color:var(--text-dim);font-size:1.1rem;cursor:pointer;padding:.2rem .5rem;line-height:1}
+  .bug-panel-close:hover{color:var(--accent)}
+  .bug-panel-body{overflow-y:auto;padding:.7rem 1rem;font-family:'Space Mono',monospace;font-size:.68rem;line-height:1.65}
+  .bug-line{padding:.2rem 0;border-bottom:1px dashed rgba(255,255,255,.06);color:var(--text-dim);word-break:break-word}
+  .bug-line:last-child{border-bottom:none}
+  .bug-line.is-err{color:#ff9a9a}
+  .bug-line.is-warn{color:var(--gold)}
+  .bug-line.is-ok{color:var(--g6)}
+  .bug-panel-foot{padding:.55rem 1rem;border-top:1px solid var(--card-border);font-size:.62rem;color:var(--text-dim);text-align:center}
+  .bug-panel-foot a{color:var(--g7)}
 </style>
 </head>
 <body>
+<button class="bug-btn" id="bugBtn" onclick="toggleBugPanel()" title="לוג העדכון האוטומטי האחרון">&#x1F41E;</button>
+<div class="bug-overlay" id="bugOverlay" onclick="if(event.target===this)toggleBugPanel()">
+  <div class="bug-panel">
+    <div class="bug-panel-head">
+      <span class="bug-panel-title">&#x1F41E; לוג העדכון האוטומטי האחרון</span>
+      <button class="bug-panel-close" onclick="toggleBugPanel()">&#x2715;</button>
+    </div>
+    <div class="bug-panel-body" id="bugPanelBody"></div>
+    <div class="bug-panel-foot">כל שני בבוקר רץ עדכון אוטומטי — כאן מוצג הלוג של הריצה שיצרה את העמוד הנוכחי</div>
+  </div>
+</div>
 <header>
   <div class="header-badge">🗺 DFW METRO · DALLAS · TEXAS · __WEEK_LABEL__</div>
   <h1>פעילויות השבועיים הקרובים</h1>
@@ -312,6 +343,33 @@ __REGION_SECTIONS__
 <div class="last-updated" id="lastUpdated">עודכן: __UPDATE_TIME__</div>
 <script>
 __EVENTS_JS__
+
+// UPDATE_LOG: מחרוזות טקסט בלבד (לא HTML) שנכתבו ע"י log() ב-update_portal.py
+// במהלך הריצה שיצרה את העמוד הזה — עוברות esc() לפני הזרקה, כמו כל טקסט אחר.
+const UPDATE_LOG = __UPDATE_LOG_JS__;
+
+function toggleBugPanel(){
+  const ov=document.getElementById('bugOverlay');
+  ov.classList.toggle('open');
+}
+
+function lineClass(line){
+  if(line.includes('❌')) return 'bug-line is-err';
+  if(line.includes('⚠️')) return 'bug-line is-warn';
+  if(line.includes('✅')) return 'bug-line is-ok';
+  return 'bug-line';
+}
+
+function renderBugLog(){
+  const body=document.getElementById('bugPanelBody');
+  if(!UPDATE_LOG || !UPDATE_LOG.length){
+    body.innerHTML='<div class="bug-line">אין נתוני לוג זמינים לריצה הזו.</div>';
+    return;
+  }
+  body.innerHTML=UPDATE_LOG.map(l=>'<div class="'+lineClass(l)+'">'+esc(l)+'</div>').join('');
+  const hasErr=UPDATE_LOG.some(l=>l.includes('❌')||l.includes('⚠️'));
+  document.getElementById('bugBtn').classList.toggle('has-errors',hasErr);
+}
 
 const VISITED_KEY='dfw_visited_events_v1';
 let visitedEvents=new Set();
@@ -483,11 +541,12 @@ function setFilter(type,btn){
 
 buildDateStrip();
 render();
+renderBugLog();
 </script>
 </body>
 </html>"""
 
-def build_html(events_js: str) -> str:
+def build_html(events_js: str, log_lines: list) -> str:
     today       = datetime.date.today()
     week_start  = today
     week_end    = today + datetime.timedelta(days=27)
@@ -535,13 +594,20 @@ def build_html(events_js: str) -> str:
     html = html.replace("__WEEKEND_RANGE__", f"שבת {fmt(saturday)} + ראשון {fmt(sunday)}")
     html = html.replace("__UPDATE_TIME__", datetime.datetime.now(CHICAGO_TZ).strftime("%d/%m/%Y %H:%M"))
     html = html.replace("__EVENTS_JS__",   events_js)
+    # לוג הריצה הנוכחית, מוטמע כמערך JSON של מחרוזות טקסט בלבד (לא HTML/קוד) —
+    # מוצג בפאנל "🐛" שנפתח בלחיצה. אותה הגנת "</" כמו ב-events_js, ליתר ביטחון.
+    log_json = json.dumps(log_lines, ensure_ascii=False).replace("</", "<\\/")
+    html = html.replace("__UPDATE_LOG_JS__", log_json)
     return html
 
 # ── לוג ──────────────────────────────────────────────
+LOG_LINES: list = []  # נצבר במהלך הריצה הנוכחית בלבד, ומוטמע ב-index.html דרך build_html()
+
 def log(msg: str):
     ts   = datetime.datetime.now(CHICAGO_TZ).strftime("[%Y-%m-%d %H:%M:%S]")
     line = f"{ts} {msg}"
     print(line)
+    LOG_LINES.append(line)
     with open(LOG_PATH, "a", encoding="utf-8") as f:
         f.write(line + "\n")
 
@@ -656,7 +722,7 @@ def main():
         events_json = json.dumps(events, ensure_ascii=False, indent=2).replace("</", "<\\/")
         events_js = "const events = " + events_json + ";"
 
-        html = build_html(events_js)
+        html = build_html(events_js, LOG_LINES)
         # לא דורסים את index.html הקיים אם משהו נכשל אחרי השלב הזה —
         # ראה תקלה #7 ב-CLAUDE.md: תבנית/תוכן פגום שדרס בעבר גרסה תקינה חיה.
         OUTPUT_PATH.write_text(html, encoding="utf-8")

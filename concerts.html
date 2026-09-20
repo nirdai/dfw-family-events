@@ -103,6 +103,18 @@
 
   .attr-card.hidden{display:none}
   .last-updated{text-align:center;font-family:'Space Mono',monospace;font-size:.6rem;color:var(--text-dim);padding:.75rem;opacity:.6;border-top:1px solid var(--card-border)}
+
+  /* WEEK BOX — aggregator of this week's shows across all venues */
+  .week-box{position:relative;z-index:5;max-width:1300px;margin:1.6rem auto 0;padding:0 1.5rem}
+  .week-box-inner{background:linear-gradient(135deg,rgba(255,215,0,.09),rgba(46,204,113,.06));border:1px solid rgba(255,215,0,.35);border-radius:1rem;padding:1.1rem 1.3rem;backdrop-filter:blur(8px)}
+  .week-box-title{font-size:.95rem;font-weight:700;color:var(--gold);margin-bottom:.7rem;display:flex;align-items:center;gap:.45rem}
+  .week-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:.6rem}
+  .week-item{display:flex;align-items:center;gap:.6rem;background:rgba(0,0,0,.22);border:1px solid rgba(255,215,0,.15);border-radius:.6rem;padding:.5rem .7rem}
+  .week-date{font-family:'Space Mono',monospace;font-size:.75rem;font-weight:700;color:var(--gold);white-space:nowrap;flex-shrink:0}
+  .week-info{display:flex;flex-direction:column;gap:.1rem;min-width:0}
+  .week-venue{font-size:.8rem;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .week-genre{font-size:.66rem;color:var(--text-dim)}
+  .week-empty{font-size:.8rem;color:var(--text-dim)}
   ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--g0)}::-webkit-scrollbar-thumb{background:var(--g4);border-radius:3px}
 </style>
 </head>
@@ -119,6 +131,13 @@
     <div class="stat-chip"><span class="stat-num" id="sLeft">0</span><span class="stat-lbl">עוד לגלות</span></div>
   </div>
 </header>
+
+<div class="week-box">
+  <div class="week-box-inner">
+    <div class="week-box-title">&#x1F525; ההופעות של השבוע &mdash; מכל המקומות</div>
+    <div class="week-grid" id="weekGrid"></div>
+  </div>
+</div>
 
 <nav>
   <div class="nav-row">
@@ -139,7 +158,7 @@
   <div class="section-header">&#x1F3B8; מקומות קבועים להופעות חיות באזור DFW &mdash; עם ההופעות הקרובות בפועל</div>
   <div class="attractions-grid" id="grid"></div>
 </main>
-<div class="last-updated">עודכן: 6 בספטמבר 2026 &mdash; רשימת ההופעות מבוססת על לוחות הזמנים הרשמיים של כל מקום נכון לתאריך העדכון. תאריכים עלולים להשתנות &mdash; מומלץ לבדוק באתר המקום לפני היציאה. הסימון "היינו" נשמר במכשיר שלך.</div>
+<div class="last-updated">עודכן: 19 בספטמבר 2026 &mdash; רשימת ההופעות רועננה ותאריכים ישנים הוסרו. מבוסס על לוחות הזמנים הרשמיים של כל מקום נכון לתאריך העדכון. תאריכים עלולים להשתנות &mdash; מומלץ לבדוק באתר המקום לפני היציאה. הסימון "היינו" נשמר במכשיר שלך.</div>
 
 <script>
 const A = [
@@ -151,11 +170,11 @@ const A = [
    seating:"Lawn = דשא פתוח, שבים באופן חופשי עם שמיכה/כיסא מתקפל; יש גם ישיבה מקורה מוקצית (יקרה יותר)",
    tip:"קנו כרטיס Lawn (הכי זול) והביאו שמיכה וכיסאות מתקפלים &mdash; חוקי האמפי מתירים זאת.",rating:9,
    shows:[
-     {date:"10/9",time:"18:30",artist:"Mötley Crüe — The Return Of The Carnival Of Sins",genre:"רוק"},
-     {date:"11/9",time:"19:00",artist:"Tim McGraw — Pawn Shop Guitar Tour",genre:"קאנטרי"},
-     {date:"12/9",time:"18:55",artist:"Zeds Dead — Journey Of A Lifetime Tour",genre:"אלקטרוני / דאבסטep"},
-     {date:"16/9",time:"18:30",artist:"Kehlani — World Tour",genre:"R&B / פופ"},
-     {date:"18/9",time:"19:30",artist:"Billy Idol",genre:"רוק"}
+     {date:"19/9",time:"20:00",artist:"Grupo Duelo — Gravedad Tour 2026",genre:"לטינית / רחדה"},
+     {date:"20/9",time:"19:30",artist:"Empire of the Sun — Ask That God: Afterlife Tour",genre:"אלקטרו-פופ"},
+     {date:"23/9",time:"19:20",artist:"Babymetal — World Tour 2026",genre:"מטאל"},
+     {date:"22/10",time:"19:00",artist:"Dan + Shay — The Young Tour",genre:"קאנטרי"},
+     {date:"30/10",time:"18:00",artist:"Uforia Latino Mix Live",genre:"לטינית — פסטיבל רב-אמנים"}
    ]},
 
   {id:2,type:"amp",tl:"&#x1F3DF; אמפיתיאטרון",name:"The Pavilion at Toyota Music Factory",
@@ -166,11 +185,15 @@ const A = [
    seating:"דשא פתוח (GA, שבים לפי מקום פנוי) מאחורי אזור ישיבה מקורה מוקצה",
    tip:"אפשר לעשות ערב שלם &mdash; ארוחה בפלאזה לפני ההופעה, בלי צורך לנסוע שוב.",rating:8,
    shows:[
-     {date:"6/9",time:"19:15",artist:"Myles Smith — My Mess, My Heart, My Life Tour",genre:"פופ / סול"},
-     {date:"9/9",time:"19:00",artist:"NEEDTOBREATHE — The Long Surrender Tour",genre:"רוק נוצרי"},
-     {date:"10/9",time:"19:00",artist:"Jimmy Eat World — 25 Years Of Bleed American",genre:"רוק אלטרנטיבי"},
-     {date:"11/9",time:"19:00",artist:"Kany García — Puerta Abierta Tour",genre:"לטינית"},
-     {date:"12/9",time:"19:00",artist:"Thee Sacred Souls, LA LOM & The Womack Sisters",genre:"R&B / סול"}
+     {date:"20/9",time:"19:00",artist:"Chief Keef Live 2026",genre:"היפ הופ"},
+     {date:"24/9",time:"19:00",artist:"Alicia Villarreal — Bendita Locura Tour 2026",genre:"לטינית"},
+     {date:"30/9",time:"19:00",artist:"Juanes — North America Tour 2026",genre:"לטינית / רוק"},
+     {date:"4/10",time:"19:00",artist:"ZZ Top",genre:"רוק"},
+     {date:"5/10",time:"19:00",artist:"TLC & Salt-N-Pepa with En Vogue — It's Iconic",genre:"R&B / היפ הופ"},
+     {date:"11/10",time:"19:00",artist:"wave to earth — The Pieces Tour",genre:"אינדי / פופ"},
+     {date:"16/10",time:"19:00",artist:"Modest Mouse",genre:"רוק אלטרנטיבי"},
+     {date:"18/10",time:"19:00",artist:"Foster The People — Good Mourning Sunshine Tour",genre:"אינדי-פופ"},
+     {date:"25/10",time:"19:00",artist:"Sin Bandera — US Escenas Tour",genre:"לטינית"}
    ]},
 
   {id:11,type:"amp",tl:"&#x1F3DF; אמפיתיאטרון",name:"Red Tail Pavilion (Oak Point Park)",
@@ -209,8 +232,6 @@ const A = [
    seating:"דשא פתוח — מביאים שמיכת פיקניק או כיסא מתקפל, יושבים בכל מקום פנוי על הדשא",
    tip:"בסדרת הסתיו (Fall Series) יש מופע כל שבוע, שישי-שבת 19:00&ndash;21:00, ברצף עד סוף אוקטובר &mdash; הגיעו כחצי שעה מוקדם לתפוס מקום נוח.",rating:8,
    shows:[
-     {date:"5/9",time:"19:00&ndash;21:00",artist:"Love Handle (סיום עונת קיץ)",genre:"רוק — להקת מסיבות/קאבר"},
-     {date:"12/9",time:"19:00&ndash;21:00",artist:"Fall Series — להקה מתחלפת (ר' הערה)",genre:"מגוון"},
      {date:"19/9",time:"19:00&ndash;21:00",artist:"Fall Series — להקה מתחלפת (ר' הערה)",genre:"מגוון"},
      {date:"26/9",time:"19:00&ndash;21:00",artist:"Southern Couch Band",genre:"רוק קלאסי/וינטג' — להקת קאבר"},
      {date:"3/10",time:"19:00&ndash;21:00",artist:"Fall Series — להקה מתחלפת (ר' הערה)",genre:"מגוון"},
@@ -218,7 +239,7 @@ const A = [
      {date:"17/10",time:"19:00&ndash;21:00",artist:"Fall Series — להקה מתחלפת (ר' הערה)",genre:"מגוון"},
      {date:"24/10",time:"19:00&ndash;21:00",artist:"Fall Series — להקה מתחלפת (ר' הערה)",genre:"מגוון"}
    ],
-   note:"הערה: ל-Fall Series כולה (7 מופעים) מתחלף רוסטר של 4 להקות שכבר אושרו לעונה — 80's Mix Tape, Radio Edit, High Octane Band, Last Exit Band — אבל ההתאמה המדויקת בין תאריך ללהקה עדיין לא פורסמה לכל השבועות; בדקו את דף האירוע הרשמי קרוב לתאריך."},
+   note:"הערה: ל-Fall Series כולה מתחלף רוסטר של 4 להקות שאושרו לעונה — 80's Mix Tape, Radio Edit, High Octane Band, Last Exit Band — אבל ההתאמה המדויקת בין תאריך ללהקה לא פורסמה לכל השבועות (חוץ מ-26/9); בדקו את דף האירוע הרשמי (watterscreek.com) קרוב לתאריך — דף האירוע חסם גישה אוטומטית בבדיקה האחרונה."},
 
   {id:4,type:"lawn",tl:"&#x1F9FA; דשא ופיקניק",name:"Klyde Warren Park",
    link:"https://www.klydewarrenpark.org/events-programming",
@@ -228,9 +249,9 @@ const A = [
    seating:"דשא פתוח בפארק, אין ישיבה מוקצית — מביאים שמיכה",
    tip:"סדרת 'Dallas Sounds Amplified' מציגה אמן מקומי משתנה &mdash; שם האמן הספציפי מתפרסם קרוב למועד, עקבו אחרי דף הפארק.",rating:7,
    shows:[
-     {date:"18/9",time:"18:00&ndash;20:00",artist:"Dallas Sounds Amplified — אמן מקומי (יתפרסם בקרוב)",genre:"לא צוין"},
-     {date:"25/9",time:"18:00&ndash;20:00",artist:"Dallas Sounds Amplified — אמן מקומי (יתפרסם בקרוב)",genre:"לא צוין"}
-   ]},
+     {date:"25/9",time:"18:00&ndash;20:00",artist:"Dallas Sounds Amplified — Will Fitzgerald",genre:"אמן מקומי — East Lawn"}
+   ],
+   note:"סדרת Dallas Sounds Amplified מתפרסמת בטפטוף — רק תאריך אחד היה מאושר בבדיקה האחרונה; בדקו את דף הפארק לעדכונים נוספים לאוקטובר."},
 
   {id:5,type:"lawn",tl:"&#x1F9FA; דשא ופיקניק",name:"Lexus Box Garden at Legacy Hall",
    link:"https://www.legacyfoodhall.com/events/",
@@ -240,12 +261,16 @@ const A = [
    seating:"דלתות נפתחות שעה לפני &mdash; ישיבה חופשית על הדשא (GA), אין מקומות מוקצים",
    tip:"קחו אוכל מתוך Legacy Hall ותשבו על הדשא בחוץ &mdash; הכי נוח למשפחות עם ילדים.",rating:9,
    shows:[
-     {date:"11/9",time:"דלתות 19:00, הופעה 20:00",artist:"24K Magic",genre:"פופ / R&B",cover:"מחווה ל-Bruno Mars",extra:"בתשלום (BUY TICKETS)"},
-     {date:"17/9",time:"דלתות 19:00, הופעה 20:00",artist:"The Bellamy Brothers",genre:"קאנטרי",extra:"בתשלום (BUY TICKETS)"},
-     {date:"18/9",time:"דלתות 19:00, הופעה 20:00",artist:"Departure ATX",genre:"רוק 70s/80s",cover:"מחווה ל-Journey",extra:"בתשלום (BUY TICKETS)"},
-     {date:"23/9",time:"דלתות 19:00, הופעה 20:00",artist:"Firehouse",genre:"רוק 90s",extra:"בתשלום (BUY TICKETS)"},
-     {date:"25/9",time:"דלתות 19:00, הופעה 20:00",artist:"Hard Night's Day",genre:"פופ",cover:"מחווה ל-The Beatles",extra:"כניסה חינם! (FREE GA)"},
-     {date:"26/9",time:"דלתות 19:00, הופעה 20:00",artist:"Def Leggend",genre:"רוק 80s",cover:"מחווה ל-Def Leppard",extra:"בתשלום (BUY TICKETS)"}
+     {date:"23/9",time:"הופעה 20:00",artist:"Firehouse",genre:"רוק 90s",extra:"בתשלום (BUY TICKETS)"},
+     {date:"24/9",time:"הופעה 20:00",artist:"Siggno",genre:"לטינית",extra:"בתשלום (BUY TICKETS)"},
+     {date:"25/9",time:"הופעה 20:00",artist:"Hard Night's Day",genre:"פופ",cover:"מחווה ל-The Beatles",extra:"בתשלום (BUY TICKETS)"},
+     {date:"26/9",time:"הופעה 20:00",artist:"Def Leggend",genre:"רוק 80s",cover:"מחווה ל-Def Leppard",extra:"בתשלום (BUY TICKETS)"},
+     {date:"2/10",time:"הופעה 20:00",artist:"The Piano Men",genre:"פופ/רוק",cover:"מחווה ל-Elton John ול-Billy Joel",extra:"בתשלום (BUY TICKETS)"},
+     {date:"9/10",time:"הופעה 20:00",artist:"Legends of New Country",genre:"קאנטרי",cover:"מחווה ל-Morgan Wallen ול-Ella Langley",extra:"בתשלום (BUY TICKETS)"},
+     {date:"15/10",time:"הופעה 20:00",artist:"William Clark Green",genre:"קאנטרי",extra:"בתשלום (BUY TICKETS)"},
+     {date:"17/10",time:"הופעה 20:00",artist:"Queen Legacy",genre:"רוק",cover:"מחווה ל-Queen",extra:"בתשלום (BUY TICKETS)"},
+     {date:"24/10",time:"הופעה 20:00",artist:"Los Lonely Boys",genre:"לטינית / רוק",extra:"בתשלום (BUY TICKETS)"},
+     {date:"30/10",time:"הופעה 20:00",artist:"Reputation",genre:"פופ",cover:"מחווה ל-Taylor Swift",extra:"בתשלום (BUY TICKETS)"}
    ]},
 
   {id:6,type:"lawn",tl:"&#x1F9FA; דשא ופיקניק",name:"The Lawn at Grandscape",
@@ -256,15 +281,11 @@ const A = [
    seating:"דשא פתוח מול הבמה (Corona Stage & Lawn) — ישיבה חופשית עם שמיכה/כיסא",
    tip:"בדקו את grandscape.com/events לעדכונים &mdash; לרוב יש מופע אחד&ndash;שניים בחודש, ולעיתים גם באוקטובר.",rating:8,
    shows:[
-     {date:"3/9",time:"19:00&ndash;21:00",artist:"CaliRumba",genre:"לטינית / רומבה",extra:"חינם"},
-     {date:"11/9",time:"19:00",artist:"Graceland Ninjaz",genre:"רוק/פופ/היפ הופ — מדליי ולהיטים מ-5 עשורים (מיקס קאבר)",extra:"חינם"},
-     {date:"20/9",time:"19:00&ndash;21:00",artist:"Nicholas Payton",genre:"ג'אז",extra:"חינם"},
-     {date:"23/9",time:"19:00",artist:"Country Close Up",genre:"קאנטרי",extra:"חינם"},
-     {date:"24/9",time:"19:00",artist:"Caribbean Night",genre:"קריבית / world music",extra:"חינם"},
-     {date:"1/10",time:"19:00",artist:"Hip Hop Hooray",genre:"היפ הופ",extra:"חינם"},
-     {date:"2/10",time:"19:00",artist:"Barefoot Nation",genre:"לא צוין",extra:"חינם"},
-     {date:"8/10",time:"19:00",artist:"Back in Black",genre:"רוק — להקת קאבר",cover:"מחווה ל-AC/DC (סגנון)",extra:"חינם"}
-   ]},
+     {date:"23/9",time:"19:00&ndash;21:00",artist:"Vincent Mason — Country Close Up",genre:"קאנטרי",extra:"חינם — בהפקת New Country 96.3 ו-99.5 The Wolf"},
+     {date:"1/10",time:"19:00&ndash;21:00",artist:"Hip Hop Hooray",genre:"היפ הופ — להקת קאבר",extra:"חינם"},
+     {date:"2/10",time:"19:00&ndash;21:00",artist:"Barefoot Nation",genre:"קאנטרי",cover:"מחווה ל-Kenny Chesney",extra:"חינם"}
+   ],
+   note:"הלו״ז המפורסם מראש דליל יחסית לחודש אוקטובר — ייתכנו הופעות נוספות שיתפרסמו קרוב למועד; בדקו grandscape.com/events."},
 
   {id:7,type:"lawn",tl:"&#x1F9FA; דשא ופיקניק",name:"Sundance Square Plaza",
    link:"https://sundancesquare.com/events/",
@@ -272,9 +293,8 @@ const A = [
    dist:"35 מייל מפלאנו",drive:"~45 דק",
    price:"חינם!",address:"201 Main St / 420 Main St, Fort Worth TX 76102",
    seating:"כיכר עירונית פתוחה — ישיבה/עמידה חופשית, אין דשא (מרצפת), אפשר להביא כיסא מתקפל",
-   tip:"זה כנראה המקום שחיפשת: ה-Night Market החודשי היה אתמול (5/9) והבא הוא 3/10 &mdash; בדיוק &quot;הופעה על דשא/כיכר&quot; עם פער של כמעט חודש. ללו״ז השוטף (רביעי-ראשון) עקבו אחרי @sundancesquaremusic באינסטגרם.",rating:7,
+   tip:"ה-Night Market החודשי (שבת ראשונה בחודש) הוא האירוע הכי בולט עם מוזיקה חיה + זיקוקים. ללו״ז השוטף (רביעי-ראשון) עקבו אחרי @sundancesquaremusic באינסטגרם.",rating:7,
    shows:[
-     {date:"5/9",time:"17:00&ndash;22:00",artist:"Greater Sundance Night Market — מוזיקה חיה + זיקוקים (עבר אתמול)",genre:"מגוון"},
      {date:"3/10",time:"17:00&ndash;22:00",artist:"Greater Sundance Night Market — מוזיקה חיה + זיקוקים",genre:"מגוון"}
    ],
    note:"בנוסף לשני התאריכים האלה יש גם סדרת מוזיקה שוטפת רביעי-ראשון באותה כיכר, אבל שמות הלהקות הספציפיים לא מתפרסמים מראש — רק דרך אינסטגרם קרוב למועד."},
@@ -286,9 +306,8 @@ const A = [
    price:"כניסה חינם (אוכל/משקאות בתשלום)",address:"5624 Sears St, Dallas TX 75206",
    seating:"חצר חיצונית פתוחה — שולחנות פיקניק ודשא, ישיבה חופשית ללא הזמנה",
    tip:"הבמה מנוהלת ע״י 13th Floor Music והלו״ז מתעדכן שוטף &mdash; בדקו truckyard.com/dallas/live-music קרוב למועד.",rating:7,
-   shows:[
-     {date:"6/9",time:"14:00&ndash;17:00",artist:"Alex Francisco Caruthers",genre:"לא צוין",extra:"מופע יום"}
-   ]},
+   shows:[],
+   note:"חסר: בבדיקה האחרונה (19/9) לוח ההופעות הרשמי של האתר הציג &quot;0 events found&quot; — נראה שהמוזיקה כאן היא שוטפת/ספונטנית (&quot;tunes every darn day&quot;) בלי תזמון שמתפרסם מראש, ולא נמצאו תאריכים ספציפיים לספטמבר&ndash;אוקטובר 2026. יש כן אירועים לא-מוזיקליים מתוזמנים: Dolly Parton Day ב-25/9 ומסיבת צפייה בטקסס נגד אוקלהומה ב-10/10."},
 
   {id:9,type:"bar",tl:"&#x1F37B; בר ומוזיקה חיה",name:"Truck Yard The Colony",
    link:"https://do214.com/venues/truck-yard-the-colony",
@@ -297,21 +316,18 @@ const A = [
    price:"כניסה חינם (אוכל/משקאות בתשלום)",address:"5959 Grove Ln, The Colony TX 75056",
    seating:"חצר חיצונית פתוחה — ישיבה חופשית, שולחנות ודשא",
    tip:"אפשר לשלב עם ביקור ב-Grandscape ו-The Lawn באותו יום.",rating:7,
-   shows:[
-     {date:"12/9",time:"11:00",artist:"Trucktoberfest (אירוע מיוחד)",genre:"לא צוין"}
-   ]},
+   shows:[],
+   note:"חסר: לא נמצאו תאריכי הופעות מוזיקה חיה מאושרים לספטמבר&ndash;אוקטובר 2026 בבדיקה האחרונה (19/9). בדקו את דף do214.com/venues/truck-yard-the-colony קרוב למועד הביקור."},
 
   {id:10,type:"bar",tl:"&#x1F37B; בר ומוזיקה חיה",name:"TUPPS Brewery",
    link:"https://www.tuppsbrewery.com/upcoming-events",
    desc:"מבשלת בירה מקומית במקיני עם אולם ענק וחצר חיצונית (Outdoor Stage & Lawn), מארחת הופעות חיות באולם ובחוץ. ידידותי למשפחות בשעות היום.",
    dist:"14 מייל מפלאנו",drive:"~20 דק",
    price:"כניסה לרוב חינם (בירה/אוכל בתשלום, 21+ לשתייה)",address:"402 E Louisiana St, McKinney TX 75069",
-   seating:"6/9: חצר חיצונית/דשא (Outdoor Stage & Lawn); 18/9: אולם הבירה הפנימי (Outdoor Beer Hall) — שני המקרים ישיבה חופשית",
+   seating:"חצר חיצונית/דשא (Outdoor Stage & Lawn) או אולם הבירה הפנימי (Outdoor Beer Hall) — תלוי באירוע, ישיבה חופשית",
    tip:"בדקו את tuppsbrewery.com/upcoming-events לפני שמגיעים &mdash; הלוח מתעדכן באופן שוטף.",rating:7,
-   shows:[
-     {date:"6/9",time:"19:00&ndash;22:00",artist:"The Flannel Pajamas — Live on the Lawn",genre:"לא צוין",extra:"חצר/דשא חיצוני"},
-     {date:"18/9",time:"19:00&ndash;22:00",artist:"Mark Hudspeth",genre:"לא צוין",extra:"אולם בירה פנימי"}
-   ]}
+   shows:[],
+   note:"חסר: לוח האירועים הרשמי (19/9) הציג רק אירועים לא-מוזיקליים לספטמבר&ndash;אוקטובר (Oktoberfest, בינגו צמחים, שוק Boho, Ratrodtober Fest, ערב סרטים, Trunk or Treat) וסיורי מבשלה חודשיים — בלי הופעות חיות מאושרות. בדקו שוב קרוב למועד."}
 ];
 
 // ============================================================
@@ -357,6 +373,57 @@ function safeHref(u){
   if(typeof u!=='string') return null;
   if(!/^https?:\/\//i.test(u)) return null;
   return esc(u);
+}
+
+// ============================================================
+// WEEK BOX — aggregates all shows happening in the next 7 days
+// across every venue card. Parses the free-text "date" field
+// (formats like "19/9", "2/10", sometimes with trailing text)
+// as D/M in the current year, and shows only date + venue + genre.
+// ============================================================
+function parseShowDate(dateStr) {
+  if (typeof dateStr !== 'string') return null;
+  const m = dateStr.match(/^(\d{1,2})\s*\/\s*(\d{1,2})/);
+  if (!m) return null;
+  const day = parseInt(m[1], 10), month = parseInt(m[2], 10);
+  if (day < 1 || day > 31 || month < 1 || month > 12) return null;
+  const year = new Date().getFullYear();
+  const d = new Date(year, month - 1, day);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function buildWeekBox() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const weekEnd = new Date(today);
+  weekEnd.setDate(today.getDate() + 7);
+
+  const items = [];
+  A.forEach(a => {
+    (a.shows || []).forEach(s => {
+      const d = parseShowDate(s.date);
+      if (d && d >= today && d < weekEnd) {
+        items.push({ d, dateLabel: s.date, venue: a.name, genre: s.genre || '' });
+      }
+    });
+  });
+  items.sort((x, y) => x.d - y.d);
+
+  const grid = document.getElementById('weekGrid');
+  if (!grid) return;
+  if (items.length === 0) {
+    grid.innerHTML = '<div class="week-empty">אין הופעות מתוזמנות השבוע לפי הנתונים הקיימים &mdash; בדקו שוב בקרוב.</div>';
+    return;
+  }
+  grid.innerHTML = items.map(it =>
+    '<div class="week-item">'
+    + '<span class="week-date">' + esc(it.dateLabel) + '</span>'
+    + '<div class="week-info">'
+    + '<span class="week-venue">' + esc(it.venue) + '</span>'
+    + '<span class="week-genre">' + esc(it.genre) + '</span>'
+    + '</div></div>'
+  ).join('');
 }
 
 // ============================================================
@@ -469,6 +536,7 @@ function updateStats() {
 document.getElementById('grid').innerHTML = A.map(buildCard).join('');
 document.getElementById('btnAll').classList.add('active-vis');
 updateStats();
+buildWeekBox();
 </script>
 </body>
 </html>
