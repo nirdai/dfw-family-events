@@ -102,6 +102,8 @@
   .been-btn.checked .check-icon{transform:scale(1.2)}
 
   .attr-card.hidden{display:none}
+  @keyframes flashHighlight{0%,100%{box-shadow:none;border-color:rgba(46,204,113,0.2)}50%{box-shadow:0 0 0 4px rgba(255,215,0,.55);border-color:var(--gold)}}
+  .attr-card.flash-highlight{animation:flashHighlight 1.6s ease-in-out}
   .last-updated{text-align:center;font-family:'Space Mono',monospace;font-size:.6rem;color:var(--text-dim);padding:.75rem;opacity:.6;border-top:1px solid var(--card-border)}
 
   /* WEEK BOX — aggregator of this week's shows across all venues */
@@ -109,7 +111,9 @@
   .week-box-inner{background:linear-gradient(135deg,rgba(255,215,0,.09),rgba(46,204,113,.06));border:1px solid rgba(255,215,0,.35);border-radius:1rem;padding:1.1rem 1.3rem;backdrop-filter:blur(8px)}
   .week-box-title{font-size:.95rem;font-weight:700;color:var(--gold);margin-bottom:.7rem;display:flex;align-items:center;gap:.45rem}
   .week-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:.6rem}
-  .week-item{display:flex;align-items:center;gap:.6rem;background:rgba(0,0,0,.22);border:1px solid rgba(255,215,0,.15);border-radius:.6rem;padding:.5rem .7rem}
+  .week-item{display:flex;align-items:center;gap:.6rem;background:rgba(0,0,0,.22);border:1px solid rgba(255,215,0,.15);border-radius:.6rem;padding:.5rem .7rem;cursor:pointer;transition:all .2s}
+  .week-item:hover,.week-item:focus-visible{border-color:var(--gold);background:rgba(255,215,0,.1);transform:translateY(-2px)}
+  .week-item:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
   .week-date{font-family:'Space Mono',monospace;font-size:.75rem;font-weight:700;color:var(--gold);white-space:nowrap;flex-shrink:0}
   .week-info{display:flex;flex-direction:column;gap:.1rem;min-width:0}
   .week-venue{font-size:.8rem;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -404,7 +408,7 @@ function buildWeekBox() {
     (a.shows || []).forEach(s => {
       const d = parseShowDate(s.date);
       if (d && d >= today && d < weekEnd) {
-        items.push({ d, dateLabel: s.date, venue: a.name, genre: s.genre || '' });
+        items.push({ d, dateLabel: s.date, venue: a.name, genre: s.genre || '', id: a.id });
       }
     });
   });
@@ -417,13 +421,36 @@ function buildWeekBox() {
     return;
   }
   grid.innerHTML = items.map(it =>
-    '<div class="week-item">'
+    '<div class="week-item" onclick="goToVenue(' + it.id + ')" role="button" tabindex="0" '
+    + 'onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();goToVenue(' + it.id + ')}" '
+    + 'title="עברו לכרטיס של ' + esc(it.venue) + '">'
     + '<span class="week-date">' + esc(it.dateLabel) + '</span>'
     + '<div class="week-info">'
     + '<span class="week-venue">' + esc(it.venue) + '</span>'
     + '<span class="week-genre">' + esc(it.genre) + '</span>'
     + '</div></div>'
   ).join('');
+}
+
+// לחיצה על פריט בריבוע "השבוע" — מנקה סינונים (כדי שהכרטיס לא יהיה
+// מוסתר ע"י פילטר קטגוריה/ביקור פעיל), גוללת אליו בעדינות, ומהבהבת
+// אותו לרגע כדי שיהיה ברור על איזה כרטיס מדובר.
+function goToVenue(id) {
+  curCat = 'all';
+  curVisit = 'all';
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  const allCatBtn = document.querySelector('.cat-btn');
+  if (allCatBtn) allCatBtn.classList.add('active');
+  document.querySelectorAll('.vis-btn').forEach(b => b.classList.remove('active-vis', 'active-unvis'));
+  const btnAll = document.getElementById('btnAll');
+  if (btnAll) btnAll.classList.add('active-vis');
+  applyFilters();
+
+  const el = document.querySelector('.attr-card[data-id="' + id + '"]');
+  if (!el) return;
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  el.classList.add('flash-highlight');
+  setTimeout(() => el.classList.remove('flash-highlight'), 1600);
 }
 
 // ============================================================

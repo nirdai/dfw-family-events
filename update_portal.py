@@ -28,6 +28,7 @@ import sys
 import os
 import re
 import json
+import time
 from zoneinfo import ZoneInfo
 
 CHICAGO_TZ = ZoneInfo("America/Chicago")  # ל-UPDATE_TIME — ה-runner של GitHub Actions רץ ב-UTC
@@ -690,6 +691,32 @@ def validate_events(data) -> list:
         raise ValueError(f"רק {len(clean)} אירועים תקינים עברו אימות — נראה כמו תשובה פגומה, מבטלים עדכון")
     return clean
 
+# ── קריאה ל-Gemini עם retry על שגיאות זמניות ─────────
+# 21/09/2026: הריצה השבועית נכשלה עם "503 UNAVAILABLE — This model is
+# currently experiencing high demand" — עומס זמני אצל גוגל, לא באג
+# בקוד שלנו. בלי retry, כישלון רגעי כזה (שנמשך בד״כ שניות עד דקות)
+# מפיל את כל העדכון השבועי עד יום שני הבא. הפתרון: כמה ניסיונות עם
+# המתנה גוברת (exponential backoff) על שגיאות שמזוהות כזמניות
+# (503/UNAVAILABLE/429/RESOURCE_EXHAUSTED) — ורק אם כולן נכשלות,
+# מוותרים (וה-except הקיים ב-main() כבר דואג לא לדרוס index.html).
+TRANSIENT_MARKERS = ("503", "UNAVAILABLE", "429", "RESOURCE_EXHAUSTED", "overloaded")
+
+def call_gemini_with_retry(client, model: str, prompt: str, max_attempts: int = 4, base_delay: int = 20):
+    last_err = None
+    for attempt in range(1, max_attempts + 1):
+        try:
+            return client.models.generate_content(model=model, contents=prompt)
+        except Exception as e:
+            last_err = e
+            is_transient = any(marker in str(e) for marker in TRANSIENT_MARKERS)
+            if attempt < max_attempts and is_transient:
+                delay = base_delay * attempt  # 20, 40, 60...
+                log(f"  ⚠️ קריאה ל-Gemini נכשלה (ניסיון {attempt}/{max_attempts}, כנראה עומס זמני): {e} — ממתין {delay}s ומנסה שוב")
+                time.sleep(delay)
+                continue
+            raise
+    raise last_err  # לא אמור להגיע לכאן בפועל
+
 # ── Main ──────────────────────────────────────────────
 def main():
     log("▶ DFW Events Portal — עדכון שבועי")
@@ -700,10 +727,7 @@ def main():
 
         log("  שולח בקשה ל-Gemini API...")
         client   = genai.Client(api_key=api_key)
-        response = client.models.generate_content(
-            model    = MODEL,
-            contents = build_prompt()
-        )
+        response = call_gemini_with_retry(client, MODEL, build_prompt())
         raw = (response.text or "").strip()
         log(f"  התקבל תגובה ({len(raw)} תווים)")
 
