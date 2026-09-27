@@ -530,6 +530,10 @@ function isVisible(card){
   const id=parseInt(card.dataset.id);
   const e=events.find(ev=>ev.id===id);
   if(!e)return false;
+  // 27/09/2026: הגנת-עומק — אם *כל* התאריכים של האירוע כבר עברו (לפני
+  // היום), הוא לא "קרוב" ולא אמור להופיע, גם אם הנתונים במקרה לא
+  // התעדכנו באותו שבוע (השוואת מחרוזות ISO YYYY-MM-DD תקינה לקסיקוגרפית).
+  if(e.dates.every(d=>d<TODAY_ISO))return false;
   if(activeDate&&!e.dates.includes(activeDate))return false;
   if(curRegion!=='all'&&card.dataset.region!==curRegion)return false;
   if(curFilter==='wknd'&&card.dataset.wknd!=='1')return false;
@@ -571,9 +575,17 @@ function showRegion(r,btn){
   curRegion=r;applyFilter();
 }
 
+// 27/09/2026: הוסר ה-toggle-off (הפעלה/כיבוי בלחיצה חוזרת על אותו
+// כפתור). הסיבה: applyDefaultView() (למטה) מפעילה את פילטר 'wknd'
+// אוטומטית כבר בטעינת הדף — כך שכשמשתמש *לוחץ* בפעם הראשונה על
+// "🔥 סופ"ש" כדי לסנן, הפילטר כבר פעיל, וה-toggle-off הישן דווקא
+// כיבה אותו (הראה הכל) — בדיוק כמו "הלחיצה לא מסננת כלום" שדווח.
+// עכשיו: כל כפתור ספציפי תמיד *מפעיל* את עצמו (curFilter=type),
+// ורק כפתור "✅ הכל" (type=null) מנקה את הסינון. לחיצה חוזרת על אותו
+// כפתור פשוט לא משנה כלום (לא מפתיע) במקום לכבות בהפתעה.
 function setFilter(type,btn){
   document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('f-wknd','f-today','f-cat'));
-  curFilter=curFilter===type?null:type;
+  curFilter=type;
   if(curFilter)btn.classList.add(curFilter==='wknd'?'f-wknd':(curFilter==='today'?'f-today':'f-cat'));
   applyFilter();
 }
@@ -730,6 +742,17 @@ MAX_STR_LEN = 400
 # dates (שכבר עברו אימות פורמט YYYY-MM-DD) עם datetime.date.weekday().
 # ההגדרה של "סופ"ש" כאן זהה בכוונה להגדרה הקיימת ב-JS (WKND_DOW=[5,6,0]
 # — שישי/שבת/ראשון, לא רק שבת-ראשון) כדי ששני הצדדים יתאימו.
+#
+# 🔧 תיקון נוסף (27/09/2026, סבב שני): הגרסה הראשונה השתמשה ב-any()
+# — כלומר "יש לפחות יום אחד בטווח שהוא שישי/שבת/ראשון" — אבל זה עדיין
+# היה רופף מדי: פסטיבל רב-יומי שרץ חמישי-שני (כמו Oktoberfest/GrapeFest/
+# פסטיבל הבלונים) נחשב "סופ"ש" כי הוא *נוגע* ביום שישי/שבת/ראשון, למרות
+# שהוא בעצם אירוע שבועי ארוך, לא "אירוע סופ"ש". המשתמש ביקש במפורש
+# "רק שישי ערב–ראשון" — כלומר האירוע *כולו* צריך להיות בתוך החלון הזה,
+# לא רק לגעת בו. הוחלף ל-all(): מסומן "סופ"ש" רק אם *כל* התאריכים של
+# האירוע הם שישי/שבת/ראשון (בלי אף יום חול בטווח) — זה גם פותר בבת אחת
+# את התלונה הנוספת "'כל יום' מסומן כסופ"ש" (אירוע/רישום שחוזר כל השבוע
+# כולל ימי חול נופל מיד מ-all() ברגע שיש בו יום חול אחד).
 WEEKEND_ISO_DOW = {4, 5, 6}  # Python weekday(): שני=0 ... שישי=4, שבת=5, ראשון=6
 
 def validate_events(data) -> list:
@@ -763,8 +786,9 @@ def validate_events(data) -> list:
                 raise ValueError(f"id כפול: {eid}")
 
             # לא סומכים על e["weekend"] שהגיע מ-Gemini — מחשבים בעצמנו,
-            # ראו ההערה מעל REQUIRED_STR_FIELDS.
-            weekend = any(
+            # ראו ההערה מעל REQUIRED_STR_FIELDS. all() ולא any(): כל
+            # התאריכים של האירוע חייבים להיות שישי/שבת/ראשון.
+            weekend = all(
                 datetime.date.fromisoformat(d).weekday() in WEEKEND_ISO_DOW
                 for d in dates
             )
