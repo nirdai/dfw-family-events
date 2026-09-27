@@ -29,6 +29,7 @@ import os
 import re
 import json
 import time
+import html as html_escape_mod
 from zoneinfo import ZoneInfo
 
 CHICAGO_TZ = ZoneInfo("America/Chicago")  # ל-UPDATE_TIME — ה-runner של GitHub Actions רץ ב-UTC
@@ -49,7 +50,10 @@ MODEL       = "gemini-3.6-flash"  # נמצא בטיר החינמי של Gemini A
 # כל שדה כנגד רשימת ערכים מותרים לפני שכותבים לקובץ.
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
-# 12 האזורים, לפי סדר מרחק מפלאנו (הבית) — התוויות המדויקות מוצגות ב-nav וב-view-all
+# 13 האזורים, לפי סדר מרחק מפלאנו (הבית) — התוויות המדויקות מוצגות ב-nav וב-view-all
+# 27/09/2026: פורט וורת' הייתה ממוזגת בטעות תחת "dallas" עם זמן נסיעה
+# שהתאים לדאלאס (~30 דק') אבל לא לפורט וורת' עצמה (שרחוקה משמעותית
+# יותר) — פוצלה לאזור נפרד עם קוד/שם/מרחק משלה.
 REGIONS = [
     ("plano",       "פלאנו",              "כאן"),
     ("richardson",  "ריצ׳רדסון",          "~10 דק׳ · 5 מייל"),
@@ -60,9 +64,10 @@ REGIONS = [
     ("thecolony",   "The Colony",         "~20 דק׳ · 15 מייל"),
     ("lewisville",  "לואיסוויל",          "~25 דק׳ · 18 מייל"),
     ("flowermound", "פלאואר מאונד",       "~28 דק׳ · 20 מייל"),
-    ("dallas",      "דאלאס / פורט וורת׳", "~30 דק׳ · 20 מייל"),
+    ("dallas",      "דאלאס",              "~30 דק׳ · 20 מייל"),
     ("irving",      "ארווינג",            "~30 דק׳ · 22 מייל"),
     ("grapevine",   "גרייפוויין",         "~35 דק׳ · 25 מייל"),
+    ("fortworth",   "פורט וורת׳",         "~45 דק׳ · 35 מייל"),
 ]
 
 VALID_REGIONS = {code for code, _, _ in REGIONS}
@@ -78,7 +83,7 @@ VALID_CATS = set(CATEGORIES)
 # ── Prompt ──────────────────────────────────────────
 def build_prompt() -> str:
     today       = datetime.date.today()
-    range_end   = today + datetime.timedelta(days=28)  # 4 שבועות קדימה
+    range_end   = today + datetime.timedelta(days=30)  # חלון מתגלגל: היום + 30 יום
     region_list = "\n".join(f'- "{code}" = {name} ({dist})' for code, name, dist in REGIONS)
     cat_list    = ", ".join(CATEGORIES)
 
@@ -164,6 +169,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   .date-count{font-size:.5rem;font-family:'Space Mono',monospace;background:rgba(46,204,113,.15);border-radius:.25rem;padding:.05rem .25rem;margin-top:.05rem;color:var(--g6)}
   .active-date .date-count{background:rgba(0,0,0,.2);color:var(--g0)}
   .active-date.is-wknd-btn .date-count{color:#fff}
+  .date-btn.date-empty{opacity:.4}
+  .date-btn.date-empty:hover{opacity:.85}
   .date-clear{font-size:.7rem;font-family:'Space Mono',monospace;padding:.4rem .8rem;border:1px solid rgba(255,255,255,.12);border-radius:.4rem;background:transparent;color:var(--text-dim);cursor:pointer;transition:all .2s;white-space:nowrap;align-self:center}
   .date-clear:hover{border-color:var(--accent);color:var(--accent)}
   .active-date-banner{display:none;text-align:center;font-family:'Space Mono',monospace;font-size:.68rem;padding:.45rem;background:rgba(46,204,113,.08);border-bottom:1px solid rgba(46,204,113,.15);color:var(--g7);letter-spacing:.08em}
@@ -181,6 +188,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   .filter-btn{font-size:.72rem;font-weight:500;padding:.28rem .8rem;border:1px solid var(--card-border);border-radius:1.5rem;background:transparent;color:var(--text-dim);cursor:pointer;transition:all .2s}
   .filter-btn:hover{border-color:var(--g6);color:var(--g6)}
   .filter-btn.f-wknd{background:rgba(255,107,107,.12);border-color:var(--wknd);color:var(--wknd)}
+  .filter-btn.f-today{background:rgba(0,255,136,.12);border-color:var(--accent);color:var(--accent)}
   .filter-btn.f-cat{background:rgba(46,204,113,.1);border-color:var(--g6);color:var(--g6)}
   .stats-bar{display:flex;gap:.85rem;margin-bottom:2rem;flex-wrap:wrap}
   .stat-chip{background:rgba(46,204,113,.06);border:1px solid var(--card-border);border-radius:.5rem;padding:.55rem 1rem;display:flex;flex-direction:column;gap:.05rem}
@@ -253,6 +261,21 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   .been-btn.checked{background:rgba(255,215,0,.15);border-color:var(--gold);color:var(--gold)}
   .event-card.hidden{display:none !important}
   .last-updated{text-align:center;font-family:'Space Mono',monospace;font-size:.6rem;color:var(--text-dim);padding:.75rem;opacity:.6;border-top:1px solid var(--card-border)}
+  /* NOSCRIPT FALLBACK — 27/09/2026: כל תוכן האירועים היה בנוי אך ורק
+     ע"י JS (render()/buildCard()), כך שקריאת ה-HTML הגולמי (curl,
+     קורא-מסך שלא מריץ JS, זוחל שלא מבצע JS, תצוגה מקדימה בשיתוף
+     לינק) הייתה רואה 0 אירועים. הבלוק הזה הוא רשימה טקסטואלית אמיתית
+     של כל האירועים, כתובה ע"י Python ישירות ל-HTML הסופי (לא ע"י JS) —
+     ה-<noscript> גורם לדפדפן להסתיר אותו כשה-JS פעיל (כדי לא לכפול
+     תצוגה), אבל הבייטים קיימים תמיד במקור ה-HTML, אז זוחלים/כלים
+     שלא מריצים JS עדיין רואים תוכן אמיתי. */
+  .noscript-fallback{max-width:900px;margin:1.5rem auto;padding:1.4rem 1.6rem;background:var(--card-bg);border:1px solid var(--card-border);border-radius:1rem}
+  .noscript-fallback h2{font-size:1.1rem;color:var(--g6);margin-bottom:.3rem}
+  .noscript-fallback p.note{font-size:.78rem;color:var(--text-dim);margin-bottom:1rem}
+  .noscript-fallback ul{list-style:none;padding:0;margin:0}
+  .noscript-fallback li{padding:.6rem 0;border-bottom:1px solid rgba(46,204,113,.12);font-size:.85rem;line-height:1.6}
+  .noscript-fallback li:last-child{border-bottom:none}
+  .noscript-fallback strong{color:var(--text)}
   ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--g0)}::-webkit-scrollbar-thumb{background:var(--g4);border-radius:3px}
 
   /* BUG / LOG BUTTON + PANEL — מציג את הלוג של ריצת העדכון האוטומטי האחרונה */
@@ -277,6 +300,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 </style>
 </head>
 <body>
+__NOSCRIPT_HTML__
 <button class="bug-btn" id="bugBtn" onclick="toggleBugPanel()" title="לוג העדכון האוטומטי האחרון">&#x1F41E;</button>
 <div class="bug-overlay" id="bugOverlay" onclick="if(event.target===this)toggleBugPanel()">
   <div class="bug-panel">
@@ -313,6 +337,7 @@ __NAV_BUTTONS__
   <div class="filter-bar">
     <span class="filter-label">סנן:</span>
     <button class="filter-btn" onclick="setFilter('wknd',this)">🔥 סופ"ש</button>
+    <button class="filter-btn" onclick="setFilter('today',this)">📅 היום</button>
     <button class="filter-btn" onclick="setFilter(null,this)">✅ הכל</button>
     <button class="filter-btn" onclick="setFilter('mlb',this)">⚾ MLB</button>
     <button class="filter-btn" onclick="setFilter('baseball',this)">⚾ בייסבול</button>
@@ -387,24 +412,36 @@ const MONTHS_HE=['','ינואר','פברואר','מרץ','אפריל','מאי','
 const WKND_DOW=[5,6,0];
 let activeDate=null;
 
+// RANGE_START/RANGE_DAYS מגיעים מ-build_html() (תואמים ל-today+30 יום
+// שהוזנו גם ל-Gemini) — משמשים גם ל-TODAY_ISO (פילטר "📅 היום") וגם
+// כדי לצייר את רצועת התאריכים על *כל* יום בטווח, לא רק ימים שיש
+// בהם אירוע. 27/09/2026: לפני התיקון buildDateStrip() אספה תאריכים
+// רק מתוך events — יום בלי שום אירוע (כמו 22/9, 24/9 שהיו ריקים
+// באותה ריצה) פשוט לא הופיע ברצועה בכלל, מה שנראה כאילו "חסרים ימים".
+const RANGE_START='__RANGE_START__';
+const RANGE_DAYS=__RANGE_DAYS__;
+const TODAY_ISO=RANGE_START;
+
+function pad2(n){return n<10?'0'+n:''+n;}
+function fmtISO(d){return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());}
+
 function buildDateStrip(){
-  const datesSet=new Set();
-  events.forEach(e=>e.dates.forEach(d=>datesSet.add(d)));
-  const dates=[...datesSet].sort();
+  const [ry,rm,rd]=RANGE_START.split('-').map(Number);
   const strip=document.getElementById('dateStrip');
   strip.innerHTML='';
-  dates.forEach(dateStr=>{
-    const d=new Date(dateStr+'T12:00:00');
+  for(let i=0;i<RANGE_DAYS;i++){
+    const d=new Date(ry,rm-1,rd+i); // JS מנרמל בעצמו גלישת חודש/שנה
+    const dateStr=fmtISO(d);
     const dow=d.getDay();
     const isWknd=WKND_DOW.includes(dow);
     const count=events.filter(e=>e.dates.includes(dateStr)).length;
     const btn=document.createElement('button');
-    btn.className='date-btn'+(isWknd?' is-wknd-btn':'');
+    btn.className='date-btn'+(isWknd?' is-wknd-btn':'')+(count===0?' date-empty':'');
     btn.dataset.date=dateStr;
     btn.innerHTML=`<span class="date-day">${DAYS_HE[dow]}</span><span class="date-num">${d.getDate()}</span><span class="date-month">${MONTHS_HE[d.getMonth()+1]}</span><span class="date-count">${count}</span>`;
     btn.onclick=()=>toggleDate(dateStr,btn);
     strip.appendChild(btn);
-  });
+  }
   const clr=document.createElement('button');
   clr.className='date-clear';clr.textContent='✕ נקה';clr.onclick=clearDate;
   strip.appendChild(clr);
@@ -496,8 +533,9 @@ function isVisible(card){
   if(activeDate&&!e.dates.includes(activeDate))return false;
   if(curRegion!=='all'&&card.dataset.region!==curRegion)return false;
   if(curFilter==='wknd'&&card.dataset.wknd!=='1')return false;
+  if(curFilter==='today'&&!e.dates.includes(TODAY_ISO))return false;
   if(curFilter==='free'&&card.dataset.free!=='1')return false;
-  if(curFilter&&curFilter!=='wknd'&&curFilter!=='free'&&card.dataset.cat!==curFilter)return false;
+  if(curFilter&&curFilter!=='wknd'&&curFilter!=='today'&&curFilter!=='free'&&card.dataset.cat!==curFilter)return false;
   return true;
 }
 
@@ -534,23 +572,65 @@ function showRegion(r,btn){
 }
 
 function setFilter(type,btn){
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('f-wknd','f-cat'));
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('f-wknd','f-today','f-cat'));
   curFilter=curFilter===type?null:type;
-  if(curFilter)btn.classList.add(type==='wknd'?'f-wknd':'f-cat');
+  if(curFilter)btn.classList.add(curFilter==='wknd'?'f-wknd':(curFilter==='today'?'f-today':'f-cat'));
   applyFilter();
+}
+
+// ברירת מחדל בטעינה: מציגים את הסופ"ש הקרוב במקום את כל ה-30 הימים
+// בבת אחת — אם אין אף אירוע מתויג "סופ"ש" (מקרה נדיר) נשארים על "הכל"
+// כדי לא להציג עמוד ריק ללא הסבר.
+function applyDefaultView(){
+  if(events.some(e=>e.weekend)){
+    const wkndBtn=document.querySelector(`.filter-btn[onclick*="setFilter('wknd'"]`);
+    if(wkndBtn) setFilter('wknd',wkndBtn);
+  }
 }
 
 buildDateStrip();
 render();
+applyDefaultView();
 renderBugLog();
 </script>
 </body>
 </html>"""
 
-def build_html(events_js: str, log_lines: list) -> str:
+# ── תוכן טקסטואלי אמיתי לגולשים/זוחלים בלי JS ──────────
+REGION_NAME_BY_CODE = {code: name for code, name, _ in REGIONS}
+
+def build_noscript_html(events: list) -> str:
+    esc = html_escape_mod.escape
+    if not events:
+        items = "<li>לא נמצאו אירועים בטווח הנוכחי.</li>"
+    else:
+        sorted_events = sorted(events, key=lambda e: (min(e["dates"]), e["id"]))
+        rows = []
+        for e in sorted_events:
+            region_he = REGION_NAME_BY_CODE.get(e["region"], e["region"])
+            rows.append(
+                "<li><strong>" + esc(e["title"]) + "</strong> — "
+                + esc(e["whenLabel"]) + ", " + esc(e["where"]) + " (" + esc(region_he) + "). "
+                + esc(e["price"]) + ". " + esc(e["desc"]) + "</li>"
+            )
+        items = "\n".join(rows)
+    return (
+        '<noscript><div class="noscript-fallback">'
+        '<h2>אירועים קרובים ב-DFW</h2>'
+        '<p class="note">הדף הזה בנוי כאפליקציית JavaScript אינטראקטיבית (סינון, מפה של תאריכים וכו׳) '
+        'שדורשת JavaScript מופעל בדפדפן. להלן רשימה טקסטואלית פשוטה של כל האירועים, '
+        'לגולשים/כלים שלא מריצים JavaScript:</p>'
+        '<ul>' + items + '</ul>'
+        '</div></noscript>'
+    )
+
+def build_html(events: list, events_js: str, log_lines: list) -> str:
     today       = datetime.date.today()
     week_start  = today
-    week_end    = today + datetime.timedelta(days=27)
+    # 27/09/2026: חלון מתגלגל "היום + 30 יום" במקום טווח קלנדרי קבוע —
+    # כל ריצה שבועית פשוט מחשבת today מחדש, כך שהטווח תמיד "זז" איתה.
+    RANGE_DAYS  = 31  # כולל את היום עצמו (יום 0) ועד +30
+    week_end    = today + datetime.timedelta(days=RANGE_DAYS - 1)
     # שבת+ראשון הקרובים (מהיום קדימה)
     days_to_sat = (5 - today.weekday()) % 7
     saturday    = today + datetime.timedelta(days=days_to_sat)
@@ -591,10 +671,13 @@ def build_html(events_js: str, log_lines: list) -> str:
     html = html.replace("__REGION_NAMES_JS__",  region_names_js)
     html = html.replace("__REGION_ORDER_JS__",  region_order_js)
     html = html.replace("__WEEK_LABEL__",  f"{fmt(week_start)}–{fmt(week_end)}")
-    html = html.replace("__WEEK_RANGE__",  f"שבוע: {fmt(week_start)}–{fmt(week_end)} {today.year}")
+    html = html.replace("__WEEK_RANGE__",  f"היום + 30 הימים הקרובים ({fmt(week_start)}–{fmt(week_end)})")
     html = html.replace("__WEEKEND_RANGE__", f"שבת {fmt(saturday)} + ראשון {fmt(sunday)}")
     html = html.replace("__UPDATE_TIME__", datetime.datetime.now(CHICAGO_TZ).strftime("%d/%m/%Y %H:%M"))
     html = html.replace("__EVENTS_JS__",   events_js)
+    html = html.replace("__RANGE_START__", week_start.isoformat())
+    html = html.replace("__RANGE_DAYS__",  str(RANGE_DAYS))
+    html = html.replace("__NOSCRIPT_HTML__", build_noscript_html(events))
     # לוג הריצה הנוכחית, מוטמע כמערך JSON של מחרוזות טקסט בלבד (לא HTML/קוד) —
     # מוצג בפאנל "🐛" שנפתח בלחיצה. אותה הגנת "</" כמו ב-events_js, ליתר ביטחון.
     log_json = json.dumps(log_lines, ensure_ascii=False).replace("</", "<\\/")
@@ -640,6 +723,15 @@ def extract_json_array(raw: str) -> str:
 REQUIRED_STR_FIELDS = ["catLabel", "title", "desc", "who", "whenLabel", "hours", "where", "price"]
 MAX_STR_LEN = 400
 
+# 27/09/2026: פילטר ה-🔥 סופ"ש היה רופף מדי (41/44 אירועים, כולל אחד
+# ביום רביעי) כי ה-"weekend" boolean הגיע ישירות מ-Gemini — ומודלי-שפה
+# ידועים כלא-אמינים בחישוב "איזה יום בשבוע חל בתאריך X". הפתרון: אף
+# פעם לא סומכים על ה-boolean שהמודל מחזיר; מחשבים אותו בעצמנו מתוך
+# dates (שכבר עברו אימות פורמט YYYY-MM-DD) עם datetime.date.weekday().
+# ההגדרה של "סופ"ש" כאן זהה בכוונה להגדרה הקיימת ב-JS (WKND_DOW=[5,6,0]
+# — שישי/שבת/ראשון, לא רק שבת-ראשון) כדי ששני הצדדים יתאימו.
+WEEKEND_ISO_DOW = {4, 5, 6}  # Python weekday(): שני=0 ... שישי=4, שבת=5, ראשון=6
+
 def validate_events(data) -> list:
     if not isinstance(data, list):
         raise ValueError("התשובה אינה מערך JSON")
@@ -653,7 +745,6 @@ def validate_events(data) -> list:
             eid = int(e["id"])
             region = e["region"]
             cat = e["cat"]
-            weekend = bool(e["weekend"])
             dates = e["dates"]
             rating = int(e["rating"])
 
@@ -670,6 +761,13 @@ def validate_events(data) -> list:
                     raise ValueError(f"תאריך לא תקין: {d!r}")
             if eid in seen_ids:
                 raise ValueError(f"id כפול: {eid}")
+
+            # לא סומכים על e["weekend"] שהגיע מ-Gemini — מחשבים בעצמנו,
+            # ראו ההערה מעל REQUIRED_STR_FIELDS.
+            weekend = any(
+                datetime.date.fromisoformat(d).weekday() in WEEKEND_ISO_DOW
+                for d in dates
+            )
 
             clean_e = {
                 "id": eid, "region": region, "cat": cat, "weekend": weekend,
@@ -746,7 +844,7 @@ def main():
         events_json = json.dumps(events, ensure_ascii=False, indent=2).replace("</", "<\\/")
         events_js = "const events = " + events_json + ";"
 
-        html = build_html(events_js, LOG_LINES)
+        html = build_html(events, events_js, LOG_LINES)
         # לא דורסים את index.html הקיים אם משהו נכשל אחרי השלב הזה —
         # ראה תקלה #7 ב-CLAUDE.md: תבנית/תוכן פגום שדרס בעבר גרסה תקינה חיה.
         OUTPUT_PATH.write_text(html, encoding="utf-8")

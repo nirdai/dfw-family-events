@@ -552,18 +552,33 @@ function applyVisitFilter() {
 }
 
 function updateStats() {
-  document.getElementById('sTot').textContent = A.length;
+  document.getElementById('sTot').textContent = VISIBLE_VENUES.length;
   document.getElementById('sVis').textContent = visited.size;
-  document.getElementById('sLeft').textContent = A.length - visited.size;
+  document.getElementById('sLeft').textContent = VISIBLE_VENUES.length - visited.size;
 }
 
 // ============================================================
 // INIT
 // ============================================================
-document.getElementById('grid').innerHTML = A.map(buildCard).join('');
+// 27/09/2026: מקומות בלי אף הופעה קרובה (shows:[]) הוצגו קודם ככרטיס
+// כמעט-ריק (רק ה-note מסביר "לא נמצא כלום"). במקום זה מסתירים אותם
+// מהגריד לגמרי, ומשאירים שורת הערה קטנה וכנה מתחת לגריד עם שמם —
+// כדי לא לאבד את השקיפות לגבי אילו מקומות נבדקו ולא נמצאה בהם הופעה.
+const VISIBLE_VENUES = A.filter(a => a.shows && a.shows.length > 0);
+const HIDDEN_VENUES = A.filter(a => !a.shows || a.shows.length === 0);
+
+document.getElementById('grid').innerHTML = VISIBLE_VENUES.map(buildCard).join('');
 document.getElementById('btnAll').classList.add('active-vis');
 updateStats();
 buildWeekBox();
+
+if (HIDDEN_VENUES.length) {
+  const note = document.createElement('div');
+  note.style.cssText = 'max-width:1300px;margin:1rem auto 0;padding:0 1.5rem 2rem;font-size:.75rem;color:var(--text-dim);text-align:center';
+  note.innerHTML = '&#x2139; מקומות בלי הופעה קרובה מאושרת כרגע (מוסתרים מלמעלה): '
+    + HIDDEN_VENUES.map(a => esc(a.name)).join(' &middot; ');
+  document.querySelector('main').appendChild(note);
+}
 </script>
 </body>
 </html>

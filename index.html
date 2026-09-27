@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DFW Family Events — 5 בספטמבר–5 באוקטובר 2026</title>
+<title>DFW Family Events — 27 ספטמבר–27 אוקטובר</title>
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root{--g0:#091510;--g2:#0f3320;--g4:#1a7a3e;--g5:#22a352;--g6:#2ecc71;--g7:#52d987;--g8:#85e8a8;--accent:#00ff88;--gold:#ffd700;--warm:#ff8c42;--wknd:#ff6b6b;--wknd-glow:rgba(255,107,107,0.3);--text:#dff5ea;--text-dim:#7bbf94;--card-bg:rgba(13,36,22,0.92);--card-border:rgba(46,204,113,0.2)}
@@ -34,6 +34,8 @@
   .date-count{font-size:.5rem;font-family:'Space Mono',monospace;background:rgba(46,204,113,.15);border-radius:.25rem;padding:.05rem .25rem;margin-top:.05rem;color:var(--g6)}
   .active-date .date-count{background:rgba(0,0,0,.2);color:var(--g0)}
   .active-date.is-wknd-btn .date-count{color:#fff}
+  .date-btn.date-empty{opacity:.4}
+  .date-btn.date-empty:hover{opacity:.85}
   .date-clear{font-size:.7rem;font-family:'Space Mono',monospace;padding:.4rem .8rem;border:1px solid rgba(255,255,255,.12);border-radius:.4rem;background:transparent;color:var(--text-dim);cursor:pointer;transition:all .2s;white-space:nowrap;align-self:center}
   .date-clear:hover{border-color:var(--accent);color:var(--accent)}
   .active-date-banner{display:none;text-align:center;font-family:'Space Mono',monospace;font-size:.68rem;padding:.45rem;background:rgba(46,204,113,.08);border-bottom:1px solid rgba(46,204,113,.15);color:var(--g7);letter-spacing:.08em}
@@ -51,6 +53,7 @@
   .filter-btn{font-size:.72rem;font-weight:500;padding:.28rem .8rem;border:1px solid var(--card-border);border-radius:1.5rem;background:transparent;color:var(--text-dim);cursor:pointer;transition:all .2s}
   .filter-btn:hover{border-color:var(--g6);color:var(--g6)}
   .filter-btn.f-wknd{background:rgba(255,107,107,.12);border-color:var(--wknd);color:var(--wknd)}
+  .filter-btn.f-today{background:rgba(0,255,136,.12);border-color:var(--accent);color:var(--accent)}
   .filter-btn.f-cat{background:rgba(46,204,113,.1);border-color:var(--g6);color:var(--g6)}
   .stats-bar{display:flex;gap:.85rem;margin-bottom:2rem;flex-wrap:wrap}
   .stat-chip{background:rgba(46,204,113,.06);border:1px solid var(--card-border);border-radius:.5rem;padding:.55rem 1rem;display:flex;flex-direction:column;gap:.05rem}
@@ -123,6 +126,21 @@
   .been-btn.checked{background:rgba(255,215,0,.15);border-color:var(--gold);color:var(--gold)}
   .event-card.hidden{display:none !important}
   .last-updated{text-align:center;font-family:'Space Mono',monospace;font-size:.6rem;color:var(--text-dim);padding:.75rem;opacity:.6;border-top:1px solid var(--card-border)}
+  /* NOSCRIPT FALLBACK — 27/09/2026: כל תוכן האירועים היה בנוי אך ורק
+     ע"י JS (render()/buildCard()), כך שקריאת ה-HTML הגולמי (curl,
+     קורא-מסך שלא מריץ JS, זוחל שלא מבצע JS, תצוגה מקדימה בשיתוף
+     לינק) הייתה רואה 0 אירועים. הבלוק הזה הוא רשימה טקסטואלית אמיתית
+     של כל האירועים, כתובה ע"י Python ישירות ל-HTML הסופי (לא ע"י JS) —
+     ה-<noscript> גורם לדפדפן להסתיר אותו כשה-JS פעיל (כדי לא לכפול
+     תצוגה), אבל הבייטים קיימים תמיד במקור ה-HTML, אז זוחלים/כלים
+     שלא מריצים JS עדיין רואים תוכן אמיתי. */
+  .noscript-fallback{max-width:900px;margin:1.5rem auto;padding:1.4rem 1.6rem;background:var(--card-bg);border:1px solid var(--card-border);border-radius:1rem}
+  .noscript-fallback h2{font-size:1.1rem;color:var(--g6);margin-bottom:.3rem}
+  .noscript-fallback p.note{font-size:.78rem;color:var(--text-dim);margin-bottom:1rem}
+  .noscript-fallback ul{list-style:none;padding:0;margin:0}
+  .noscript-fallback li{padding:.6rem 0;border-bottom:1px solid rgba(46,204,113,.12);font-size:.85rem;line-height:1.6}
+  .noscript-fallback li:last-child{border-bottom:none}
+  .noscript-fallback strong{color:var(--text)}
   ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--g0)}::-webkit-scrollbar-thumb{background:var(--g4);border-radius:3px}
 
   /* BUG / LOG BUTTON + PANEL — מציג את הלוג של ריצת העדכון האוטומטי האחרונה */
@@ -147,6 +165,50 @@
 </style>
 </head>
 <body>
+<noscript><div class="noscript-fallback"><h2>אירועים קרובים ב-DFW</h2><p class="note">הדף הזה בנוי כאפליקציית JavaScript אינטראקטיבית (סינון, מפה של תאריכים וכו׳) שדורשת JavaScript מופעל בדפדפן. להלן רשימה טקסטואלית פשוטה של כל האירועים, לגולשים/כלים שלא מריצים JavaScript:</p><ul><li><strong>Stockyards Championship Rodeo — Fort Worth</strong> — כל שישי–שבת, Cowtown Coliseum, Fort Worth (פורט וורת׳). מ-$20. רודיאו שבועי אגדי ב-Stockyards ההיסטורי. קרבות רכיבה על פרות וסוסים, אווירה מערב-טקסנית קלאסית.</li>
+<li><strong>Water Lantern Festival 2026 — Haggard Park</strong> — שבת 5 בספטמבר, Haggard Park, Plano (פלאנו). $30.99–$57.99. שיגור פנסים צפים על פני האגם עם מוזיקה חיה, אוכל וצילום מקצועי. חוויה קסומה וויזואלית לכל המשפחה.</li>
+<li><strong>Plano Farmers Market — Willow Bend</strong> — שבתות כל החודש, The Shops at Willow Bend, Plano (פלאנו). חינם. שוק שבועי: דבש, תוצרת טרייה, מאפים, מלאכות יד. נגיש וידידותי לכלבים.</li>
+<li><strong>Cottage Farmers Market — Allen Heritage Village</strong> — שבתות כל החודש, Allen Heritage Village (אלן). חינם. שוק חוצות בוטיקי עם מוצרי אמנים ותוצרת מקומית באווירה כפרית.</li>
+<li><strong>Concerts by the Creek — Watters Creek</strong> — שבתות כל החודש, Watters Creek Village Green, Allen (אלן). חינם!. קונצרטים חינמיים כל שבת בערב על הדשא, כולל מוזיקה חיה של Love Handle בפתיחת החודש.</li>
+<li><strong>DFW Restaurant Week — סוף עונה באדיסון</strong> — עד 7 בספטמבר (Labor Day), מסעדות ברחבי Addison Circle (אדיסון). $29 צהריים / $49–59 ערב. הסופ&quot;ש האחרון של שבוע המסעדות של DFW (מסתיים 7/9) — הזדמנות אחרונה לתפריטים מוזלים ב-200+ מסעדות אדיסון.</li>
+<li><strong>Frisco Fresh Market — Downtown Frisco</strong> — שבת+ראשון כל שבוע, 9215 John W Elliott Dr, Frisco (פריסקו). חינם. 90+ דוכנים, תוצרת טרייה, שפים ומוזיקה חיה. שבת+ראשון כל שבוע.</li>
+<li><strong>McKinney Farmers Market — Chestnut Square</strong> — שבתות כל החודש, 315 S Chestnut St, McKinney (מקיני). חינם. המוערך ביותר בטקסס: בשר, ירקות, מאפים, אמנות ומוזיקה חיה.</li>
+<li><strong>TUPPS Brewery Brewmaster Education Class</strong> — שבת 5 בספטמבר, TUPPS Brewery, McKinney (מקיני). ראה כרטיסים באתר. כיתת חינוך חודשית על תהליך הבישול עם טעימות ישירות מהמבשל.</li>
+<li><strong>Riverfront Jazz Festival — Fair Park (סוף השבוע)</strong> — שבת–ראשון 5–6 בספטמבר, Fair Park (Automobile &amp; Centennial Buildings), Dallas (דאלאס). ראה כרטיסים באתר. סופ&quot;ש הסיום של פסטיבל הג&#x27;אז עם כוכבים כמו Gladys Knight, Samara Joy, Rose Royce ו-Brian McKnight. ג&#x27;אז, פופ, סול ו-R&amp;B.</li>
+<li><strong>DSO: Harry Potter and the Half-Blood Prince in Concert</strong> — שבת–ראשון 5–6 בספטמבר, Morton H. Meyerson Symphony Center, Dallas (דאלאס). מ-$35. הסרט המלא על המסך הגדול עם הפסקול המבוצע חי על ידי התזמורת הסימפונית של דאלאס. סוף שבוע ההופעות האחרון.</li>
+<li><strong>Grapevine Wineries &amp; Historic Downtown — כל יום</strong> — כל יום, Historic Main Street, Grapevine TX (גרייפוויין). טעימות מ-$15. גרייפוויין היא &quot;בירת היין של טקסס&quot; — 8 יקבים בהליכה ברחוב Main Street ההיסטורי. פתוח כל יום, גם לפני ואחרי GrapeFest.</li>
+<li><strong>Downtown Plano Disco Cowgirl Market</strong> — ראשון 6 בספטמבר, Downtown Plano Arts District (פלאנו). חינם. שוק וינטג&#x27;-מערבי עם דוכני מוכרים מקומיים ו-&quot;sip-and-shop&quot; בהשראת דיסקו-קאווגירל.</li>
+<li><strong>North Dallas Toy Show</strong> — ראשון 6 בספטמבר, Courtyard by Marriott Dallas Allen (אלן). ראה כרטיסים באתר. 130+ שולחנות עם צעצועי וינטג&#x27; ומודרניים, קומיקס ואספנות. גן עדן לאספנים ולילדים.</li>
+<li><strong>Disco Cowgirl Market — Armor Brewing</strong> — ראשון 6 בספטמבר, Armor Brewing Co., Allen (אלן). חינם (שתייה בתשלום). שוק ספקים בהשראת דיסקו-מערבי במפעל הבירה המקומי — בוטיקים, מוצרי יד ומשקאות אומן.</li>
+<li><strong>The Melting Pot Market — Grandscape</strong> — ראשון 6 בספטמבר, The Lawn at Grandscape, The Colony (The Colony). חינם. 80+ ספקים, DJ חי ותרבויות שונות ב-The Lawn at Grandscape.</li>
+<li><strong>Irving Farmers Market — Las Colinas</strong> — ראשונים כל החודש, 501 E Las Colinas Blvd, Irving (ארווינג). חינם. שוק איכרים שבועי בלב Las Colinas: תוצרת טרייה, מאפים ומלאכות יד.</li>
+<li><strong>Myles Smith — Toyota Music Factory</strong> — ראשון 6 בספטמבר, The Pavilion at Toyota Music Factory, Irving (ארווינג). ראה כרטיסים באתר. הזמר הבריטי המתפרץ מופיע עם אלבום הבכורה שלו. אווירה אינטימית באמפיתאטרון החוץ של Irving.</li>
+<li><strong>Texas Pool Closing Weekend — Labor Day</strong> — שני 7 בספטמבר (Labor Day), The Texas Pool, Plano (פלאנו). $10. מסיבת יום העבודה בבריכה: משחקי בריכה קלאסיים, תחרות קפיצות &quot;cannonball&quot; עם פרסים, גרילים ופיקניק. סגירת הבריכה לעונה בכיף.</li>
+<li><strong>Legacy of the Longhorn — Fort Worth Stockyards (Labor Day)</strong> — שני 7 בספטמבר (Labor Day), Fort Worth Stockyards, 131 E Exchange Ave (פורט וורת׳). חינם לצפייה. מצעד הבקר האגדי של פרות הלונגהורן ברחוב Exchange Ave ההיסטורי, במיוחד ביום העבודה. חוויה טקסנית קלאסית וחינמית לצפייה.</li>
+<li><strong>End of Summer Labor Day Pool Party — Lorenzo Hotel</strong> — שני 7 בספטמבר (Labor Day), Lorenzo Hotel Pool, Downtown Dallas (דאלאס). מ-$23. מסיבת בריכה 21+ עם 18 די-ג&#x27;יי מוזיקת האוס, אווירת בריכה ואוכל ומשקאות. סגירת קיץ גדולה במלון בוטיק בדאונטאון.</li>
+<li><strong>Labor Day Throwback Party With Live 90 — Legacy Hall</strong> — רביעי 9 בספטמבר, Legacy Hall, Plano (פלאנו). עד $109. חגיגת מוזיקת שנות ה-90 — גראנג&#x27;, פופ והיפ-הופ. ערב נוסטלגי גדול ב-Legacy Hall.</li>
+<li><strong>CityLine Night Market — ספטמבר</strong> — שישי 11 בספטמבר, CityLine Plaza, Richardson (ריצ׳רדסון). חינם. שוק לילה חודשי חינמי עם 45+ דוכני יד-שנייה ואומנות, ומוזיקה חיה.</li>
+<li><strong>Movies in the Park — Heritage Park</strong> — שישי בערב — 11, 18, 25 בספטמבר, Heritage Park, Flower Mound (פלאואר מאונד). חינם. סדרת קולנוע בחוץ חינמית עם משאיות אוכל. שלוש הקרנות נותרות בסדרה החודש.</li>
+<li><strong>Paws in the Pool — Frisco Water Park</strong> — שבת 12 בספטמבר, Frisco Water Park (פריסקו). ראה כרטיסים באתר. לפני סגירת הבריכה לעונה — יום מיוחד שבו כלבים יכולים ליהנות מהבריכה. נדרש כרטיס מראש.</li>
+<li><strong>2026 Plano Balloon Festival</strong> — חמישי–ראשון 17–20 בספטמבר, Oak Point Event Field, Plano (פלאנו). $5–$10. פסטיבל כדורים פורחים ענקי עם שיגורים, הופעות מקומיות ואווירה פסטיבלית. אחד האירועים הגדולים באזור.</li>
+<li><strong>Frisco RoughRiders — פלייאוף בית (Riders Field)</strong> — חמישי-שישי 17–18 + ראשון 20 בספטמבר, Riders Field, 7300 RoughRiders Trail, Frisco (פריסקו). ראה כרטיסים באתר. הרוחריידרס זכו באליפות המחצית הראשונה וממשיכים לפלייאוף! משחקי בית בסדרת המחצית (17-18/9) ומשחק 1 של הגמר (20/9) אם יעפילו. אווירה חשמלית.</li>
+<li><strong>GrapeFest 40th Annual — A Texas Wine Experience</strong> — חמישי–ראשון 17–20 בספטמבר, Historic Main Street &amp; Silver Lake Park, Grapevine (גרייפוויין). ראה כרטיסים באתר. פסטיבל היין הגדול בטקסס חוגג 40 שנה! טעימות יין, אוכל, מוזיקה חיה ותחרות דריכת ענבים. אחד האירועים הכי גדולים בגרייפוויין.</li>
+<li><strong>Waterloo — ABBA Tribute Live</strong> — שישי 18 בספטמבר, Eisemann Center, Richardson (ריצ׳רדסון). מ-$35. הופעת מחווה מקצועית ל-ABBA באולם הבמה המוביל של ריצ&#x27;רדסון.</li>
+<li><strong>Addison Oktoberfest 2026</strong> — שישי–שני 18–21 בספטמבר, Addison Circle Park, Addison (אדיסון). חינם כניסה. אחת מחגיגות האוקטוברפסט האותנטיות ביותר מחוץ למינכן — בירה גרמנית, אוכל, להקות אומפה חיות ומרוץ דצשונדים.</li>
+<li><strong>McKinney Monday Trade Days</strong> — שישי–ראשון 18–20 בספטמבר, McKinney Trade Days grounds (מקיני). חינם כניסה. יריד מסחר וינטג&#x27; ואספנות מסורתי בטקסס — דוכנים רבים בכל רחבי האתר.</li>
+<li><strong>Richardson Community Band — Fall Concert</strong> — שבת 19 בספטמבר, Eisemann Center, Richardson (ריצ׳רדסון). חינם. קונצרט חינמי של התזמורת הקהילתית — יצירות קלאסיות, פטריוטיות ופופולריות.</li>
+<li><strong>Flea Style Market At The Star</strong> — שבת 19 בספטמבר, Tostitos Championship Plaza, The Star, Frisco (פריסקו). חינם. שוק פשפשים חינמי ברחבת The Star, מרכז האימונים של Dallas Cowboys. דוכני יד-שנייה ואומנות.</li>
+<li><strong>9th Annual Rhythms at the River Walk &amp; Duck Derby</strong> — שבת 19 בספטמבר, River Walk at Central Park, Flower Mound (פלאואר מאונד). חינם. 30,000+ ברווזי גומי במרוץ על פני ה-River Walk, פלוס מוזיקה חיה. אחד האירועים המצחיקים והמשפחתיים ביותר בחודש.</li>
+<li><strong>Autumn at the Arboretum — Pumpkin Village &quot;Harvest Hues&quot;</strong> — נפתח שבת 19 בספטמבר, Dallas Arboretum, 8525 Garland Rd, Dallas (דאלאס). כלול בכרטיס הגן. 100,000+ דלועים ודגלים ברחבי הגן, עם עיצוב Pumpkin Village בהשראת באסקיה, רות&#x27;קו ופולוק. נפתח 19 בספטמבר וממשיך עד 1 בנובמבר.</li>
+<li><strong>Country Close Up — Grandscape</strong> — רביעי 23 בספטמבר, Grandscape, The Colony (The Colony). חינם. ערב קאנטרי חי אינטימי בהופעה בחוץ ב-Grandscape.</li>
+<li><strong>McKinney Oktoberfest — 19th Annual</strong> — שישי–ראשון 25–27 בספטמבר, Historic Downtown McKinney (מקיני). חינם. חגיגת אוקטוברפסט שנתית בדאונטאון ההיסטורי של מקיני — בירה, אוכל גרמני ומוזיקה חיה.</li>
+<li><strong>Western Days Festival 2026</strong> — שישי 25 בספטמבר, Old Town Lewisville (לואיסוויל). חינם. פסטיבל רחוב בהשראה מערבית ב-Old Town Lewisville ההיסטורי — בידור, אוכל ומוזיקה. כניסה חינם.</li>
+<li><strong>State Fair of Texas 2026 — נפתח!</strong> — נפתח שישי 25 בספטמבר (ממשיך עד 18 אוקטובר), Fair Park, Dallas (דאלאס). ראה כרטיסים באתר. האירוע השנתי הגדול בטקסס נפתח! 24 יום של פעילויות פארק שעשועים, אוכל מטוגן ייחודי, תערוכות, קרקסים וכל מה שאהוב על ילדים. ממשיך עד 18 באוקטובר.</li>
+<li><strong>Fall Plano Train Show 2026</strong> — שבת–ראשון 26–27 בספטמבר, Plano Event Center (פלאנו). חינם. תערוכת רכבות מודל אינטראקטיבית ומשפחתית עם מסילות מרהיבות.</li>
+<li><strong>Richardson Symphony Orchestra — Fall Season Opener</strong> — שבת 26 בספטמבר, Eisemann Center, Richardson (ריצ׳רדסון). מ-$25. תזמורת מובילה באזור DFW פותחת את העונה. ערב מוזיקלי איכותי ב-Eisemann.</li>
+<li><strong>St. Paulpalooza</strong> — שבת 26 בספטמבר, St. Paul the Apostle Catholic Church, Richardson (ריצ׳רדסון). חינם. פסטיבל קהילתי שנתי עם אוכל, בידור ומשחקים לכל המשפחה.</li>
+<li><strong>Hopeful Hearts 5K/1M Stampede</strong> — שבת 26 בספטמבר, Christian Community Action, Lewisville (לואיסוויל). ראה הרשמה באתר. מרוץ צדקה למען משפחות נזקקות באזור. אפשרות ל-5 ק&quot;מ או 1 מייל.</li>
+<li><strong>The Bloom Bazaar — שוק נשי כולו</strong> — ראשון 27 בספטמבר, Grandscape, The Colony (The Colony). חינם. שוק ייחודי שכל הדוכנים בו בבעלות נשים — אופנה, אמנות ומוצרי בוטיק.</li></ul></div></noscript>
 <button class="bug-btn" id="bugBtn" onclick="toggleBugPanel()" title="לוג העדכון האוטומטי האחרון">&#x1F41E;</button>
 <div class="bug-overlay" id="bugOverlay" onclick="if(event.target===this)toggleBugPanel()">
   <div class="bug-panel">
@@ -159,15 +221,12 @@
   </div>
 </div>
 <header>
-  <div class="header-badge">🗺 DFW METRO · DALLAS · TEXAS · ספטמבר–אוקטובר 2026</div>
+  <div class="header-badge">🗺 DFW METRO · DALLAS · TEXAS · 27 ספטמבר–27 אוקטובר</div>
   <h1>פעילויות השבועיים הקרובים</h1>
   <p class="subtitle">ספורט · מרוצים · הופעות · פסטיבלים · שווקים · תיאטרון · ירידים</p>
   <div class="week-tags">
-    <span class="wtag wknd">🎉 Labor Day: שני 7 בספטמבר</span>
-    <span class="wtag reg">📅 שבוע: 8–13 בספטמבר</span>
-    <span class="wtag wknd">🔥 סופ"ש: 17–20 בספטמבר (GrapeFest + Balloon Fest)</span>
-    <span class="wtag reg">📅 שבוע: 21–24 בספטמבר</span>
-    <span class="wtag wknd">🎡 25/9: נפתח State Fair of Texas</span>
+    <span class="wtag reg">📅 היום + 30 הימים הקרובים (27 ספטמבר–27 אוקטובר)</span>
+    <span class="wtag wknd">🔥 סופ"ש הקרוב: שבת 3 אוקטובר + ראשון 4 אוקטובר</span>
   </div>
 </header>
 
@@ -191,12 +250,14 @@
   <button class="tab-btn" onclick="showRegion('dallas',this)">דאלאס</button>
   <button class="tab-btn" onclick="showRegion('irving',this)">ארווינג</button>
   <button class="tab-btn" onclick="showRegion('grapevine',this)">גרייפוויין</button>
+  <button class="tab-btn" onclick="showRegion('fortworth',this)">פורט וורת׳</button>
 </nav>
 
 <main>
   <div class="filter-bar">
     <span class="filter-label">סנן:</span>
     <button class="filter-btn" onclick="setFilter('wknd',this)">🔥 סופ"ש</button>
+    <button class="filter-btn" onclick="setFilter('today',this)">📅 היום</button>
     <button class="filter-btn" onclick="setFilter(null,this)">✅ הכל</button>
     <button class="filter-btn" onclick="setFilter('mlb',this)">⚾ MLB</button>
     <button class="filter-btn" onclick="setFilter('baseball',this)">⚾ בייסבול</button>
@@ -223,348 +284,900 @@
 
   <div id="view-all" class="region-section active"></div>
   <style>.region-dist{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--text-dim);background:rgba(46,204,113,.07);border:1px solid var(--card-border);padding:.2rem .6rem;border-radius:1rem;white-space:nowrap;margin-right:auto;margin-left:.5rem}</style>
-  <div id="view-plano"   class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">פלאנו</h2><span class="region-drive">🏠 כאן</span><span class="region-count" id="cnt-plano"></span></div><div class="events-grid" id="grid-plano"></div></div>
+  <div id="view-plano" class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">פלאנו</h2><span class="region-drive">כאן</span><span class="region-count" id="cnt-plano"></span></div><div class="events-grid" id="grid-plano"></div></div>
   <div id="view-richardson" class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">ריצ׳רדסון</h2><span class="region-drive">~10 דק׳ · 5 מייל</span><span class="region-count" id="cnt-richardson"></span></div><div class="events-grid" id="grid-richardson"></div></div>
-  <div id="view-allen"  class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">אלן</h2><span class="region-drive">~12 דק׳ · 8 מייל</span><span class="region-count" id="cnt-allen"></span></div><div class="events-grid" id="grid-allen"></div></div>
+  <div id="view-allen" class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">אלן</h2><span class="region-drive">~12 דק׳ · 8 מייל</span><span class="region-count" id="cnt-allen"></span></div><div class="events-grid" id="grid-allen"></div></div>
   <div id="view-addison" class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">אדיסון</h2><span class="region-drive">~15 דק׳ · 9 מייל</span><span class="region-count" id="cnt-addison"></span></div><div class="events-grid" id="grid-addison"></div></div>
-  <div id="view-frisco"  class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">פריסקו</h2><span class="region-drive">~18 דק׳ · 12 מייל</span><span class="region-count" id="cnt-frisco"></span></div><div class="events-grid" id="grid-frisco"></div></div>
+  <div id="view-frisco" class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">פריסקו</h2><span class="region-drive">~18 דק׳ · 12 מייל</span><span class="region-count" id="cnt-frisco"></span></div><div class="events-grid" id="grid-frisco"></div></div>
   <div id="view-mckinney" class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">מקיני</h2><span class="region-drive">~20 דק׳ · 14 מייל</span><span class="region-count" id="cnt-mckinney"></span></div><div class="events-grid" id="grid-mckinney"></div></div>
   <div id="view-thecolony" class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">The Colony</h2><span class="region-drive">~20 דק׳ · 15 מייל</span><span class="region-count" id="cnt-thecolony"></span></div><div class="events-grid" id="grid-thecolony"></div></div>
   <div id="view-lewisville" class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">לואיסוויל</h2><span class="region-drive">~25 דק׳ · 18 מייל</span><span class="region-count" id="cnt-lewisville"></span></div><div class="events-grid" id="grid-lewisville"></div></div>
   <div id="view-flowermound" class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">פלאואר מאונד</h2><span class="region-drive">~28 דק׳ · 20 מייל</span><span class="region-count" id="cnt-flowermound"></span></div><div class="events-grid" id="grid-flowermound"></div></div>
-  <div id="view-dallas"  class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">דאלאס / פורט וורת׳</h2><span class="region-drive">~30 דק׳ · 20 מייל</span><span class="region-count" id="cnt-dallas"></span></div><div class="events-grid" id="grid-dallas"></div></div>
-  <div id="view-irving"  class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">ארווינג</h2><span class="region-drive">~30 דק׳ · 22 מייל</span><span class="region-count" id="cnt-irving"></span></div><div class="events-grid" id="grid-irving"></div></div>
+  <div id="view-dallas" class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">דאלאס</h2><span class="region-drive">~30 דק׳ · 20 מייל</span><span class="region-count" id="cnt-dallas"></span></div><div class="events-grid" id="grid-dallas"></div></div>
+  <div id="view-irving" class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">ארווינג</h2><span class="region-drive">~30 דק׳ · 22 מייל</span><span class="region-count" id="cnt-irving"></span></div><div class="events-grid" id="grid-irving"></div></div>
   <div id="view-grapevine" class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">גרייפוויין</h2><span class="region-drive">~35 דק׳ · 25 מייל</span><span class="region-count" id="cnt-grapevine"></span></div><div class="events-grid" id="grid-grapevine"></div></div>
+  <div id="view-fortworth" class="region-section"><div class="region-header"><span style="font-size:1.8rem">📍</span><h2 class="region-title">פורט וורת׳</h2><span class="region-drive">~45 דק׳ · 35 מייל</span><span class="region-count" id="cnt-fortworth"></span></div><div class="events-grid" id="grid-fortworth"></div></div>
 </main>
-<div class="last-updated">עודכן: 05/09/2026 — 5 בספטמבר–5 באוקטובר 2026 | 44 אירועים | דגש על Labor Day (7/9) | מבוסס על חיפוש אונליין בזמן אמת</div>
-
+<div class="last-updated" id="lastUpdated">עודכן: 27/09/2026 06:59</div>
 <script>
 const events = [
-
-  // ===== PLANO =====
-  { id:1, region:'plano', cat:'festival', catLabel:'🏮 פסטיבל פנסים', weekend:true,
-    dates:['2026-09-05'],
-    title:'Water Lantern Festival 2026 — Haggard Park',
-    desc:'שיגור פנסים צפים על פני האגם עם מוזיקה חיה, אוכל וצילום מקצועי. חוויה קסומה וויזואלית לכל המשפחה.',
-    who:'כל הגילאים', whenLabel:'שבת 5 בספטמבר', hours:'ערב',
-    where:'Haggard Park, Plano', price:'$30.99–$57.99', rating:8 },
-
-  { id:2, region:'plano', cat:'festival', catLabel:'🏊 Labor Day — סגירת עונה', weekend:true,
-    dates:['2026-09-07'],
-    title:'Texas Pool Closing Weekend — Labor Day',
-    desc:'מסיבת יום העבודה בבריכה: משחקי בריכה קלאסיים, תחרות קפיצות "cannonball" עם פרסים, גרילים ופיקניק. סגירת הבריכה לעונה בכיף.',
-    who:'כל המשפחה', whenLabel:'שני 7 בספטמבר (Labor Day)', hours:'12:00–18:00',
-    where:'The Texas Pool, Plano', price:'$10', rating:9 },
-
-  { id:3, region:'plano', cat:'market', catLabel:'🛒 שוק שבתי', weekend:true,
-    dates:['2026-09-05','2026-09-12','2026-09-19','2026-09-26'],
-    title:'Plano Farmers Market — Willow Bend',
-    desc:'שוק שבועי: דבש, תוצרת טרייה, מאפים, מלאכות יד. נגיש וידידותי לכלבים.',
-    who:'כל המשפחה', whenLabel:'שבתות כל החודש', hours:'10:00–14:00',
-    where:'The Shops at Willow Bend, Plano', price:'חינם', rating:8 },
-
-  { id:4, region:'plano', cat:'market', catLabel:'🤠 שוק דיסקו-קאווגירל', weekend:true,
-    dates:['2026-09-06'],
-    title:'Downtown Plano Disco Cowgirl Market',
-    desc:'שוק וינטג\'-מערבי עם דוכני מוכרים מקומיים ו-"sip-and-shop" בהשראת דיסקו-קאווגירל.',
-    who:'כל הגילאים', whenLabel:'ראשון 6 בספטמבר', hours:'אחה"צ',
-    where:'Downtown Plano Arts District', price:'חינם', rating:7 },
-
-  { id:5, region:'plano', cat:'concert', catLabel:'🎸 מסיבת שנות ה-90', weekend:false,
-    dates:['2026-09-09'],
-    title:'Labor Day Throwback Party With Live 90 — Legacy Hall',
-    desc:'חגיגת מוזיקת שנות ה-90 — גראנג\', פופ והיפ-הופ. ערב נוסטלגי גדול ב-Legacy Hall.',
-    who:'מבוגרים', whenLabel:'רביעי 9 בספטמבר', hours:'ערב',
-    where:'Legacy Hall, Plano', price:'עד $109', rating:7 },
-
-  { id:6, region:'plano', cat:'festival', catLabel:'🎈 פסטיבל כדורים פורחים', weekend:true,
-    dates:['2026-09-17','2026-09-18','2026-09-19','2026-09-20'],
-    title:'2026 Plano Balloon Festival',
-    desc:'פסטיבל כדורים פורחים ענקי עם שיגורים, הופעות מקומיות ואווירה פסטיבלית. אחד האירועים הגדולים באזור.',
-    who:'כל המשפחה', whenLabel:'חמישי–ראשון 17–20 בספטמבר', hours:'ראה לוח',
-    where:'Oak Point Event Field, Plano', price:'$5–$10', rating:9 },
-
-  { id:7, region:'plano', cat:'culture', catLabel:'🚂 תערוכת רכבות', weekend:true,
-    dates:['2026-09-26','2026-09-27'],
-    title:'Fall Plano Train Show 2026',
-    desc:'תערוכת רכבות מודל אינטראקטיבית ומשפחתית עם מסילות מרהיבות.',
-    who:'כל הגילאים', whenLabel:'שבת–ראשון 26–27 בספטמבר', hours:'ראה לוח',
-    where:'Plano Event Center', price:'חינם', rating:7 },
-
-  // ===== RICHARDSON =====
-  { id:8, region:'richardson', cat:'market', catLabel:'🌙 שוק לילה', weekend:true,
-    dates:['2026-09-11'],
-    title:'CityLine Night Market — ספטמבר',
-    desc:'שוק לילה חודשי חינמי עם 45+ דוכני יד-שנייה ואומנות, ומוזיקה חיה.',
-    who:'כל הגילאים', whenLabel:'שישי 11 בספטמבר', hours:'17:00–21:00',
-    where:'CityLine Plaza, Richardson', price:'חינם', rating:8 },
-
-  { id:9, region:'richardson', cat:'concert', catLabel:'🎤 ABBA Tribute', weekend:true,
-    dates:['2026-09-18'],
-    title:'Waterloo — ABBA Tribute Live',
-    desc:'הופעת מחווה מקצועית ל-ABBA באולם הבמה המוביל של ריצ\'רדסון.',
-    who:'כל הגילאים', whenLabel:'שישי 18 בספטמבר', hours:'19:30',
-    where:'Eisemann Center, Richardson', price:'מ-$35', rating:8 },
-
-  { id:10, region:'richardson', cat:'concert', catLabel:'🎺 תזמורת קהילתית', weekend:true,
-    dates:['2026-09-19'],
-    title:'Richardson Community Band — Fall Concert',
-    desc:'קונצרט חינמי של התזמורת הקהילתית — יצירות קלאסיות, פטריוטיות ופופולריות.',
-    who:'כל הגילאים', whenLabel:'שבת 19 בספטמבר', hours:'19:30',
-    where:'Eisemann Center, Richardson', price:'חינם', rating:7 },
-
-  { id:11, region:'richardson', cat:'concert', catLabel:'🎻 פתיחת עונה', weekend:true,
-    dates:['2026-09-26'],
-    title:'Richardson Symphony Orchestra — Fall Season Opener',
-    desc:'תזמורת מובילה באזור DFW פותחת את העונה. ערב מוזיקלי איכותי ב-Eisemann.',
-    who:'כל הגילאים', whenLabel:'שבת 26 בספטמבר', hours:'19:30',
-    where:'Eisemann Center, Richardson', price:'מ-$25', rating:8 },
-
-  { id:12, region:'richardson', cat:'festival', catLabel:'⛪ פסטיבל קהילתי', weekend:true,
-    dates:['2026-09-26'],
-    title:'St. Paulpalooza',
-    desc:'פסטיבל קהילתי שנתי עם אוכל, בידור ומשחקים לכל המשפחה.',
-    who:'כל המשפחה', whenLabel:'שבת 26 בספטמבר', hours:'16:00–21:00',
-    where:'St. Paul the Apostle Catholic Church, Richardson', price:'חינם', rating:7 },
-
-  // ===== ALLEN =====
-  { id:13, region:'allen', cat:'market', catLabel:'🛒 שוק בוטיק', weekend:true,
-    dates:['2026-09-05','2026-09-12','2026-09-19','2026-09-26'],
-    title:'Cottage Farmers Market — Allen Heritage Village',
-    desc:'שוק חוצות בוטיקי עם מוצרי אמנים ותוצרת מקומית באווירה כפרית.',
-    who:'כל הגילאים', whenLabel:'שבתות כל החודש', hours:'בוקר–אחה"צ',
-    where:'Allen Heritage Village', price:'חינם', rating:7 },
-
-  { id:14, region:'allen', cat:'concert', catLabel:'🎵 קונצרט חינם', weekend:true,
-    dates:['2026-09-05','2026-09-12','2026-09-19','2026-09-26'],
-    title:'Concerts by the Creek — Watters Creek',
-    desc:'קונצרטים חינמיים כל שבת בערב על הדשא, כולל מוזיקה חיה של Love Handle בפתיחת החודש.',
-    who:'כל הגילאים', whenLabel:'שבתות כל החודש', hours:'19:00–21:00',
-    where:'Watters Creek Village Green, Allen', price:'חינם!', rating:8 },
-
-  { id:15, region:'allen', cat:'market', catLabel:'🧸 יריד צעצועים', weekend:true,
-    dates:['2026-09-06'],
-    title:'North Dallas Toy Show',
-    desc:'130+ שולחנות עם צעצועי וינטג\' ומודרניים, קומיקס ואספנות. גן עדן לאספנים ולילדים.',
-    who:'כל הגילאים', whenLabel:'ראשון 6 בספטמבר', hours:'בוקר–אחה"צ',
-    where:'Courtyard by Marriott Dallas Allen', price:'ראה כרטיסים באתר', rating:7 },
-
-  { id:16, region:'allen', cat:'market', catLabel:'🍺 שוק דיסקו-קאווגירל', weekend:true,
-    dates:['2026-09-06'],
-    title:'Disco Cowgirl Market — Armor Brewing',
-    desc:'שוק ספקים בהשראת דיסקו-מערבי במפעל הבירה המקומי — בוטיקים, מוצרי יד ומשקאות אומן.',
-    who:'כל הגילאים (18+ לשתייה)', whenLabel:'ראשון 6 בספטמבר', hours:'אחה"צ',
-    where:'Armor Brewing Co., Allen', price:'חינם (שתייה בתשלום)', rating:7 },
-
-  // ===== ADDISON =====
-  { id:17, region:'addison', cat:'festival', catLabel:'🍺 Oktoberfest', weekend:true,
-    dates:['2026-09-18','2026-09-19','2026-09-20','2026-09-21'],
-    title:'Addison Oktoberfest 2026',
-    desc:'אחת מחגיגות האוקטוברפסט האותנטיות ביותר מחוץ למינכן — בירה גרמנית, אוכל, להקות אומפה חיות ומרוץ דצשונדים.',
-    who:'כל הגילאים', whenLabel:'שישי–שני 18–21 בספטמבר', hours:'ראה לוח',
-    where:'Addison Circle Park, Addison', price:'חינם כניסה', rating:9 },
-
-  { id:18, region:'addison', cat:'food', catLabel:'🍴 שבוע המסעדות (מסתיים)', weekend:false,
-    dates:['2026-09-05','2026-09-06','2026-09-07'],
-    title:'DFW Restaurant Week — סוף עונה באדיסון',
-    desc:'הסופ"ש האחרון של שבוע המסעדות של DFW (מסתיים 7/9) — הזדמנות אחרונה לתפריטים מוזלים ב-200+ מסעדות אדיסון.',
-    who:'כל הגילאים', whenLabel:'עד 7 בספטמבר (Labor Day)', hours:'ראה תפריטים באתר',
-    where:'מסעדות ברחבי Addison Circle', price:'$29 צהריים / $49–59 ערב', rating:8 },
-
-  // ===== FRISCO =====
-  { id:19, region:'frisco', cat:'market', catLabel:'🌾 שוק טרי', weekend:true,
-    dates:['2026-09-05','2026-09-06','2026-09-12','2026-09-13','2026-09-19','2026-09-20','2026-09-26','2026-09-27'],
-    title:'Frisco Fresh Market — Downtown Frisco',
-    desc:'90+ דוכנים, תוצרת טרייה, שפים ומוזיקה חיה. שבת+ראשון כל שבוע.',
-    who:'כל המשפחה', whenLabel:'שבת+ראשון כל שבוע', hours:'שבת 8:00–16:00 | ראשון 10:00–16:00',
-    where:'9215 John W Elliott Dr, Frisco', price:'חינם', rating:9 },
-
-  { id:20, region:'frisco', cat:'baseball', catLabel:'⚾ פלייאוף AA!', weekend:true,
-    dates:['2026-09-17','2026-09-18','2026-09-20'],
-    title:'Frisco RoughRiders — פלייאוף בית (Riders Field)',
-    desc:'הרוחריידרס זכו באליפות המחצית הראשונה וממשיכים לפלייאוף! משחקי בית בסדרת המחצית (17-18/9) ומשחק 1 של הגמר (20/9) אם יעפילו. אווירה חשמלית.',
-    who:'כל הגילאים', whenLabel:'חמישי-שישי 17–18 + ראשון 20 בספטמבר', hours:'ראה לוח Riders Field',
-    where:'Riders Field, 7300 RoughRiders Trail, Frisco', price:'ראה כרטיסים באתר', rating:9 },
-
-  { id:21, region:'frisco', cat:'market', catLabel:'🎪 שוק פשפשים', weekend:true,
-    dates:['2026-09-19'],
-    title:'Flea Style Market At The Star',
-    desc:'שוק פשפשים חינמי ברחבת The Star, מרכז האימונים של Dallas Cowboys. דוכני יד-שנייה ואומנות.',
-    who:'כל הגילאים', whenLabel:'שבת 19 בספטמבר', hours:'10:00–16:00',
-    where:'Tostitos Championship Plaza, The Star, Frisco', price:'חינם', rating:7 },
-
-  { id:22, region:'frisco', cat:'culture', catLabel:'🐶 כלבים בבריכה', weekend:true,
-    dates:['2026-09-12'],
-    title:'Paws in the Pool — Frisco Water Park',
-    desc:'לפני סגירת הבריכה לעונה — יום מיוחד שבו כלבים יכולים ליהנות מהבריכה. נדרש כרטיס מראש.',
-    who:'בעלי כלבים', whenLabel:'שבת 12 בספטמבר', hours:'8:30 / 10:30 / 12:30',
-    where:'Frisco Water Park', price:'ראה כרטיסים באתר', rating:7 },
-
-  // ===== MCKINNEY =====
-  { id:23, region:'mckinney', cat:'market', catLabel:'🛒 שוק שבתי', weekend:true,
-    dates:['2026-09-05','2026-09-12','2026-09-19','2026-09-26'],
-    title:'McKinney Farmers Market — Chestnut Square',
-    desc:'המוערך ביותר בטקסס: בשר, ירקות, מאפים, אמנות ומוזיקה חיה.',
-    who:'כל הגילאים', whenLabel:'שבתות כל החודש', hours:'8:00–12:00',
-    where:'315 S Chestnut St, McKinney', price:'חינם', rating:9 },
-
-  { id:24, region:'mckinney', cat:'culture', catLabel:'🍺 כיתת מבשלים', weekend:true,
-    dates:['2026-09-05'],
-    title:'TUPPS Brewery Brewmaster Education Class',
-    desc:'כיתת חינוך חודשית על תהליך הבישול עם טעימות ישירות מהמבשל.',
-    who:'21+', whenLabel:'שבת 5 בספטמבר', hours:'11:00–12:00',
-    where:'TUPPS Brewery, McKinney', price:'ראה כרטיסים באתר', rating:7 },
-
-  { id:25, region:'mckinney', cat:'market', catLabel:'🤠 ימי מסחר', weekend:true,
-    dates:['2026-09-18','2026-09-19','2026-09-20'],
-    title:'McKinney Monday Trade Days',
-    desc:'יריד מסחר וינטג\' ואספנות מסורתי בטקסס — דוכנים רבים בכל רחבי האתר.',
-    who:'כל הגילאים', whenLabel:'שישי–ראשון 18–20 בספטמבר', hours:'כל היום',
-    where:'McKinney Trade Days grounds', price:'חינם כניסה', rating:8 },
-
-  { id:26, region:'mckinney', cat:'festival', catLabel:'🍺 Oktoberfest שנה 19', weekend:true,
-    dates:['2026-09-25','2026-09-26','2026-09-27'],
-    title:'McKinney Oktoberfest — 19th Annual',
-    desc:'חגיגת אוקטוברפסט שנתית בדאונטאון ההיסטורי של מקיני — בירה, אוכל גרמני ומוזיקה חיה.',
-    who:'כל הגילאים', whenLabel:'שישי–ראשון 25–27 בספטמבר', hours:'ראה לוח',
-    where:'Historic Downtown McKinney', price:'חינם', rating:8 },
-
-  // ===== THE COLONY (Grandscape) =====
-  { id:27, region:'thecolony', cat:'market', catLabel:'🍲 שוק בינלאומי', weekend:true,
-    dates:['2026-09-06'],
-    title:'The Melting Pot Market — Grandscape',
-    desc:'80+ ספקים, DJ חי ותרבויות שונות ב-The Lawn at Grandscape.',
-    who:'כל הגילאים', whenLabel:'ראשון 6 בספטמבר', hours:'14:00–20:00',
-    where:'The Lawn at Grandscape, The Colony', price:'חינם', rating:8 },
-
-  { id:28, region:'thecolony', cat:'concert', catLabel:'🎸 Country Close Up', weekend:true,
-    dates:['2026-09-23'],
-    title:'Country Close Up — Grandscape',
-    desc:'ערב קאנטרי חי אינטימי בהופעה בחוץ ב-Grandscape.',
-    who:'כל הגילאים', whenLabel:'רביעי 23 בספטמבר', hours:'19:00–21:00',
-    where:'Grandscape, The Colony', price:'חינם', rating:7 },
-
-  { id:29, region:'thecolony', cat:'market', catLabel:'🌸 שוק נשות עסקים', weekend:true,
-    dates:['2026-09-27'],
-    title:'The Bloom Bazaar — שוק נשי כולו',
-    desc:'שוק ייחודי שכל הדוכנים בו בבעלות נשים — אופנה, אמנות ומוצרי בוטיק.',
-    who:'כל הגילאים', whenLabel:'ראשון 27 בספטמבר', hours:'14:00–20:00',
-    where:'Grandscape, The Colony', price:'חינם', rating:7 },
-
-  // ===== LEWISVILLE =====
-  { id:30, region:'lewisville', cat:'festival', catLabel:'🤠 Western Days', weekend:true,
-    dates:['2026-09-25'],
-    title:'Western Days Festival 2026',
-    desc:'פסטיבל רחוב בהשראה מערבית ב-Old Town Lewisville ההיסטורי — בידור, אוכל ומוזיקה. כניסה חינם.',
-    who:'כל המשפחה', whenLabel:'שישי 25 בספטמבר', hours:'16:00–23:30',
-    where:'Old Town Lewisville', price:'חינם', rating:8 },
-
-  { id:31, region:'lewisville', cat:'sport', catLabel:'🏃 מרוץ צדקה', weekend:true,
-    dates:['2026-09-26'],
-    title:'Hopeful Hearts 5K/1M Stampede',
-    desc:'מרוץ צדקה למען משפחות נזקקות באזור. אפשרות ל-5 ק"מ או 1 מייל.',
-    who:'כל הגילאים', whenLabel:'שבת 26 בספטמבר', hours:'7:00–9:30',
-    where:'Christian Community Action, Lewisville', price:'ראה הרשמה באתר', rating:7 },
-
-  // ===== FLOWER MOUND =====
-  { id:32, region:'flowermound', cat:'film', catLabel:'🎬 סרטים בפארק', weekend:true,
-    dates:['2026-09-11','2026-09-18','2026-09-25'],
-    title:'Movies in the Park — Heritage Park',
-    desc:'סדרת קולנוע בחוץ חינמית עם משאיות אוכל. שלוש הקרנות נותרות בסדרה החודש.',
-    who:'כל המשפחה', whenLabel:'שישי בערב — 11, 18, 25 בספטמבר', hours:'19:30',
-    where:'Heritage Park, Flower Mound', price:'חינם', rating:7 },
-
-  { id:33, region:'flowermound', cat:'festival', catLabel:'🦆 מרוץ ברווזי גומי', weekend:true,
-    dates:['2026-09-19'],
-    title:'9th Annual Rhythms at the River Walk & Duck Derby',
-    desc:'30,000+ ברווזי גומי במרוץ על פני ה-River Walk, פלוס מוזיקה חיה. אחד האירועים המצחיקים והמשפחתיים ביותר בחודש.',
-    who:'כל המשפחה', whenLabel:'שבת 19 בספטמבר', hours:'10:00–14:00',
-    where:'River Walk at Central Park, Flower Mound', price:'חינם', rating:9 },
-
-  // ===== DALLAS / ארלינגטון / פורט וורת׳ =====
-  { id:34, region:'dallas', cat:'culture', catLabel:'🐂 Legacy of the Longhorn — Labor Day', weekend:true,
-    dates:['2026-09-07'],
-    title:'Legacy of the Longhorn — Fort Worth Stockyards (Labor Day)',
-    desc:'מצעד הבקר האגדי של פרות הלונגהורן ברחוב Exchange Ave ההיסטורי, במיוחד ביום העבודה. חוויה טקסנית קלאסית וחינמית לצפייה.',
-    who:'כל הגילאים', whenLabel:'שני 7 בספטמבר (Labor Day)', hours:'12:30',
-    where:'Fort Worth Stockyards, 131 E Exchange Ave', price:'חינם לצפייה', rating:8 },
-
-  { id:35, region:'dallas', cat:'rodeo', catLabel:'🤠 רודיאו שבועי', weekend:true,
-    dates:['2026-09-04','2026-09-05','2026-09-11','2026-09-12','2026-09-18','2026-09-19','2026-09-25','2026-09-26'],
-    title:'Stockyards Championship Rodeo — Fort Worth',
-    desc:'רודיאו שבועי אגדי ב-Stockyards ההיסטורי. קרבות רכיבה על פרות וסוסים, אווירה מערב-טקסנית קלאסית.',
-    who:'כל הגילאים', whenLabel:'כל שישי–שבת', hours:'19:30',
-    where:'Cowtown Coliseum, Fort Worth', price:'מ-$20', rating:9 },
-
-  { id:36, region:'dallas', cat:'concert', catLabel:'🎷 פסטיבל ג\'אז — סיום', weekend:true,
-    dates:['2026-09-05','2026-09-06'],
-    title:'Riverfront Jazz Festival — Fair Park (סוף השבוע)',
-    desc:'סופ"ש הסיום של פסטיבל הג\'אז עם כוכבים כמו Gladys Knight, Samara Joy, Rose Royce ו-Brian McKnight. ג\'אז, פופ, סול ו-R&B.',
-    who:'כל הגילאים', whenLabel:'שבת–ראשון 5–6 בספטמבר', hours:'ראה לוח',
-    where:'Fair Park (Automobile & Centennial Buildings), Dallas', price:'ראה כרטיסים באתר', rating:9 },
-
-  { id:37, region:'dallas', cat:'concert', catLabel:'🎬 DSO — הארי פוטר', weekend:true,
-    dates:['2026-09-05','2026-09-06'],
-    title:'DSO: Harry Potter and the Half-Blood Prince in Concert',
-    desc:'הסרט המלא על המסך הגדול עם הפסקול המבוצע חי על ידי התזמורת הסימפונית של דאלאס. סוף שבוע ההופעות האחרון.',
-    who:'כל הגילאים (מומלץ 8+)', whenLabel:'שבת–ראשון 5–6 בספטמבר', hours:'ראה לוח Meyerson',
-    where:'Morton H. Meyerson Symphony Center, Dallas', price:'מ-$35', rating:8 },
-
-  { id:38, region:'dallas', cat:'festival', catLabel:'🏊 Labor Day פארטי (21+)', weekend:true,
-    dates:['2026-09-07'],
-    title:'End of Summer Labor Day Pool Party — Lorenzo Hotel',
-    desc:'מסיבת בריכה 21+ עם 18 די-ג\'יי מוזיקת האוס, אווירת בריכה ואוכל ומשקאות. סגירת קיץ גדולה במלון בוטיק בדאונטאון.',
-    who:'21+', whenLabel:'שני 7 בספטמבר (Labor Day)', hours:'13:00–22:00',
-    where:'Lorenzo Hotel Pool, Downtown Dallas', price:'מ-$23', rating:7 },
-
-  { id:39, region:'dallas', cat:'festival', catLabel:'🎡 היריד הגדול של טקסס!', weekend:true,
-    dates:['2026-09-25','2026-09-26','2026-09-27','2026-09-28','2026-09-29','2026-09-30','2026-10-01','2026-10-02','2026-10-03','2026-10-04','2026-10-05'],
-    title:'State Fair of Texas 2026 — נפתח!',
-    desc:'האירוע השנתי הגדול בטקסס נפתח! 24 יום של פעילויות פארק שעשועים, אוכל מטוגן ייחודי, תערוכות, קרקסים וכל מה שאהוב על ילדים. ממשיך עד 18 באוקטובר.',
-    who:'כל המשפחה', whenLabel:'נפתח שישי 25 בספטמבר (ממשיך עד 18 אוקטובר)', hours:'ראה לוח Fair Park',
-    where:'Fair Park, Dallas', price:'ראה כרטיסים באתר', rating:10 },
-
-  { id:40, region:'dallas', cat:'art', catLabel:'🎃 דלועים בארבורטום', weekend:true,
-    dates:['2026-09-19','2026-09-20','2026-09-26','2026-09-27','2026-10-01','2026-10-02','2026-10-03','2026-10-04','2026-10-05'],
-    title:'Autumn at the Arboretum — Pumpkin Village "Harvest Hues"',
-    desc:'100,000+ דלועים ודגלים ברחבי הגן, עם עיצוב Pumpkin Village בהשראת באסקיה, רות\'קו ופולוק. נפתח 19 בספטמבר וממשיך עד 1 בנובמבר.',
-    who:'כל המשפחה', whenLabel:'נפתח שבת 19 בספטמבר', hours:'9:00–17:00',
-    where:'Dallas Arboretum, 8525 Garland Rd, Dallas', price:'כלול בכרטיס הגן', rating:9 },
-
-  // ===== IRVING =====
-  { id:41, region:'irving', cat:'market', catLabel:'🛒 שוק איכרים', weekend:true,
-    dates:['2026-09-06','2026-09-13','2026-09-20','2026-09-27'],
-    title:'Irving Farmers Market — Las Colinas',
-    desc:'שוק איכרים שבועי בלב Las Colinas: תוצרת טרייה, מאפים ומלאכות יד.',
-    who:'כל המשפחה', whenLabel:'ראשונים כל החודש', hours:'10:00–14:00',
-    where:'501 E Las Colinas Blvd, Irving', price:'חינם', rating:7 },
-
-  { id:42, region:'irving', cat:'concert', catLabel:'🎤 Myles Smith', weekend:true,
-    dates:['2026-09-06'],
-    title:'Myles Smith — Toyota Music Factory',
-    desc:'הזמר הבריטי המתפרץ מופיע עם אלבום הבכורה שלו. אווירה אינטימית באמפיתאטרון החוץ של Irving.',
-    who:'כל הגילאים', whenLabel:'ראשון 6 בספטמבר', hours:'19:30',
-    where:'The Pavilion at Toyota Music Factory, Irving', price:'ראה כרטיסים באתר', rating:7 },
-
-  // ===== GRAPEVINE =====
-  { id:43, region:'grapevine', cat:'festival', catLabel:'🍇 GrapeFest — 40 שנה!', weekend:true,
-    dates:['2026-09-17','2026-09-18','2026-09-19','2026-09-20'],
-    title:'GrapeFest 40th Annual — A Texas Wine Experience',
-    desc:'פסטיבל היין הגדול בטקסס חוגג 40 שנה! טעימות יין, אוכל, מוזיקה חיה ותחרות דריכת ענבים. אחד האירועים הכי גדולים בגרייפוויין.',
-    who:'כל הגילאים (טעימות 21+)', whenLabel:'חמישי–ראשון 17–20 בספטמבר', hours:'ראה לוח',
-    where:'Historic Main Street & Silver Lake Park, Grapevine', price:'ראה כרטיסים באתר', rating:10 },
-
-  { id:44, region:'grapevine', cat:'culture', catLabel:'🍷 Grapevine Wine', weekend:false,
-    dates:['2026-09-05','2026-09-06','2026-09-07','2026-09-08','2026-09-09','2026-09-10','2026-09-11','2026-09-12','2026-09-13','2026-09-14','2026-09-15','2026-09-16'],
-    title:'Grapevine Wineries & Historic Downtown — כל יום',
-    desc:'גרייפוויין היא "בירת היין של טקסס" — 8 יקבים בהליכה ברחוב Main Street ההיסטורי. פתוח כל יום, גם לפני ואחרי GrapeFest.',
-    who:'מבוגרים בעיקר', whenLabel:'כל יום', hours:'ראה כל יקב בנפרד',
-    where:'Historic Main Street, Grapevine TX', price:'טעימות מ-$15', rating:9 }
+  {
+    "id": 1,
+    "region": "plano",
+    "cat": "festival",
+    "weekend": true,
+    "dates": [
+      "2026-09-05"
+    ],
+    "rating": 8,
+    "catLabel": "🏮 פסטיבל פנסים",
+    "title": "Water Lantern Festival 2026 — Haggard Park",
+    "desc": "שיגור פנסים צפים על פני האגם עם מוזיקה חיה, אוכל וצילום מקצועי. חוויה קסומה וויזואלית לכל המשפחה.",
+    "who": "כל הגילאים",
+    "whenLabel": "שבת 5 בספטמבר",
+    "hours": "ערב",
+    "where": "Haggard Park, Plano",
+    "price": "$30.99–$57.99"
+  },
+  {
+    "id": 2,
+    "region": "plano",
+    "cat": "festival",
+    "weekend": false,
+    "dates": [
+      "2026-09-07"
+    ],
+    "rating": 9,
+    "catLabel": "🏊 Labor Day — סגירת עונה",
+    "title": "Texas Pool Closing Weekend — Labor Day",
+    "desc": "מסיבת יום העבודה בבריכה: משחקי בריכה קלאסיים, תחרות קפיצות \"cannonball\" עם פרסים, גרילים ופיקניק. סגירת הבריכה לעונה בכיף.",
+    "who": "כל המשפחה",
+    "whenLabel": "שני 7 בספטמבר (Labor Day)",
+    "hours": "12:00–18:00",
+    "where": "The Texas Pool, Plano",
+    "price": "$10"
+  },
+  {
+    "id": 3,
+    "region": "plano",
+    "cat": "market",
+    "weekend": true,
+    "dates": [
+      "2026-09-05",
+      "2026-09-12",
+      "2026-09-19",
+      "2026-09-26"
+    ],
+    "rating": 8,
+    "catLabel": "🛒 שוק שבתי",
+    "title": "Plano Farmers Market — Willow Bend",
+    "desc": "שוק שבועי: דבש, תוצרת טרייה, מאפים, מלאכות יד. נגיש וידידותי לכלבים.",
+    "who": "כל המשפחה",
+    "whenLabel": "שבתות כל החודש",
+    "hours": "10:00–14:00",
+    "where": "The Shops at Willow Bend, Plano",
+    "price": "חינם"
+  },
+  {
+    "id": 4,
+    "region": "plano",
+    "cat": "market",
+    "weekend": true,
+    "dates": [
+      "2026-09-06"
+    ],
+    "rating": 7,
+    "catLabel": "🤠 שוק דיסקו-קאווגירל",
+    "title": "Downtown Plano Disco Cowgirl Market",
+    "desc": "שוק וינטג'-מערבי עם דוכני מוכרים מקומיים ו-\"sip-and-shop\" בהשראת דיסקו-קאווגירל.",
+    "who": "כל הגילאים",
+    "whenLabel": "ראשון 6 בספטמבר",
+    "hours": "אחה\"צ",
+    "where": "Downtown Plano Arts District",
+    "price": "חינם"
+  },
+  {
+    "id": 5,
+    "region": "plano",
+    "cat": "concert",
+    "weekend": false,
+    "dates": [
+      "2026-09-09"
+    ],
+    "rating": 7,
+    "catLabel": "🎸 מסיבת שנות ה-90",
+    "title": "Labor Day Throwback Party With Live 90 — Legacy Hall",
+    "desc": "חגיגת מוזיקת שנות ה-90 — גראנג', פופ והיפ-הופ. ערב נוסטלגי גדול ב-Legacy Hall.",
+    "who": "מבוגרים",
+    "whenLabel": "רביעי 9 בספטמבר",
+    "hours": "ערב",
+    "where": "Legacy Hall, Plano",
+    "price": "עד $109"
+  },
+  {
+    "id": 6,
+    "region": "plano",
+    "cat": "festival",
+    "weekend": true,
+    "dates": [
+      "2026-09-17",
+      "2026-09-18",
+      "2026-09-19",
+      "2026-09-20"
+    ],
+    "rating": 9,
+    "catLabel": "🎈 פסטיבל כדורים פורחים",
+    "title": "2026 Plano Balloon Festival",
+    "desc": "פסטיבל כדורים פורחים ענקי עם שיגורים, הופעות מקומיות ואווירה פסטיבלית. אחד האירועים הגדולים באזור.",
+    "who": "כל המשפחה",
+    "whenLabel": "חמישי–ראשון 17–20 בספטמבר",
+    "hours": "ראה לוח",
+    "where": "Oak Point Event Field, Plano",
+    "price": "$5–$10"
+  },
+  {
+    "id": 7,
+    "region": "plano",
+    "cat": "culture",
+    "weekend": true,
+    "dates": [
+      "2026-09-26",
+      "2026-09-27"
+    ],
+    "rating": 7,
+    "catLabel": "🚂 תערוכת רכבות",
+    "title": "Fall Plano Train Show 2026",
+    "desc": "תערוכת רכבות מודל אינטראקטיבית ומשפחתית עם מסילות מרהיבות.",
+    "who": "כל הגילאים",
+    "whenLabel": "שבת–ראשון 26–27 בספטמבר",
+    "hours": "ראה לוח",
+    "where": "Plano Event Center",
+    "price": "חינם"
+  },
+  {
+    "id": 8,
+    "region": "richardson",
+    "cat": "market",
+    "weekend": true,
+    "dates": [
+      "2026-09-11"
+    ],
+    "rating": 8,
+    "catLabel": "🌙 שוק לילה",
+    "title": "CityLine Night Market — ספטמבר",
+    "desc": "שוק לילה חודשי חינמי עם 45+ דוכני יד-שנייה ואומנות, ומוזיקה חיה.",
+    "who": "כל הגילאים",
+    "whenLabel": "שישי 11 בספטמבר",
+    "hours": "17:00–21:00",
+    "where": "CityLine Plaza, Richardson",
+    "price": "חינם"
+  },
+  {
+    "id": 9,
+    "region": "richardson",
+    "cat": "concert",
+    "weekend": true,
+    "dates": [
+      "2026-09-18"
+    ],
+    "rating": 8,
+    "catLabel": "🎤 ABBA Tribute",
+    "title": "Waterloo — ABBA Tribute Live",
+    "desc": "הופעת מחווה מקצועית ל-ABBA באולם הבמה המוביל של ריצ'רדסון.",
+    "who": "כל הגילאים",
+    "whenLabel": "שישי 18 בספטמבר",
+    "hours": "19:30",
+    "where": "Eisemann Center, Richardson",
+    "price": "מ-$35"
+  },
+  {
+    "id": 10,
+    "region": "richardson",
+    "cat": "concert",
+    "weekend": true,
+    "dates": [
+      "2026-09-19"
+    ],
+    "rating": 7,
+    "catLabel": "🎺 תזמורת קהילתית",
+    "title": "Richardson Community Band — Fall Concert",
+    "desc": "קונצרט חינמי של התזמורת הקהילתית — יצירות קלאסיות, פטריוטיות ופופולריות.",
+    "who": "כל הגילאים",
+    "whenLabel": "שבת 19 בספטמבר",
+    "hours": "19:30",
+    "where": "Eisemann Center, Richardson",
+    "price": "חינם"
+  },
+  {
+    "id": 11,
+    "region": "richardson",
+    "cat": "concert",
+    "weekend": true,
+    "dates": [
+      "2026-09-26"
+    ],
+    "rating": 8,
+    "catLabel": "🎻 פתיחת עונה",
+    "title": "Richardson Symphony Orchestra — Fall Season Opener",
+    "desc": "תזמורת מובילה באזור DFW פותחת את העונה. ערב מוזיקלי איכותי ב-Eisemann.",
+    "who": "כל הגילאים",
+    "whenLabel": "שבת 26 בספטמבר",
+    "hours": "19:30",
+    "where": "Eisemann Center, Richardson",
+    "price": "מ-$25"
+  },
+  {
+    "id": 12,
+    "region": "richardson",
+    "cat": "festival",
+    "weekend": true,
+    "dates": [
+      "2026-09-26"
+    ],
+    "rating": 7,
+    "catLabel": "⛪ פסטיבל קהילתי",
+    "title": "St. Paulpalooza",
+    "desc": "פסטיבל קהילתי שנתי עם אוכל, בידור ומשחקים לכל המשפחה.",
+    "who": "כל המשפחה",
+    "whenLabel": "שבת 26 בספטמבר",
+    "hours": "16:00–21:00",
+    "where": "St. Paul the Apostle Catholic Church, Richardson",
+    "price": "חינם"
+  },
+  {
+    "id": 13,
+    "region": "allen",
+    "cat": "market",
+    "weekend": true,
+    "dates": [
+      "2026-09-05",
+      "2026-09-12",
+      "2026-09-19",
+      "2026-09-26"
+    ],
+    "rating": 7,
+    "catLabel": "🛒 שוק בוטיק",
+    "title": "Cottage Farmers Market — Allen Heritage Village",
+    "desc": "שוק חוצות בוטיקי עם מוצרי אמנים ותוצרת מקומית באווירה כפרית.",
+    "who": "כל הגילאים",
+    "whenLabel": "שבתות כל החודש",
+    "hours": "בוקר–אחה\"צ",
+    "where": "Allen Heritage Village",
+    "price": "חינם"
+  },
+  {
+    "id": 14,
+    "region": "allen",
+    "cat": "concert",
+    "weekend": true,
+    "dates": [
+      "2026-09-05",
+      "2026-09-12",
+      "2026-09-19",
+      "2026-09-26"
+    ],
+    "rating": 8,
+    "catLabel": "🎵 קונצרט חינם",
+    "title": "Concerts by the Creek — Watters Creek",
+    "desc": "קונצרטים חינמיים כל שבת בערב על הדשא, כולל מוזיקה חיה של Love Handle בפתיחת החודש.",
+    "who": "כל הגילאים",
+    "whenLabel": "שבתות כל החודש",
+    "hours": "19:00–21:00",
+    "where": "Watters Creek Village Green, Allen",
+    "price": "חינם!"
+  },
+  {
+    "id": 15,
+    "region": "allen",
+    "cat": "market",
+    "weekend": true,
+    "dates": [
+      "2026-09-06"
+    ],
+    "rating": 7,
+    "catLabel": "🧸 יריד צעצועים",
+    "title": "North Dallas Toy Show",
+    "desc": "130+ שולחנות עם צעצועי וינטג' ומודרניים, קומיקס ואספנות. גן עדן לאספנים ולילדים.",
+    "who": "כל הגילאים",
+    "whenLabel": "ראשון 6 בספטמבר",
+    "hours": "בוקר–אחה\"צ",
+    "where": "Courtyard by Marriott Dallas Allen",
+    "price": "ראה כרטיסים באתר"
+  },
+  {
+    "id": 16,
+    "region": "allen",
+    "cat": "market",
+    "weekend": true,
+    "dates": [
+      "2026-09-06"
+    ],
+    "rating": 7,
+    "catLabel": "🍺 שוק דיסקו-קאווגירל",
+    "title": "Disco Cowgirl Market — Armor Brewing",
+    "desc": "שוק ספקים בהשראת דיסקו-מערבי במפעל הבירה המקומי — בוטיקים, מוצרי יד ומשקאות אומן.",
+    "who": "כל הגילאים (18+ לשתייה)",
+    "whenLabel": "ראשון 6 בספטמבר",
+    "hours": "אחה\"צ",
+    "where": "Armor Brewing Co., Allen",
+    "price": "חינם (שתייה בתשלום)"
+  },
+  {
+    "id": 17,
+    "region": "addison",
+    "cat": "festival",
+    "weekend": true,
+    "dates": [
+      "2026-09-18",
+      "2026-09-19",
+      "2026-09-20",
+      "2026-09-21"
+    ],
+    "rating": 9,
+    "catLabel": "🍺 Oktoberfest",
+    "title": "Addison Oktoberfest 2026",
+    "desc": "אחת מחגיגות האוקטוברפסט האותנטיות ביותר מחוץ למינכן — בירה גרמנית, אוכל, להקות אומפה חיות ומרוץ דצשונדים.",
+    "who": "כל הגילאים",
+    "whenLabel": "שישי–שני 18–21 בספטמבר",
+    "hours": "ראה לוח",
+    "where": "Addison Circle Park, Addison",
+    "price": "חינם כניסה"
+  },
+  {
+    "id": 18,
+    "region": "addison",
+    "cat": "food",
+    "weekend": true,
+    "dates": [
+      "2026-09-05",
+      "2026-09-06",
+      "2026-09-07"
+    ],
+    "rating": 8,
+    "catLabel": "🍴 שבוע המסעדות (מסתיים)",
+    "title": "DFW Restaurant Week — סוף עונה באדיסון",
+    "desc": "הסופ\"ש האחרון של שבוע המסעדות של DFW (מסתיים 7/9) — הזדמנות אחרונה לתפריטים מוזלים ב-200+ מסעדות אדיסון.",
+    "who": "כל הגילאים",
+    "whenLabel": "עד 7 בספטמבר (Labor Day)",
+    "hours": "ראה תפריטים באתר",
+    "where": "מסעדות ברחבי Addison Circle",
+    "price": "$29 צהריים / $49–59 ערב"
+  },
+  {
+    "id": 19,
+    "region": "frisco",
+    "cat": "market",
+    "weekend": true,
+    "dates": [
+      "2026-09-05",
+      "2026-09-06",
+      "2026-09-12",
+      "2026-09-13",
+      "2026-09-19",
+      "2026-09-20",
+      "2026-09-26",
+      "2026-09-27"
+    ],
+    "rating": 9,
+    "catLabel": "🌾 שוק טרי",
+    "title": "Frisco Fresh Market — Downtown Frisco",
+    "desc": "90+ דוכנים, תוצרת טרייה, שפים ומוזיקה חיה. שבת+ראשון כל שבוע.",
+    "who": "כל המשפחה",
+    "whenLabel": "שבת+ראשון כל שבוע",
+    "hours": "שבת 8:00–16:00 | ראשון 10:00–16:00",
+    "where": "9215 John W Elliott Dr, Frisco",
+    "price": "חינם"
+  },
+  {
+    "id": 20,
+    "region": "frisco",
+    "cat": "baseball",
+    "weekend": true,
+    "dates": [
+      "2026-09-17",
+      "2026-09-18",
+      "2026-09-20"
+    ],
+    "rating": 9,
+    "catLabel": "⚾ פלייאוף AA!",
+    "title": "Frisco RoughRiders — פלייאוף בית (Riders Field)",
+    "desc": "הרוחריידרס זכו באליפות המחצית הראשונה וממשיכים לפלייאוף! משחקי בית בסדרת המחצית (17-18/9) ומשחק 1 של הגמר (20/9) אם יעפילו. אווירה חשמלית.",
+    "who": "כל הגילאים",
+    "whenLabel": "חמישי-שישי 17–18 + ראשון 20 בספטמבר",
+    "hours": "ראה לוח Riders Field",
+    "where": "Riders Field, 7300 RoughRiders Trail, Frisco",
+    "price": "ראה כרטיסים באתר"
+  },
+  {
+    "id": 21,
+    "region": "frisco",
+    "cat": "market",
+    "weekend": true,
+    "dates": [
+      "2026-09-19"
+    ],
+    "rating": 7,
+    "catLabel": "🎪 שוק פשפשים",
+    "title": "Flea Style Market At The Star",
+    "desc": "שוק פשפשים חינמי ברחבת The Star, מרכז האימונים של Dallas Cowboys. דוכני יד-שנייה ואומנות.",
+    "who": "כל הגילאים",
+    "whenLabel": "שבת 19 בספטמבר",
+    "hours": "10:00–16:00",
+    "where": "Tostitos Championship Plaza, The Star, Frisco",
+    "price": "חינם"
+  },
+  {
+    "id": 22,
+    "region": "frisco",
+    "cat": "culture",
+    "weekend": true,
+    "dates": [
+      "2026-09-12"
+    ],
+    "rating": 7,
+    "catLabel": "🐶 כלבים בבריכה",
+    "title": "Paws in the Pool — Frisco Water Park",
+    "desc": "לפני סגירת הבריכה לעונה — יום מיוחד שבו כלבים יכולים ליהנות מהבריכה. נדרש כרטיס מראש.",
+    "who": "בעלי כלבים",
+    "whenLabel": "שבת 12 בספטמבר",
+    "hours": "8:30 / 10:30 / 12:30",
+    "where": "Frisco Water Park",
+    "price": "ראה כרטיסים באתר"
+  },
+  {
+    "id": 23,
+    "region": "mckinney",
+    "cat": "market",
+    "weekend": true,
+    "dates": [
+      "2026-09-05",
+      "2026-09-12",
+      "2026-09-19",
+      "2026-09-26"
+    ],
+    "rating": 9,
+    "catLabel": "🛒 שוק שבתי",
+    "title": "McKinney Farmers Market — Chestnut Square",
+    "desc": "המוערך ביותר בטקסס: בשר, ירקות, מאפים, אמנות ומוזיקה חיה.",
+    "who": "כל הגילאים",
+    "whenLabel": "שבתות כל החודש",
+    "hours": "8:00–12:00",
+    "where": "315 S Chestnut St, McKinney",
+    "price": "חינם"
+  },
+  {
+    "id": 24,
+    "region": "mckinney",
+    "cat": "culture",
+    "weekend": true,
+    "dates": [
+      "2026-09-05"
+    ],
+    "rating": 7,
+    "catLabel": "🍺 כיתת מבשלים",
+    "title": "TUPPS Brewery Brewmaster Education Class",
+    "desc": "כיתת חינוך חודשית על תהליך הבישול עם טעימות ישירות מהמבשל.",
+    "who": "21+",
+    "whenLabel": "שבת 5 בספטמבר",
+    "hours": "11:00–12:00",
+    "where": "TUPPS Brewery, McKinney",
+    "price": "ראה כרטיסים באתר"
+  },
+  {
+    "id": 25,
+    "region": "mckinney",
+    "cat": "market",
+    "weekend": true,
+    "dates": [
+      "2026-09-18",
+      "2026-09-19",
+      "2026-09-20"
+    ],
+    "rating": 8,
+    "catLabel": "🤠 ימי מסחר",
+    "title": "McKinney Monday Trade Days",
+    "desc": "יריד מסחר וינטג' ואספנות מסורתי בטקסס — דוכנים רבים בכל רחבי האתר.",
+    "who": "כל הגילאים",
+    "whenLabel": "שישי–ראשון 18–20 בספטמבר",
+    "hours": "כל היום",
+    "where": "McKinney Trade Days grounds",
+    "price": "חינם כניסה"
+  },
+  {
+    "id": 26,
+    "region": "mckinney",
+    "cat": "festival",
+    "weekend": true,
+    "dates": [
+      "2026-09-25",
+      "2026-09-26",
+      "2026-09-27"
+    ],
+    "rating": 8,
+    "catLabel": "🍺 Oktoberfest שנה 19",
+    "title": "McKinney Oktoberfest — 19th Annual",
+    "desc": "חגיגת אוקטוברפסט שנתית בדאונטאון ההיסטורי של מקיני — בירה, אוכל גרמני ומוזיקה חיה.",
+    "who": "כל הגילאים",
+    "whenLabel": "שישי–ראשון 25–27 בספטמבר",
+    "hours": "ראה לוח",
+    "where": "Historic Downtown McKinney",
+    "price": "חינם"
+  },
+  {
+    "id": 27,
+    "region": "thecolony",
+    "cat": "market",
+    "weekend": true,
+    "dates": [
+      "2026-09-06"
+    ],
+    "rating": 8,
+    "catLabel": "🍲 שוק בינלאומי",
+    "title": "The Melting Pot Market — Grandscape",
+    "desc": "80+ ספקים, DJ חי ותרבויות שונות ב-The Lawn at Grandscape.",
+    "who": "כל הגילאים",
+    "whenLabel": "ראשון 6 בספטמבר",
+    "hours": "14:00–20:00",
+    "where": "The Lawn at Grandscape, The Colony",
+    "price": "חינם"
+  },
+  {
+    "id": 28,
+    "region": "thecolony",
+    "cat": "concert",
+    "weekend": false,
+    "dates": [
+      "2026-09-23"
+    ],
+    "rating": 7,
+    "catLabel": "🎸 Country Close Up",
+    "title": "Country Close Up — Grandscape",
+    "desc": "ערב קאנטרי חי אינטימי בהופעה בחוץ ב-Grandscape.",
+    "who": "כל הגילאים",
+    "whenLabel": "רביעי 23 בספטמבר",
+    "hours": "19:00–21:00",
+    "where": "Grandscape, The Colony",
+    "price": "חינם"
+  },
+  {
+    "id": 29,
+    "region": "thecolony",
+    "cat": "market",
+    "weekend": true,
+    "dates": [
+      "2026-09-27"
+    ],
+    "rating": 7,
+    "catLabel": "🌸 שוק נשות עסקים",
+    "title": "The Bloom Bazaar — שוק נשי כולו",
+    "desc": "שוק ייחודי שכל הדוכנים בו בבעלות נשים — אופנה, אמנות ומוצרי בוטיק.",
+    "who": "כל הגילאים",
+    "whenLabel": "ראשון 27 בספטמבר",
+    "hours": "14:00–20:00",
+    "where": "Grandscape, The Colony",
+    "price": "חינם"
+  },
+  {
+    "id": 30,
+    "region": "lewisville",
+    "cat": "festival",
+    "weekend": true,
+    "dates": [
+      "2026-09-25"
+    ],
+    "rating": 8,
+    "catLabel": "🤠 Western Days",
+    "title": "Western Days Festival 2026",
+    "desc": "פסטיבל רחוב בהשראה מערבית ב-Old Town Lewisville ההיסטורי — בידור, אוכל ומוזיקה. כניסה חינם.",
+    "who": "כל המשפחה",
+    "whenLabel": "שישי 25 בספטמבר",
+    "hours": "16:00–23:30",
+    "where": "Old Town Lewisville",
+    "price": "חינם"
+  },
+  {
+    "id": 31,
+    "region": "lewisville",
+    "cat": "sport",
+    "weekend": true,
+    "dates": [
+      "2026-09-26"
+    ],
+    "rating": 7,
+    "catLabel": "🏃 מרוץ צדקה",
+    "title": "Hopeful Hearts 5K/1M Stampede",
+    "desc": "מרוץ צדקה למען משפחות נזקקות באזור. אפשרות ל-5 ק\"מ או 1 מייל.",
+    "who": "כל הגילאים",
+    "whenLabel": "שבת 26 בספטמבר",
+    "hours": "7:00–9:30",
+    "where": "Christian Community Action, Lewisville",
+    "price": "ראה הרשמה באתר"
+  },
+  {
+    "id": 32,
+    "region": "flowermound",
+    "cat": "film",
+    "weekend": true,
+    "dates": [
+      "2026-09-11",
+      "2026-09-18",
+      "2026-09-25"
+    ],
+    "rating": 7,
+    "catLabel": "🎬 סרטים בפארק",
+    "title": "Movies in the Park — Heritage Park",
+    "desc": "סדרת קולנוע בחוץ חינמית עם משאיות אוכל. שלוש הקרנות נותרות בסדרה החודש.",
+    "who": "כל המשפחה",
+    "whenLabel": "שישי בערב — 11, 18, 25 בספטמבר",
+    "hours": "19:30",
+    "where": "Heritage Park, Flower Mound",
+    "price": "חינם"
+  },
+  {
+    "id": 33,
+    "region": "flowermound",
+    "cat": "festival",
+    "weekend": true,
+    "dates": [
+      "2026-09-19"
+    ],
+    "rating": 9,
+    "catLabel": "🦆 מרוץ ברווזי גומי",
+    "title": "9th Annual Rhythms at the River Walk & Duck Derby",
+    "desc": "30,000+ ברווזי גומי במרוץ על פני ה-River Walk, פלוס מוזיקה חיה. אחד האירועים המצחיקים והמשפחתיים ביותר בחודש.",
+    "who": "כל המשפחה",
+    "whenLabel": "שבת 19 בספטמבר",
+    "hours": "10:00–14:00",
+    "where": "River Walk at Central Park, Flower Mound",
+    "price": "חינם"
+  },
+  {
+    "id": 34,
+    "region": "fortworth",
+    "cat": "culture",
+    "weekend": false,
+    "dates": [
+      "2026-09-07"
+    ],
+    "rating": 8,
+    "catLabel": "🐂 Legacy of the Longhorn — Labor Day",
+    "title": "Legacy of the Longhorn — Fort Worth Stockyards (Labor Day)",
+    "desc": "מצעד הבקר האגדי של פרות הלונגהורן ברחוב Exchange Ave ההיסטורי, במיוחד ביום העבודה. חוויה טקסנית קלאסית וחינמית לצפייה.",
+    "who": "כל הגילאים",
+    "whenLabel": "שני 7 בספטמבר (Labor Day)",
+    "hours": "12:30",
+    "where": "Fort Worth Stockyards, 131 E Exchange Ave",
+    "price": "חינם לצפייה"
+  },
+  {
+    "id": 35,
+    "region": "fortworth",
+    "cat": "rodeo",
+    "weekend": true,
+    "dates": [
+      "2026-09-04",
+      "2026-09-05",
+      "2026-09-11",
+      "2026-09-12",
+      "2026-09-18",
+      "2026-09-19",
+      "2026-09-25",
+      "2026-09-26"
+    ],
+    "rating": 9,
+    "catLabel": "🤠 רודיאו שבועי",
+    "title": "Stockyards Championship Rodeo — Fort Worth",
+    "desc": "רודיאו שבועי אגדי ב-Stockyards ההיסטורי. קרבות רכיבה על פרות וסוסים, אווירה מערב-טקסנית קלאסית.",
+    "who": "כל הגילאים",
+    "whenLabel": "כל שישי–שבת",
+    "hours": "19:30",
+    "where": "Cowtown Coliseum, Fort Worth",
+    "price": "מ-$20"
+  },
+  {
+    "id": 36,
+    "region": "dallas",
+    "cat": "concert",
+    "weekend": true,
+    "dates": [
+      "2026-09-05",
+      "2026-09-06"
+    ],
+    "rating": 9,
+    "catLabel": "🎷 פסטיבל ג'אז — סיום",
+    "title": "Riverfront Jazz Festival — Fair Park (סוף השבוע)",
+    "desc": "סופ\"ש הסיום של פסטיבל הג'אז עם כוכבים כמו Gladys Knight, Samara Joy, Rose Royce ו-Brian McKnight. ג'אז, פופ, סול ו-R&B.",
+    "who": "כל הגילאים",
+    "whenLabel": "שבת–ראשון 5–6 בספטמבר",
+    "hours": "ראה לוח",
+    "where": "Fair Park (Automobile & Centennial Buildings), Dallas",
+    "price": "ראה כרטיסים באתר"
+  },
+  {
+    "id": 37,
+    "region": "dallas",
+    "cat": "concert",
+    "weekend": true,
+    "dates": [
+      "2026-09-05",
+      "2026-09-06"
+    ],
+    "rating": 8,
+    "catLabel": "🎬 DSO — הארי פוטר",
+    "title": "DSO: Harry Potter and the Half-Blood Prince in Concert",
+    "desc": "הסרט המלא על המסך הגדול עם הפסקול המבוצע חי על ידי התזמורת הסימפונית של דאלאס. סוף שבוע ההופעות האחרון.",
+    "who": "כל הגילאים (מומלץ 8+)",
+    "whenLabel": "שבת–ראשון 5–6 בספטמבר",
+    "hours": "ראה לוח Meyerson",
+    "where": "Morton H. Meyerson Symphony Center, Dallas",
+    "price": "מ-$35"
+  },
+  {
+    "id": 38,
+    "region": "dallas",
+    "cat": "festival",
+    "weekend": false,
+    "dates": [
+      "2026-09-07"
+    ],
+    "rating": 7,
+    "catLabel": "🏊 Labor Day פארטי (21+)",
+    "title": "End of Summer Labor Day Pool Party — Lorenzo Hotel",
+    "desc": "מסיבת בריכה 21+ עם 18 די-ג'יי מוזיקת האוס, אווירת בריכה ואוכל ומשקאות. סגירת קיץ גדולה במלון בוטיק בדאונטאון.",
+    "who": "21+",
+    "whenLabel": "שני 7 בספטמבר (Labor Day)",
+    "hours": "13:00–22:00",
+    "where": "Lorenzo Hotel Pool, Downtown Dallas",
+    "price": "מ-$23"
+  },
+  {
+    "id": 39,
+    "region": "dallas",
+    "cat": "festival",
+    "weekend": true,
+    "dates": [
+      "2026-09-25",
+      "2026-09-26",
+      "2026-09-27",
+      "2026-09-28",
+      "2026-09-29",
+      "2026-09-30",
+      "2026-10-01",
+      "2026-10-02",
+      "2026-10-03",
+      "2026-10-04",
+      "2026-10-05"
+    ],
+    "rating": 10,
+    "catLabel": "🎡 היריד הגדול של טקסס!",
+    "title": "State Fair of Texas 2026 — נפתח!",
+    "desc": "האירוע השנתי הגדול בטקסס נפתח! 24 יום של פעילויות פארק שעשועים, אוכל מטוגן ייחודי, תערוכות, קרקסים וכל מה שאהוב על ילדים. ממשיך עד 18 באוקטובר.",
+    "who": "כל המשפחה",
+    "whenLabel": "נפתח שישי 25 בספטמבר (ממשיך עד 18 אוקטובר)",
+    "hours": "ראה לוח Fair Park",
+    "where": "Fair Park, Dallas",
+    "price": "ראה כרטיסים באתר"
+  },
+  {
+    "id": 40,
+    "region": "dallas",
+    "cat": "art",
+    "weekend": true,
+    "dates": [
+      "2026-09-19",
+      "2026-09-20",
+      "2026-09-26",
+      "2026-09-27",
+      "2026-10-01",
+      "2026-10-02",
+      "2026-10-03",
+      "2026-10-04",
+      "2026-10-05"
+    ],
+    "rating": 9,
+    "catLabel": "🎃 דלועים בארבורטום",
+    "title": "Autumn at the Arboretum — Pumpkin Village \"Harvest Hues\"",
+    "desc": "100,000+ דלועים ודגלים ברחבי הגן, עם עיצוב Pumpkin Village בהשראת באסקיה, רות'קו ופולוק. נפתח 19 בספטמבר וממשיך עד 1 בנובמבר.",
+    "who": "כל המשפחה",
+    "whenLabel": "נפתח שבת 19 בספטמבר",
+    "hours": "9:00–17:00",
+    "where": "Dallas Arboretum, 8525 Garland Rd, Dallas",
+    "price": "כלול בכרטיס הגן"
+  },
+  {
+    "id": 41,
+    "region": "irving",
+    "cat": "market",
+    "weekend": true,
+    "dates": [
+      "2026-09-06",
+      "2026-09-13",
+      "2026-09-20",
+      "2026-09-27"
+    ],
+    "rating": 7,
+    "catLabel": "🛒 שוק איכרים",
+    "title": "Irving Farmers Market — Las Colinas",
+    "desc": "שוק איכרים שבועי בלב Las Colinas: תוצרת טרייה, מאפים ומלאכות יד.",
+    "who": "כל המשפחה",
+    "whenLabel": "ראשונים כל החודש",
+    "hours": "10:00–14:00",
+    "where": "501 E Las Colinas Blvd, Irving",
+    "price": "חינם"
+  },
+  {
+    "id": 42,
+    "region": "irving",
+    "cat": "concert",
+    "weekend": true,
+    "dates": [
+      "2026-09-06"
+    ],
+    "rating": 7,
+    "catLabel": "🎤 Myles Smith",
+    "title": "Myles Smith — Toyota Music Factory",
+    "desc": "הזמר הבריטי המתפרץ מופיע עם אלבום הבכורה שלו. אווירה אינטימית באמפיתאטרון החוץ של Irving.",
+    "who": "כל הגילאים",
+    "whenLabel": "ראשון 6 בספטמבר",
+    "hours": "19:30",
+    "where": "The Pavilion at Toyota Music Factory, Irving",
+    "price": "ראה כרטיסים באתר"
+  },
+  {
+    "id": 43,
+    "region": "grapevine",
+    "cat": "festival",
+    "weekend": true,
+    "dates": [
+      "2026-09-17",
+      "2026-09-18",
+      "2026-09-19",
+      "2026-09-20"
+    ],
+    "rating": 10,
+    "catLabel": "🍇 GrapeFest — 40 שנה!",
+    "title": "GrapeFest 40th Annual — A Texas Wine Experience",
+    "desc": "פסטיבל היין הגדול בטקסס חוגג 40 שנה! טעימות יין, אוכל, מוזיקה חיה ותחרות דריכת ענבים. אחד האירועים הכי גדולים בגרייפוויין.",
+    "who": "כל הגילאים (טעימות 21+)",
+    "whenLabel": "חמישי–ראשון 17–20 בספטמבר",
+    "hours": "ראה לוח",
+    "where": "Historic Main Street & Silver Lake Park, Grapevine",
+    "price": "ראה כרטיסים באתר"
+  },
+  {
+    "id": 44,
+    "region": "grapevine",
+    "cat": "culture",
+    "weekend": true,
+    "dates": [
+      "2026-09-05",
+      "2026-09-06",
+      "2026-09-07",
+      "2026-09-08",
+      "2026-09-09",
+      "2026-09-10",
+      "2026-09-11",
+      "2026-09-12",
+      "2026-09-13",
+      "2026-09-14",
+      "2026-09-15",
+      "2026-09-16"
+    ],
+    "rating": 9,
+    "catLabel": "🍷 Grapevine Wine",
+    "title": "Grapevine Wineries & Historic Downtown — כל יום",
+    "desc": "גרייפוויין היא \"בירת היין של טקסס\" — 8 יקבים בהליכה ברחוב Main Street ההיסטורי. פתוח כל יום, גם לפני ואחרי GrapeFest.",
+    "who": "מבוגרים בעיקר",
+    "whenLabel": "כל יום",
+    "hours": "ראה כל יקב בנפרד",
+    "where": "Historic Main Street, Grapevine TX",
+    "price": "טעימות מ-$15"
+  }
 ];
 
 // UPDATE_LOG: מחרוזות טקסט בלבד (לא HTML) שנכתבו ע"י log() ב-update_portal.py
 // במהלך הריצה שיצרה את העמוד הזה — עוברות esc() לפני הזרקה, כמו כל טקסט אחר.
-const UPDATE_LOG = ["[2026-09-14 12:11:45] ▶ DFW Events Portal — עדכון שבועי","[2026-09-14 12:11:45]   שולח בקשה ל-Gemini API...","[2026-09-14 12:12:45]   התקבל תגובה (17628 תווים)","[2026-09-14 12:12:45]   ✅ נשמר בהצלחה: index.html"];
+const UPDATE_LOG = ["[2026-09-27 manual] תיקון ידני חד-פעמי: weekend מחושב מחדש + Fort Worth פוצל מ-dallas, ראו CLAUDE.md"];
 
 function toggleBugPanel(){
   const ov=document.getElementById('bugOverlay');
@@ -588,7 +1201,6 @@ function renderBugLog(){
   const hasErr=UPDATE_LOG.some(l=>l.includes('❌')||l.includes('⚠️'));
   document.getElementById('bugBtn').classList.toggle('has-errors',hasErr);
 }
-renderBugLog();
 
 const VISITED_KEY='dfw_visited_events_v1';
 let visitedEvents=new Set();
@@ -600,31 +1212,41 @@ function toggleBeenThere(id,btn,card){
   saveVisitedEvents();
 }
 
-// ============================================================
 const DAYS_HE=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
 const MONTHS_HE=['','ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
-const WEEKEND_DAYS=[5,6,0];
+const WKND_DOW=[5,6,0];
 let activeDate=null;
 
+// RANGE_START/RANGE_DAYS מגיעים מ-build_html() (תואמים ל-today+30 יום
+// שהוזנו גם ל-Gemini) — משמשים גם ל-TODAY_ISO (פילטר "📅 היום") וגם
+// כדי לצייר את רצועת התאריכים על *כל* יום בטווח, לא רק ימים שיש
+// בהם אירוע. 27/09/2026: לפני התיקון buildDateStrip() אספה תאריכים
+// רק מתוך events — יום בלי שום אירוע (כמו 22/9, 24/9 שהיו ריקים
+// באותה ריצה) פשוט לא הופיע ברצועה בכלל, מה שנראה כאילו "חסרים ימים".
+const RANGE_START='2026-09-27';
+const RANGE_DAYS=31;
+const TODAY_ISO=RANGE_START;
+
+function pad2(n){return n<10?'0'+n:''+n;}
+function fmtISO(d){return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());}
+
 function buildDateStrip(){
-  // בונים allDates כאן — אחרי כל events.push()
-  const datesSet=new Set();
-  events.forEach(e=>e.dates.forEach(d=>datesSet.add(d)));
-  const dates=[...datesSet].sort();
+  const [ry,rm,rd]=RANGE_START.split('-').map(Number);
   const strip=document.getElementById('dateStrip');
   strip.innerHTML='';
-  dates.forEach(dateStr=>{
-    const d=new Date(dateStr+'T12:00:00');
+  for(let i=0;i<RANGE_DAYS;i++){
+    const d=new Date(ry,rm-1,rd+i); // JS מנרמל בעצמו גלישת חודש/שנה
+    const dateStr=fmtISO(d);
     const dow=d.getDay();
-    const isWknd=WEEKEND_DAYS.includes(dow);
+    const isWknd=WKND_DOW.includes(dow);
     const count=events.filter(e=>e.dates.includes(dateStr)).length;
     const btn=document.createElement('button');
-    btn.className='date-btn'+(isWknd?' is-wknd-btn':'');
+    btn.className='date-btn'+(isWknd?' is-wknd-btn':'')+(count===0?' date-empty':'');
     btn.dataset.date=dateStr;
     btn.innerHTML=`<span class="date-day">${DAYS_HE[dow]}</span><span class="date-num">${d.getDate()}</span><span class="date-month">${MONTHS_HE[d.getMonth()+1]}</span><span class="date-count">${count}</span>`;
     btn.onclick=()=>toggleDate(dateStr,btn);
     strip.appendChild(btn);
-  });
+  }
   const clr=document.createElement('button');
   clr.className='date-clear';clr.textContent='✕ נקה';clr.onclick=clearDate;
   strip.appendChild(clr);
@@ -637,7 +1259,7 @@ function toggleDate(dateStr,btn){
   btn.classList.add('active-date');
   const d=new Date(dateStr+'T12:00:00');
   const dow=d.getDay();
-  const isWknd=WEEKEND_DAYS.includes(dow);
+  const isWknd=WKND_DOW.includes(dow);
   const banner=document.getElementById('activeDateBanner');
   banner.textContent=`📅 מציג: ${DAYS_HE[dow]} ${d.getDate()} ${MONTHS_HE[d.getMonth()+1]} — ${events.filter(e=>e.dates.includes(dateStr)).length} אירועים`;
   banner.className='active-date-banner show'+(isWknd?' wknd-banner':'');
@@ -651,9 +1273,15 @@ function clearDate(){
   applyFilter();
 }
 
+// esc(): הגנת-עומק מפני XSS — ה-events מגיעים מ-update_portal.py שכבר מאמת
+// כל שדה מול רשימה-לבנה (region/cat/dates/rating) ומגביל אורך מחרוזות,
+// אבל שדות הטקסט החופשי (title/desc/וכו') הם עדיין טקסט "בר-קיימא" ולא
+// HTML — לכן בורחים כאן מכל תו HTML לפני הזרקה ל-innerHTML, כדי שאם
+// אירוע כלשהו יכלול תווי HTML הם יוצגו כטקסט רגיל ולא ירוצו כקוד.
 function esc(s){
   return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
+
 function buildCard(e){
   const isFree=e.price==='חינם'||e.price==='חינם!';
   const wc=e.weekend?' is-wknd':'';const beenCls=visitedEvents.has(e.id)?' been-there':'';
@@ -683,8 +1311,8 @@ function buildCard(e){
   </div>`;
 }
 
-const regionNames={plano:'פלאנו',richardson:'ריצ׳רדסון (5 מייל · ~10 דק׳)',allen:'אלן (8 מייל · ~12 דק׳)',addison:'אדיסון (9 מייל · ~15 דק׳)',frisco:'פריסקו (12 מייל · ~18 דק׳)',mckinney:'מקיני (14 מייל · ~20 דק׳)',thecolony:'The Colony (15 מייל · ~20 דק׳)',lewisville:'לואיסוויל (18 מייל · ~25 דק׳)',flowermound:'פלאואר מאונד (20 מייל · ~28 דק׳)',dallas:'דאלאס (20 מייל · ~30 דק׳)',irving:'ארווינג (22 מייל · ~30 דק׳)',grapevine:'גרייפוויין (25 מייל · ~35 דק׳)'};
-const regionOrder=['plano','richardson','allen','addison','frisco','mckinney','thecolony','lewisville','flowermound','dallas','irving','grapevine'];
+const regionNames={plano:'פלאנו (כאן)',richardson:'ריצ׳רדסון (~10 דק׳ · 5 מייל)',allen:'אלן (~12 דק׳ · 8 מייל)',addison:'אדיסון (~15 דק׳ · 9 מייל)',frisco:'פריסקו (~18 דק׳ · 12 מייל)',mckinney:'מקיני (~20 דק׳ · 14 מייל)',thecolony:'The Colony (~20 דק׳ · 15 מייל)',lewisville:'לואיסוויל (~25 דק׳ · 18 מייל)',flowermound:'פלאואר מאונד (~28 דק׳ · 20 מייל)',dallas:'דאלאס (~30 דק׳ · 20 מייל)',irving:'ארווינג (~30 דק׳ · 22 מייל)',grapevine:'גרייפוויין (~35 דק׳ · 25 מייל)',fortworth:'פורט וורת׳ (~45 דק׳ · 35 מייל)'};
+const regionOrder=['plano','richardson','allen','addison','frisco','mckinney','thecolony','lewisville','flowermound','dallas','irving','grapevine','fortworth'];
 
 let curRegion='all',curFilter=null;
 
@@ -710,8 +1338,9 @@ function isVisible(card){
   if(activeDate&&!e.dates.includes(activeDate))return false;
   if(curRegion!=='all'&&card.dataset.region!==curRegion)return false;
   if(curFilter==='wknd'&&card.dataset.wknd!=='1')return false;
+  if(curFilter==='today'&&!e.dates.includes(TODAY_ISO))return false;
   if(curFilter==='free'&&card.dataset.free!=='1')return false;
-  if(curFilter&&curFilter!=='wknd'&&curFilter!=='free'&&card.dataset.cat!==curFilter)return false;
+  if(curFilter&&curFilter!=='wknd'&&curFilter!=='today'&&curFilter!=='free'&&card.dataset.cat!==curFilter)return false;
   return true;
 }
 
@@ -730,7 +1359,6 @@ function applyFilter(){
 }
 
 function updateStats(){
-  // סופרים מהמערך events ישירות — לא מה-DOM
   const visibleIds=new Set();
   document.querySelectorAll('#view-all .event-card:not(.hidden)').forEach(c=>visibleIds.add(parseInt(c.dataset.id)));
   const evs=events.filter(e=>visibleIds.has(e.id));
@@ -749,14 +1377,26 @@ function showRegion(r,btn){
 }
 
 function setFilter(type,btn){
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('f-wknd','f-cat'));
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('f-wknd','f-today','f-cat'));
   curFilter=curFilter===type?null:type;
-  if(curFilter)btn.classList.add(type==='wknd'?'f-wknd':'f-cat');
+  if(curFilter)btn.classList.add(curFilter==='wknd'?'f-wknd':(curFilter==='today'?'f-today':'f-cat'));
   applyFilter();
+}
+
+// ברירת מחדל בטעינה: מציגים את הסופ"ש הקרוב במקום את כל ה-30 הימים
+// בבת אחת — אם אין אף אירוע מתויג "סופ"ש" (מקרה נדיר) נשארים על "הכל"
+// כדי לא להציג עמוד ריק ללא הסבר.
+function applyDefaultView(){
+  if(events.some(e=>e.weekend)){
+    const wkndBtn=document.querySelector(`.filter-btn[onclick*="setFilter('wknd'"]`);
+    if(wkndBtn) setFilter('wknd',wkndBtn);
+  }
 }
 
 buildDateStrip();
 render();
+applyDefaultView();
+renderBugLog();
 </script>
 </body>
 </html>
