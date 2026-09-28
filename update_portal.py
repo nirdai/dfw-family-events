@@ -187,9 +187,14 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   .filter-label{font-size:.7rem;color:var(--text-dim)}
   .filter-btn{font-size:.72rem;font-weight:500;padding:.28rem .8rem;border:1px solid var(--card-border);border-radius:1.5rem;background:transparent;color:var(--text-dim);cursor:pointer;transition:all .2s}
   .filter-btn:hover{border-color:var(--g6);color:var(--g6)}
-  .filter-btn.f-wknd{background:rgba(255,107,107,.12);border-color:var(--wknd);color:var(--wknd)}
-  .filter-btn.f-today{background:rgba(0,255,136,.12);border-color:var(--accent);color:var(--accent)}
-  .filter-btn.f-cat{background:rgba(46,204,113,.1);border-color:var(--g6);color:var(--g6)}
+  /* 27/09/2026 (סבב 4): המשתמש דיווח שאין שום אינדיקציה ויזואלית
+     שפילטר פעיל — הגרסה הקודמת (border-color דק + רקע 10-12% שקיפות)
+     כנראה הייתה עדינה מדי על הרקע הכהה. הודגש משמעותית: מסגרת 2px
+     מלאה (לא 1px), box-shadow זוהר, ומשקל גופן 700 — כדי שאי אפשר
+     יהיה לפספס איזה כפתור פעיל כרגע. */
+  .filter-btn.f-wknd{background:rgba(255,107,107,.18);border:2px solid var(--wknd);color:var(--wknd);font-weight:700;box-shadow:0 0 12px rgba(255,107,107,.45)}
+  .filter-btn.f-today{background:rgba(0,255,136,.18);border:2px solid var(--accent);color:var(--accent);font-weight:700;box-shadow:0 0 12px rgba(0,255,136,.45)}
+  .filter-btn.f-cat{background:rgba(46,204,113,.16);border:2px solid var(--g6);color:var(--g6);font-weight:700;box-shadow:0 0 12px rgba(46,204,113,.4)}
   .stats-bar{display:flex;gap:.85rem;margin-bottom:2rem;flex-wrap:wrap}
   .stat-chip{background:rgba(46,204,113,.06);border:1px solid var(--card-border);border-radius:.5rem;padding:.55rem 1rem;display:flex;flex-direction:column;gap:.05rem}
   .stat-num{font-family:'Space Mono',monospace;font-size:1.25rem;font-weight:700;color:var(--accent)}
@@ -561,7 +566,11 @@ function updateStats(){
   const visibleIds=new Set();
   document.querySelectorAll('#view-all .event-card:not(.hidden)').forEach(c=>visibleIds.add(parseInt(c.dataset.id)));
   const evs=events.filter(e=>visibleIds.has(e.id));
-  document.getElementById('sTotal').textContent=visibleIds.size;
+  // 27/09/2026 (סבב 4): "58 מוצגים" לבד בילבל — נראה כמו סתירה מול
+  // "65 אירועים" שמוזכר בלוג/ב-CLAUDE.md, כי לא היה ברור שזה *אחרי*
+  // סינון. עכשיו מציג "58/65" כדי שברור מיד שזה מתוך הכל, לא הכל.
+  document.getElementById('sTotal').textContent=
+    visibleIds.size===events.length ? String(visibleIds.size) : `${visibleIds.size}/${events.length}`;
   document.getElementById('sWknd').textContent=evs.filter(e=>e.weekend).length;
   document.getElementById('sFree').textContent=evs.filter(e=>e.price==='חינם'||e.price==='חינם!').length;
   document.getElementById('sTop').textContent=evs.filter(e=>e.rating>=9).length;
@@ -575,17 +584,24 @@ function showRegion(r,btn){
   curRegion=r;applyFilter();
 }
 
-// 27/09/2026: הוסר ה-toggle-off (הפעלה/כיבוי בלחיצה חוזרת על אותו
-// כפתור). הסיבה: applyDefaultView() (למטה) מפעילה את פילטר 'wknd'
-// אוטומטית כבר בטעינת הדף — כך שכשמשתמש *לוחץ* בפעם הראשונה על
-// "🔥 סופ"ש" כדי לסנן, הפילטר כבר פעיל, וה-toggle-off הישן דווקא
-// כיבה אותו (הראה הכל) — בדיוק כמו "הלחיצה לא מסננת כלום" שדווח.
-// עכשיו: כל כפתור ספציפי תמיד *מפעיל* את עצמו (curFilter=type),
-// ורק כפתור "✅ הכל" (type=null) מנקה את הסינון. לחיצה חוזרת על אותו
-// כפתור פשוט לא משנה כלום (לא מפתיע) במקום לכבות בהפתעה.
+// 27/09/2026 (סבב 2): הוסר ה-toggle-off, כי applyDefaultView() מפעילה
+// את פילטר 'wknd' אוטומטית בטעינה, וחשבתי שה-toggle-off הישן הוא מה
+// שגרם ל"לחיצה לא מסננת כלום". 27/09/2026 (סבב 4) — **זו לא הייתה
+// האבחנה הנכונה, והתיקון ההוא בעצמו יצר את אותה תלונה מחדש**: כש-
+// setFilter תמיד *מפעיל* (לא toggle), לחיצה על כפתור שכבר פעיל היא
+// no-op מוחלט — 0 שינוי במסך. מכיוון שהדף כבר טוען עם 'wknd' פעיל
+// כברירת מחדל, הלחיצה *הראשונה* של המשתמש בדיוק על אותו כפתור לא
+// גרמה לשום שינוי נראה לעין — בדיוק "התקוע" שדווח, פעם שנייה.
+// שורש הבעיה האמיתי (מהסבב הקודם): הגדרת "סופ"ש" הרופפת (41/44,
+// כמעט הכל) גרמה לכך שסינון/ביטול-סינון נראו כמעט זהים — לא בעיה
+// ב-toggle עצמו. עכשיו ש-weekend מחושב עם all() (הדוק בהרבה, 58/65
+// לא 41/44) ההבדל בין "הכל" ל"סופ"ש" משמעותי ונראה לעין — אז
+// ה-toggle-off *מוחזר בחזרה*: לחיצה על כפתור פעיל מכבה אותו (חוזרים
+// ל"הכל", שינוי ברור של 65→58 או ההפך), לחיצה נוספת מפעילה שוב.
+// כך כל לחיצה, תמיד, גורמת לשינוי נראה לעין — בלי קשר למצב ההתחלתי.
 function setFilter(type,btn){
   document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('f-wknd','f-today','f-cat'));
-  curFilter=type;
+  curFilter=curFilter===type?null:type;
   if(curFilter)btn.classList.add(curFilter==='wknd'?'f-wknd':(curFilter==='today'?'f-today':'f-cat'));
   applyFilter();
 }
