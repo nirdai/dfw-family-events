@@ -26,11 +26,24 @@ jobs:
         run: pip install google-genai
 
       - name: Run weekly update script
+        id: run_update
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python update_portal.py
 
+      # 28/09/2026: לפני התיקון הזה, כישלון בשלב הקודם (למשל 503 חוזר
+      # מ-Gemini לאורך כל חלון ה-retry) גרם ל-GitHub לדלג אוטומטית על
+      # השלב הזה — כלומר שורת השגיאה שהסקריפט כן כתב מקומית ל-
+      # update_log.txt (דרך log() בתוך except של main()) אף פעם לא
+      # הגיעה לריפו. זה גרם לתעלומה אמיתית: ריצה שבועית נכשלה בפועל
+      # (Gemini החזיר 503 בכל 4 הניסיונות, על פני כ-2:20 דקות — יותר
+      # מסך כל חלון ה-retry), אבל ב-git לא היה שום זכר לזה, לא הצלחה
+      # ולא כישלון. `if: always()` מבטיח שהשלב הזה ירוץ גם כשהשלב
+      # הקודם נכשל, כך שלפחות רשומת השגיאה תמיד תגיע לריפו — גם אם
+      # index.html עצמו לא מתעדכן (וזה בסדר: main() לא כותב index.html
+      # חדש אם הריצה נכשלה, ראו תקלה #7 ב-CLAUDE.md).
       - name: Commit and push if changed
+        if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -38,6 +51,10 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes to commit."
           else
-            git commit -m "Weekly events auto-update"
+            if [ "${{ steps.run_update.outcome }}" = "failure" ]; then
+              git commit -m "Weekly auto-update FAILED - see update_log.txt for error"
+            else
+              git commit -m "Weekly events auto-update"
+            fi
             git push
           fi

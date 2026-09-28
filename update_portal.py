@@ -105,7 +105,8 @@ def build_prompt() -> str:
 - כלול מרוצי NASCAR / IndyCar / Dirt Track אם יש ב-Texas Motor Speedway או באזור, משחקי MLB (Texas Rangers), Frisco RoughRiders (AA baseball), רודיאו (Fort Worth Stockyards)
 - לכל אירוע תן דירוג 1-10 בהתאם לביקורות היסטוריות ורמת האטרקציה
 - שדה dates הוא מערך של תאריכים בפורמט YYYY-MM-DD — אם האירוע חוזר על עצמו כמה פעמים (כמו שוק שבועי), כלול את כל התאריכים הרלוונטיים בטווח; אם זה אירוע רב-יומי (פסטיבל 3 ימים), כלול את כל הימים
-- שדה weekend צריך להיות true אם לפחות אחד מהתאריכים חל בשבת/ראשון
+- ⚠️ קריטי במיוחד לאירוע **רציף/יומי** שנמשך שבועות (יריד מדינתי, תערוכת דלעות/פסלים בגן בוטני וכו'): אם האירוע פתוח **כל יום** מתאריך פתיחה לתאריך סיום, שדה dates חייב לכלול **ממש כל יום קלנדרי** בטווח (כולל ימי חול!) — לא רק את השבתות/ימי הראשון. סינון "רק סוף"ש" באתר נגזר אוטומטית מרשימת התאריכים הזו (ראו הערה הבאה) — אם תכלול רק תאריכי סוף שבוע לאירוע שבאמת פתוח כל יום, האתר יסמן אותו בטעות כ"אירוע סוף שבוע" למרות שהוא לא כזה. דוגמה: יריד שפתוח כל יום 25/9–18/10 → dates = כל 24 התאריכים מ-2026-09-25 עד 2026-10-18 כולל, לא רק 4-5 שבתות/ראשונים לדוגמה
+- שדה weekend: מלא true/false בכל מקרה (חובה בסכימה), אבל שימו לב — **הקוד שלנו מתעלם לגמרי מהערך הזה ומחשב מחדש בעצמו** מתוך שדה dates (true רק אם *כל* התאריכים ברשימה חלים בשישי-ערב/שבת/ראשון). לכן הדיוק היחיד שבאמת קובע הוא ברשימת ה-dates עצמה, כמתואר בסעיף הקודם — לא משנה מה תשימו כאן.
 - שדה cat חייב להיות אחד בדיוק מהרשימה הזו: {cat_list}
 
 החזר **JSON בלבד** (לא קוד JavaScript, לא הסברים, לא backticks) — מערך אחד בפורמט JSON תקני, עם כמה שיותר אירועים (לפחות 25-40 אם אפשר, פרוסים על פני כל האזורים). כל מפתח ו-string חייבים להיות במרכאות כפולות כנדרש ב-JSON תקני:
@@ -207,6 +208,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   .region-drive{font-size:.82rem;font-weight:400;color:#7bbf94;opacity:.8;margin-right:.5rem;flex-shrink:0}
   .region-count{margin-right:auto;font-family:'Space Mono',monospace;font-size:.67rem;color:var(--text-dim);background:rgba(46,204,113,.07);border:1px solid var(--card-border);padding:.2rem .65rem;border-radius:1rem}
   .events-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(295px,1fr));gap:1.3rem;margin-bottom:2rem}
+  .empty-region-msg{grid-column:1/-1;text-align:center;color:var(--text-dim);font-size:.88rem;line-height:1.7;padding:2.2rem 1rem;border:1px dashed var(--card-border);border-radius:.75rem;background:rgba(46,204,113,.03)}
   .all-section-header{font-size:1.05rem;font-weight:700;color:var(--g6);margin:2rem 0 .9rem;padding-right:.6rem;border-right:3px solid var(--g6);display:flex;align-items:center;gap:.4rem}
   .event-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:.9rem;overflow:hidden;transition:transform .28s,box-shadow .28s,border-color .28s;position:relative;backdrop-filter:blur(8px)}
   .event-card:hover{transform:translateY(-5px);box-shadow:0 18px 50px rgba(46,204,113,.18);border-color:rgba(46,204,113,.55)}
@@ -516,15 +518,26 @@ const regionOrder=__REGION_ORDER_JS__;
 
 let curRegion='all',curFilter=null;
 
+// 28/09/2026 (סבב 5): המשתמש דיווח שסקשן אזור ריק (The Colony, שאין
+// לו כרגע שום אירוע מאומת) "נראה כמו באג" — כותרת + רשת ריקה, בלי שום
+// הסבר. תוקן בשתי דרכים: (1) בתצוגה המשולבת "🌆 הכל" — אזור בלי אירועים
+// כלל לא מקבל כותרת/סקשן, כדי לא לבלגן את הפיד המשולב בכותרות ריקות.
+// (2) בטאב הספציפי של האזור עצמו (למשל לחיצה על "The Colony") — הכותרת
+// והטאב עדיין קיימים (זו רשימת האזורים האמיתית שהפורטל מכסה), אבל במקום
+// רשת ריקה מוצגת הודעה ידידותית שמסבירה שזה מכוון, לא שבור.
+function emptyRegionMsg(){
+  return `<div class="empty-region-msg">📭 עדיין לא נמצא כאן אירוע מאומת לתקופה הקרובה.<br>נעדכן ברגע שיהיה — בינתיים אפשר לבדוק את שאר האזורים.</div>`;
+}
 function render(){
   regionOrder.forEach(r=>{
     const items=events.filter(e=>e.region===r);
-    document.getElementById(`grid-${r}`).innerHTML=items.map(buildCard).join('');
+    document.getElementById(`grid-${r}`).innerHTML=items.length?items.map(buildCard).join(''):emptyRegionMsg();
     document.getElementById(`cnt-${r}`).textContent=`${items.length} אירועים`;
   });
   const av=document.getElementById('view-all');let html='';
   regionOrder.forEach(r=>{
     const items=events.filter(e=>e.region===r);
+    if(!items.length)return; // לא מציגים כותרת אזור ריקה בתצוגה המשולבת
     html+=`<div class="all-section-header" id="hdr-${r}">📍 ${regionNames[r]} <span class="wknd-count" id="wc-${r}"></span></div><div class="events-grid">${items.map(buildCard).join('')}</div>`;
   });
   av.innerHTML=html;
