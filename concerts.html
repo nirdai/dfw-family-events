@@ -91,7 +91,13 @@
   .dot.top{background:var(--accent);box-shadow:0 0 7px rgba(0,255,136,.7)}
   .rating-score{font-family:'Space Mono',monospace;font-size:.88rem;font-weight:700;color:var(--accent)}
   .rating-lbl{font-size:.6rem;color:var(--text-dim)}
-  .price-badge{font-size:.72rem;font-weight:600;padding:.22rem .6rem;border-radius:1rem;background:rgba(46,204,113,.08);border:1px solid rgba(46,204,113,.2);color:var(--g7);white-space:nowrap}
+  /* 28/09/2026: אותה תקלה שנמצאה ב-attractions.html — היה white-space:nowrap
+     בלי max-width/ellipsis, וה-JS חתך את ה-price בעיוור על '(' ואז '/'. תוקן
+     גם כאן: רשת ביטחון של ellipsis למקרה שהמחרוזת עדיין ארוכה מדי.
+     unicode-bidi:plaintext — כדי שה-"..." יופיע בסוף הפסקה *לפי כיוון
+     התוכן עצמו* (עברית/אנגלית) ולא תמיד לפי כיוון העמוד (RTL) — אחרת
+     טקסט שמתחיל באנגלית נחתך מההתחלה במקום מהסוף. */
+  .price-badge{font-size:.72rem;font-weight:600;padding:.22rem .6rem;border-radius:1rem;background:rgba(46,204,113,.08);border:1px solid rgba(46,204,113,.2);color:var(--g7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60%;min-width:0;display:inline-block;vertical-align:middle;unicode-bidi:plaintext}
   .price-badge.free{background:rgba(255,215,0,.09);border-color:rgba(255,215,0,.28);color:var(--gold)}
 
   /* BEEN THERE BUTTON */
@@ -368,6 +374,20 @@ function toggleVisited(id, btn, card) {
   applyVisitFilter();
 }
 
+// 28/09/2026: תג המחיר הקומפקטי בפוטר חתך קודם עיוור על '(' ואז '/', בהנחה
+// שהמידע השימושי תמיד לפני הראשון מהם. זה איבד לגמרי מחירים אצל מקומות
+// כמו Toyota Music Factory ("כרטיסי דשא (Lawn) מ-$25–$45..." — הכל אחרי
+// ה-"(" הראשון, כולל כל הספרות, פשוט נעלם מהתג). עכשיו: חותכים רק אם מה
+// שנשאר לפני הסוגר/לוכסן כבר מכיל בעצמו ספרה/סימן מטבע (כלומר זה באמת
+// "מחיר קצר" ולא רק תחילת משפט תיאורי) וגם באורך סביר לתג; אחרת מוצג כל
+// ה-price (ה-ellipsis ב-CSS דואג לקיצור אלגנטי אם עדיין ארוך מדי).
+function priceBadgeLabel(price){
+  if(!/[(/]/.test(price))return price;
+  const cut=price.split(/[(/]/)[0].trim();
+  if(cut.length>=4 && cut.length<=35 && /[\d$₪]/.test(cut))return cut;
+  return price;
+}
+
 // esc(): הגנת-עומק מפני XSS — בורחים מכל תו HTML לפני הזרקה ל-innerHTML.
 function esc(s){
   return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -501,7 +521,7 @@ function buildCard(a) {
     +'<div class="attr-footer">'
     +'<div class="rating-wrap"><div><div class="rating-dots">'+dots+'</div><div class="rating-lbl">דירוג קהילתי</div></div>'
     +'<div class="rating-score">'+a.rating+'/10</div></div>'
-    +'<span class="price-badge'+(isFree?' free':'')+'">'+esc(a.price.split('(')[0].split('/')[0].trim())+'</span>'
+    +'<span class="price-badge'+(isFree?' free':'')+'" title="'+esc(a.price)+'">'+esc(priceBadgeLabel(a.price))+'</span>'
     +'<button class="been-btn'+(isVis?' checked':'')+'" onclick="toggleVisited('+a.id+',this,this.closest(\'.attr-card\'))">'
     +'<span class="check-icon">'+(isVis?'&#x2714;':'&#x2B55;')+'</span>'
     +(isVis?' היינו!':' לא היינו')

@@ -79,7 +79,23 @@
   .dot.top{background:var(--accent);box-shadow:0 0 7px rgba(0,255,136,.7)}
   .rating-score{font-family:'Space Mono',monospace;font-size:.88rem;font-weight:700;color:var(--accent)}
   .rating-lbl{font-size:.6rem;color:var(--text-dim)}
-  .price-badge{font-size:.72rem;font-weight:600;padding:.22rem .6rem;border-radius:1rem;background:rgba(46,204,113,.08);border:1px solid rgba(46,204,113,.2);color:var(--g7);white-space:nowrap}
+  /* 28/09/2026: היה white-space:nowrap בלי max-width/ellipsis, ובלוגיקת ה-JS
+     (buildCard) היה price.split('/')[0] שהניח שכל price בפורמט "מבוגר / ילד"
+     — אבל אצל Fossil Rim ("...בדקו ב-fossilrim.org/tickets") וOak Meadow Ranch
+     ("$299/אדם...") ה-"/" הוא חלק מ-URL או "לאדם", לא הפרדת מבוגר/ילד. התוצאה:
+     טקסט חלקי/שגוי בתג, ומכיוון שאין ellipsis + הכרטיס עצמו overflow:hidden —
+     מה שנשאר פשוט נחתך קשה בקצה הכרטיס (נראה כמו תקלה, לא רק קיצור). תוקן:
+     ה-JS כבר לא חותך את המחרוזת בעצמו (רואים למטה ב-buildCard) — ה-CSS כאן
+     הוא רשת ביטחון: אם מחרוזת מחיר עדיין ארוכה מדי, ה-ellipsis יקצר יפה
+     ("...") במקום חיתוך גולמי. תוספת נוספת: unicode-bidi:plaintext — בלי
+     זה, ה-"..." תמיד מופיע בצד "סוף" הפסקה לפי כיוון העמוד (RTL), כלומר
+     בצד שמאל — נכון לטקסט עברי, אבל שגוי לטקסט שמתחיל באנגלית (למשל
+     "Wildlife Experience: $299" הוצג כ"...erience: $299", חותך את
+     "Wildlife Exp" מההתחלה!). plaintext גורם לדפדפן לקבוע את כיוון
+     הפסקה לפי התו החזק הראשון *בתוכן עצמו* (לא לפי כיוון העמוד) — כך
+     שטקסט שמתחיל באנגלית מקבל "..." בסוף שלו (ימין), וטקסט שמתחיל
+     בעברית ממשיך לקבל "..." בסוף שלו (שמאל), כל אחד נכון לכיוון שלו. */
+  .price-badge{font-size:.72rem;font-weight:600;padding:.22rem .6rem;border-radius:1rem;background:rgba(46,204,113,.08);border:1px solid rgba(46,204,113,.2);color:var(--g7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60%;min-width:0;display:inline-block;vertical-align:middle;unicode-bidi:plaintext}
   .price-badge.free{background:rgba(255,215,0,.09);border-color:rgba(255,215,0,.28);color:var(--gold)}
 
   /* BEEN THERE BUTTON */
@@ -270,6 +286,27 @@ function toggleVisited(id, btn, card) {
   applyVisitFilter();
 }
 
+// 28/09/2026: תג המחיר הקומפקטי בפוטר הכרטיס עשה קודם price.split('/')[0]
+// בעיוור, בהנחה שכל price בפורמט "מחיר מבוגר / מחיר ילד". זה שבר לגמרי
+// אצל Fossil Rim ("...בדקו ב-fossilrim.org/tickets" — ה"/" הוא חלק מ-URL,
+// לא הפרדת מבוגר/ילד) ואצל Heard Museum (אותה בעיה) — התוצאה הייתה טקסט
+// חלקי/שגוי, ומכיוון שאין ellipsis וה-card עצמו overflow:hidden, מה שנשאר
+// נחתך קשה בקצה הכרטיס באמצע מילה (נראה כמו תקלה אמיתית, לא רק קיצור).
+// גם "חינם (אוכל/קניות בתשלום)" נשבר (סוגר לא מאוזן: "חינם (אוכל").
+// עכשיו: מפצלים על "/" רק כשזה *נראה* כמו פיצול מבוגר/ילד אמיתי — אין
+// דפוס דומיין/URL, יש בדיוק 2 חלקים, החלק הראשון קצר-ומתאים לתג קומפקטי,
+// והסוגריים בו מאוזנים. אחרת מוצג כל ה-price (ו-CSS ellipsis בתג עצמו
+// דואג לקיצור אלגנטי אם זה עדיין ארוך מדי, במקום חיתוך גולמי).
+function priceBadgeLabel(price){
+  if(!price.includes('/'))return price;
+  if(/https?:\/\/|\.(org|com|net|gov|edu)\b/i.test(price))return price;
+  const parts=price.split('/');
+  const first=parts[0].trim();
+  const openP=(first.match(/\(/g)||[]).length, closeP=(first.match(/\)/g)||[]).length;
+  if(parts.length===2 && first.length<=30 && openP===closeP)return first;
+  return price;
+}
+
 // ============================================================
 // esc(): הגנת-עומק מפני XSS — הנתונים כאן מוזנים ידנית (לא מ-LLM), אבל
 // בורחים מכל תו HTML לפני הזרקה ל-innerHTML כהרגל בטוח לכל טקסט חופשי,
@@ -304,7 +341,7 @@ function buildCard(a) {
     +'<div class="attr-footer">'
     +'<div class="rating-wrap"><div><div class="rating-dots">'+dots+'</div><div class="rating-lbl">דירוג קהילתי</div></div>'
     +'<div class="rating-score">'+a.rating+'/10</div></div>'
-    +'<span class="price-badge'+(isFree?' free':'')+'">'+esc(a.price.split('/')[0].trim())+'</span>'
+    +'<span class="price-badge'+(isFree?' free':'')+'" title="'+esc(a.price)+'">'+esc(priceBadgeLabel(a.price))+'</span>'
     +'<button class="been-btn'+(isVis?' checked':'')+'" onclick="toggleVisited('+a.id+',this,this.closest(\'.attr-card\'))">'
     +'<span class="check-icon">'+(isVis?'&#x2714;':'&#x2B55;')+'</span>'
     +(isVis?' היינו!':' לא היינו')
