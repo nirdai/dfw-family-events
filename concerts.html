@@ -168,7 +168,7 @@
   <div class="section-header">&#x1F3B8; מקומות קבועים להופעות חיות באזור DFW &mdash; עם ההופעות הקרובות בפועל</div>
   <div class="attractions-grid" id="grid"></div>
 </main>
-<div class="last-updated">עודכן: 27 בספטמבר 2026 &mdash; רשימת ההופעות רועננה ותאריכים ישנים הוסרו. מבוסס על לוחות הזמנים הרשמיים של כל מקום נכון לתאריך העדכון. תאריכים עלולים להשתנות &mdash; מומלץ לבדוק באתר המקום לפני היציאה. הסימון "היינו" נשמר במכשיר שלך.</div>
+<div class="last-updated">עודכן: 18 באוקטובר 2026 &mdash; רשימת ההופעות רועננה (חלון 18/10–17/11) ותאריכים ישנים הוסרו. מקומות שלא נמצא להם לוח מאומת מסומנים בהערה. מבוסס על לוחות הזמנים הרשמיים של כל מקום נכון לתאריך העדכון. תאריכים עלולים להשתנות &mdash; מומלץ לבדוק באתר המקום לפני היציאה. הסימון "היינו" נשמר במכשיר שלך.</div>
 
 <script>
 const A = [
@@ -180,9 +180,10 @@ const A = [
    seating:"Lawn = דשא פתוח, שבים באופן חופשי עם שמיכה/כיסא מתקפל; יש גם ישיבה מקורה מוקצית (יקרה יותר)",
    tip:"קנו כרטיס Lawn (הכי זול) והביאו שמיכה וכיסאות מתקפלים — חוקי האמפי מתירים זאת.",rating:9,
    shows:[
-     {date:"22/10",time:"19:00",artist:"Dan + Shay — The Young Tour",genre:"קאנטרי"}
-   ]},
-
+     {date:"22/10",time:"19:00",artist:"Dan + Shay — The Young Tour",genre:"קאנטרי"},
+     {date:"30/10",time:"18:00",artist:"Uforia Latino Mix Live",genre:"לטינית"}
+   ],
+   note:"אומת בעמוד המקום ב-do214 (לא באתר Live Nation). ייתכן שהעונה מסתיימת; בדקו את לוח האולם לפני שנוסעים."},
   {id:2,type:"amp",tl:"🏟 אמפיתיאטרון",name:"The Pavilion at Toyota Music Factory",
    link:"https://thepaviliontmf.com/",
    desc:"אמפיתיאטרון קטן ואינטימי יותר בלב מתחם Toyota Music Factory באירווינג, עם מגוון אמנים מקומיים ובינלאומיים כל השנה. דשא פתוח מאחורי המושבים, ומסביב פלאזה שלמה של מסעדות ובארים.",
@@ -191,26 +192,24 @@ const A = [
    seating:"דשא פתוח (GA, שבים לפי מקום פנוי) מאחורי אזור ישיבה מקורה מוקצה",
    tip:"אפשר לעשות ערב שלם — ארוחה בפלאזה לפני ההופעה, בלי צורך לנסוע שוב.",rating:8,
    shows:[
-     {date:"30/9",time:"19:00",artist:"Juanes — North America Tour 2026",genre:"לטינית / רוק"},
-     {date:"1/10",time:"19:00",artist:"Stephen Wilson Jr. — Gary The Torch Tour",genre:"קאנטרי אלטרנטיבי"},
-     {date:"4/10",time:"19:00",artist:"ZZ Top",genre:"רוק"},
-     {date:"5/10",time:"19:00",artist:"TLC & Salt-N-Pepa with En Vogue — It's Iconic",genre:"R&B / היפ הופ"},
-     {date:"8/10",time:"19:00",artist:"Sonic Live in Concert",genre:"וידאו-גיים / תזמורתי"},
-     {date:"9/10",time:"19:00",artist:"Role Model — Chuck On Tour",genre:"פופ"},
-     {date:"11/10",time:"19:00",artist:"wave to earth — The Pieces Tour",genre:"אינדי / פופ"},
-     {date:"12/10",time:"19:00",artist:"Logic & G-Eazy — The Endless Summer Tour Part II",genre:"היפ הופ"},
-     {date:"14/10",time:"19:00",artist:"Dermot Kennedy — The Weight of the Woods Tour",genre:"אינדי-פולק"},
-     {date:"15/10",time:"19:00",artist:"Monsta X — World Tour",genre:"K-Pop"},
-     {date:"16/10",time:"19:00",artist:"Modest Mouse",genre:"רוק אלטרנטיבי"},
-     {date:"17/10",time:"19:00",artist:"Gov't Mule and Ziggy Marley",genre:"רוק / רגאיי"},
-     {date:"18/10",time:"19:00",artist:"Foster The People — Good Mourning Sunshine Tour",genre:"אינדי-פופ"},
-     {date:"21/10",time:"19:00",artist:"Mon Laferte — Femme Fatale Tour",genre:"לטינית"},
-     {date:"22/10",time:"19:00",artist:"Maria Jose + Moenia",genre:"לטינית"},
-     {date:"23/10",time:"19:00",artist:"Brincos Dieras — El Desmadre Continua Tour",genre:"לטינית",extra:"18+"},
-     {date:"24/10",time:"19:00",artist:"Casey Donahew + Friends",genre:"קאנטרי"},
-     {date:"25/10",time:"19:00",artist:"Sin Bandera — US Escenas Tour",genre:"לטינית"}
-   ]},
-
+     {date:"18/10",time:"",artist:"Foster The People — Good Mourning Sunshine Tour",genre:"אינדי-פופ"},
+     {date:"21/10",time:"",artist:"Mon Laferte — Femme Fatale Tour",genre:"לטינית"},
+     {date:"22/10",time:"",artist:"Maria Jose + Moenia",genre:"לטינית"},
+     {date:"23/10",time:"",artist:"Brincos Dieras — El Desmadre Continua Tour",genre:"לטינית",extra:"18+"},
+     {date:"24/10",time:"",artist:"Casey Donahew + Friends",genre:"קאנטרי"},
+     {date:"25/10",time:"",artist:"Sin Bandera — US Escenas Tour",genre:"לטינית"},
+     {date:"29/10",time:"",artist:"Alvaro Diaz — Omakase Tour",genre:"לטינית / אורבן"},
+     {date:"30/10",time:"",artist:"Los Gemelos de Sinaloa — The Gemeliza Tour",genre:"לטינית / ריג'יונל מקסיקני"},
+     {date:"31/10",time:"",artist:"Hugel presents: Make The Girls Dance",genre:"אלקטרוני / האוס"},
+     {date:"1/11",time:"",artist:"RNB X Live in Dallas",genre:"R&B"},
+     {date:"5/11",time:"",artist:"Steve Lacy — Oh yeah? Tour",genre:"אינדי / R&B"},
+     {date:"6/11",time:"",artist:"Arcangel — La 8va Maravilla World Tour",genre:"לטינית / רגטון"},
+     {date:"7/11",time:"",artist:"Lenny Pearce — Toddler Rave World Tour",genre:"מסיבת ריקוד לפעוטות"},
+     {date:"8/11",time:"",artist:"Bryce Crawford: Open Heaven",genre:"קאנטרי / פולחן"},
+     {date:"12/11",time:"",artist:"Nurse John: Against Medical Advice Tour",genre:"מגוון"},
+     {date:"14/11",time:"",artist:"El Tri",genre:"רוק לטיני"}
+   ],
+   note:"התאריכים מהאתר הרשמי של המקום (נבדק ב-18/10); שעות ההופעה לא פורסמו שם ולכן לא מוצגות. ז'אנרים ותיאורים הם שלנו, ויש להם ערך מכוון בלבד. Lenny Pearce — Toddler Rave ב-7/11 הוא האירוע היחיד כאן שמיועד במפורש לפעוטות."},
   {id:11,type:"amp",tl:"🏟 אמפיתיאטרון",name:"Red Tail Pavilion (Oak Point Park)",
    link:"https://www.plano.gov/1078/Red-Tail-Pavilion",
    desc:"אמפיתיאטרון חוץ עירוני בבעלות עיריית פלאנו, בתוך שמורת הטבע Oak Point Park — ממש בתוך העיר, לא צריך לנסוע רחוק. בניגוד לאמפי המסחריים ברשימה (Dos Equis, Toyota Music Factory), הלו״ז כאן דליל יותר ומורכב בעיקר מאירועי עיריית פלאנו (לא סבב הופעות ארצי שוטף) — אבל כשיש הופעה, זה הכי קרוב לבית מכל הרשימה.",
@@ -219,14 +218,8 @@ const A = [
    address:"2801 E Spring Creek Pkwy, Plano TX 75074",
    seating:"\"Grass-covered landings\" — שטח דשא פתוח ללא ישיבה קבועה, קיבולת כוללת עד כ-2,000 איש; מביאים שמיכה/כיסא מתקפל",
    tip:"זה כנראה המקום שחיפשת — 2801 E Spring Creek Pkwy, פלאנו. שימו לב: זה לא סדרת הופעות שבועית כמו שאר הרשימה, אלא בעיקר 2-3 אירועי עיריית פלאנו בשנה (חלקם ספורט/ריצות, לא מוזיקה) — עקבו אחרי events.visitplano.com/red_tail_pavilion לעדכונים.",rating:7,
-   shows:[
-     {date:"2/10",time:"18:30–22:30",artist:"Family Fest DFW (מהדורה 6) — A Night of Jazz Under the Stars",genre:"ג'אז"},
-     {date:"3/10",time:"17:45–22:15",artist:"Family Fest DFW (מהדורה 6) — Neo Soul Night Under the Stars",genre:"ניאו-סול / R&B"},
-     {date:"4/10",time:"17:15–21:30",artist:"Family Fest DFW (מהדורה 6) — A Night of Worship Under the Stars",genre:"מוזיקת פולחן / גוספל"},
-     {date:"10/10",time:"19:00–22:30 (שערים 18:00)",artist:"Beatles Night — Hard Night's Day",genre:"רוק/פופ קלאסי",cover:"מחווה ל-The Beatles",extra:"$16–$20 לפי גיל"}
-   ],
-   note:"3 הימים של Family Fest DFW הם פסטיבל תשלום נפרד (כרטיסים דרך Eventbrite, המחיר משתנה לפי אזור ישיבה) — לא כלול באירועי העירייה החינמיים."},
-
+   shows:[],
+   note:"נבדק ב-18/10: אין אירועים רשומים בחלון 18/10–17/11 בדפי עיריית פלאנו ו-Visit Plano. לא הצלחנו לפתוח את events.visitplano.com ו-Eventbrite, ולכן לא ניתן לשלול הופעות שם. בדקו שם קרוב למועד."},
   {id:12,type:"amp",tl:"🏟 אמפיתיאטרון",name:"Vitruvian Park (אדיסון) — מחוץ לעונה",
    link:"https://visitaddison.com/events/vitruvian-park/",
    desc:"אמפיתיאטרון חוץ חינמי בפארק Vitruvian שבאדיסון, עם סדרת קונצרטים חינמית בשם \"Vitruvian Nights\" — מקום נוסף מסוג \"אמפי\" שהיה חסר מהרשימה המקורית, אבל **עונת 2026 כבר הסתיימה ב-6/8** ואין הופעות נוספות עד הקיץ הבא. נשאר ברשימה כדי שלא נשכח לבדוק שוב באביב 2027.",
@@ -234,11 +227,8 @@ const A = [
    price:"חינם! (וגם חניה חינם)",address:"Vitruvian Park, ליד Midway Rd & Spring Valley Rd, Addison TX 75001",
    seating:"אמפיתיאטרון דשא פתוח — משפחתי וידידותי לחיות מחמד, מביאים שמיכה",
    tip:"⚠️ אין הופעות קרובות כרגע — הסדרה השנתית (חמישי בערב, יוני-אוגוסט) הסתיימה. לבדוק שוב באביב 2027 לפני שמתכננים סביב זה.",rating:6,
-   shows:[
-     {date:"6/8 (עונת 2026 האחרונה)",time:"בערב",artist:"Lover — מחווה ל-Taylor Swift (מופע הסיום של העונה)",genre:"פופ",cover:"מחווה ל-Taylor Swift"}
-   ],
-   note:"עונת 2026 המלאה (לעיון בלבד, כולה כבר עברה): 11/6 Bidi Bidi Banda (מחווה לסלינה), 25/6 Dueling Pianos, 9/7 Ashmore (רוק קלאסי), 23/7 The Spazmatics (מחווה לניו-ווייב), 6/8 Lover (מחווה לטיילור סוויפט). דפוס טיפוסי: חמישי בערב, יוני עד תחילת אוגוסט."},
-
+   shows:[],
+   note:"מחוץ לעונה: Vitruvian Nights Live הסתיימה ב-6/8/2026. באתר אדיסון מופיע רק 'Vitruvian Lights — חוזר בנובמבר 2026' ללא תאריכים. בדקו vitruvianpark.com."},
   {id:3,type:"lawn",tl:"🧺 דשא ופיקניק",name:"Concerts by the Creek — Watters Creek",
    link:"https://www.watterscreek.com/event/35335-concerts-by-the-creek-fall-series",
    desc:"קונצרטים חינמיים על הדשא הירוק במרכז Watters Creek Village Green. הביאו שמיכה או כיסאות מתקפלים — מסביב מסעדות וקפה. עונת הקיץ הסתיימה ב-5/9, אבל מיד אחריה מתחילה \"Fall Series\" שבועית עד סוף אוקטובר — לא פספסנו כלום, פשוט מדובר בשתי עונות נפרדות באותו מקום.",
@@ -247,13 +237,9 @@ const A = [
    seating:"דשא פתוח — מביאים שמיכת פיקניק או כיסא מתקפל, יושבים בכל מקום פנוי על הדשא",
    tip:"בסדרת הסתיו (Fall Series) יש מופע כל שבוע, שישי-שבת 19:00–21:00, ברצף עד סוף אוקטובר — הגיעו כחצי שעה מוקדם לתפוס מקום נוח.",rating:8,
    shows:[
-     {date:"3/10",time:"19:00–21:00",artist:"Fall Series — להקה מתחלפת (ר' הערה)",genre:"מגוון"},
-     {date:"10/10",time:"19:00–21:00",artist:"Fall Series — להקה מתחלפת (ר' הערה)",genre:"מגוון"},
-     {date:"17/10",time:"19:00–21:00",artist:"Fall Series — להקה מתחלפת (ר' הערה)",genre:"מגוון"},
-     {date:"24/10",time:"19:00–21:00",artist:"Fall Series — להקה מתחלפת (ר' הערה)",genre:"מגוון"}
+     {date:"24/10",time:"19:00–21:00",artist:"The Bedzin Project",genre:"מגוון",extra:"חינם"}
    ],
-   note:"הערה: ל-Fall Series כולה מתחלף רוסטר של 4 להקות שאושרו לעונה — 80's Mix Tape, Radio Edit, High Octane Band, Last Exit Band — אבל ההתאמה המדויקת בין תאריך ללהקה לא פורסמה לכל השבועות (חוץ מ-26/9); בדקו את דף האירוע הרשמי (watterscreek.com) קרוב לתאריך — דף האירוע חסם גישה אוטומטית בבדיקה האחרונה."},
-
+   note:"תיקון: סדרת ה-Fall Series רצה מ-5/9 עד 24/10/2026 בלבד (לפי הדף הרשמי), ולכן 24/10 הוא המופע האחרון — לא נמצאה סדרה שממשיכה לנובמבר."},
   {id:4,type:"lawn",tl:"🧺 דשא ופיקניק",name:"Klyde Warren Park",
    link:"https://www.klydewarrenpark.org/events-programming",
    desc:"פארק עירוני מעל כביש מהיר בלב דאלאס, עם דוכני אוכל טרקים (food trucks) כמעט כל יום. סדרת הופעות חינמית מצומצמת יותר מהצפוי בעונה הנוכחית.",
@@ -262,10 +248,9 @@ const A = [
    seating:"דשא פתוח בפארק, אין ישיבה מוקצית — מביאים שמיכה",
    tip:"סדרת 'Dallas Sounds Amplified' מציגה אמן מקומי משתנה — שם האמן הספציפי מתפרסם קרוב למועד, עקבו אחרי דף הפארק.",rating:7,
    shows:[
-     {date:"16/10",time:"בערב",artist:"שיעור וריקוד סלסה עם להקה חיה",genre:"סלסה / לטינית"}
+     {date:"30/10",time:"17:00",artist:"Dallas Sounds Amplified: Oboghene Ezaga (ב-My Best Friend's Park)",genre:"מגוון",extra:"חינם"}
    ],
-   note:"מלבד ריקוד הסלסה, בחלון הזה נמצאו גם Music Bingo (2/10) וסרט בפארק (24/10) — לא כללנו אותם כ'הופעה' כי אין בהם להקה/אמן חי. סדרת Dallas Sounds Amplified לא פרסמה תאריכים חדשים בבדיקה האחרונה (27/9) — בדקו את דף הפארק קרוב למועד."},
-
+   note:"זה הביצוע החי היחיד עם אמן בשם שנמצא בחלון. לא נכללו: Yappy Hour ב-30/10 (מוזכרת מוזיקה חיה בלי אמן), Music Bingo ב-6/11 וריצת 5K ב-31/10."},
   {id:5,type:"lawn",tl:"🧺 דשא ופיקניק",name:"Lexus Box Garden at Legacy Hall",
    link:"https://www.legacyfoodhall.com/events/",
    desc:"גינת דשא מוצלת מאחורי Legacy Hall — פוד הול ענק עם עשרות דוכני אוכל. הלו״ז העשיר ביותר באזור: כמעט כל שבוע להקת מקור או להקת מחווה (טריביוט) מוכרת.",
@@ -274,14 +259,18 @@ const A = [
    seating:"דלתות נפתחות שעה לפני — ישיבה חופשית על הדשא (GA), אין מקומות מוקצים",
    tip:"קחו אוכל מתוך Legacy Hall ותשבו על הדשא בחוץ — הכי נוח למשפחות עם ילדים.",rating:9,
    shows:[
-     {date:"2/10",time:"הופעה 20:00",artist:"The Piano Men",genre:"פופ/רוק",cover:"מחווה ל-Elton John ול-Billy Joel",extra:"בתשלום (BUY TICKETS)"},
-     {date:"3/10",time:"אחה\"צ/ערב",artist:"Oktoberfest Afterparty feat. Live 90",genre:"פופ/רוק — מסיבת אוקטוברפסט",extra:"בתשלום (BUY TICKETS)"},
-     {date:"9/10",time:"הופעה 20:00",artist:"Legends of New Country",genre:"קאנטרי",cover:"מחווה ל-Morgan Wallen ול-Ella Langley",extra:"בתשלום (BUY TICKETS)"},
-     {date:"15/10",time:"הופעה 20:00",artist:"William Clark Green",genre:"קאנטרי",extra:"בתשלום (BUY TICKETS)"},
-     {date:"17/10",time:"הופעה 20:00",artist:"Queen Legacy",genre:"רוק",cover:"מחווה ל-Queen",extra:"בתשלום (BUY TICKETS)"},
-     {date:"24/10",time:"הופעה 20:00",artist:"Los Lonely Boys",genre:"לטינית / רוק",extra:"בתשלום (BUY TICKETS)"}
-   ]},
-
+     {date:"22/10",time:"20:00",artist:"Y2K Band — The Ultimate 2000s Party Band",genre:"מסיבת שנות ה-2000",extra:"חינם (RSVP)"},
+     {date:"24/10",time:"20:00",artist:"Los Lonely Boys",genre:"לטינית / רוק",extra:"בתשלום — לאשר באתר"},
+     {date:"29/10",time:"20:00",artist:"Like Combs",genre:"קאנטרי",cover:"מחווה ל-Luke Combs",extra:"בתשלום"},
+     {date:"30/10",time:"20:00",artist:"Reputation",genre:"פופ",cover:"מחווה ל-Taylor Swift",extra:"בתשלום"},
+     {date:"31/10",time:"20:00",artist:"Prince Again — Hall-O-Ween Party",genre:"פאנק / פופ",cover:"מחווה ל-Prince",extra:"בתשלום"},
+     {date:"4/11",time:"19:00",artist:"Ottoman Turks — Locally Sourced Concert Series",genre:"מגוון",extra:"חינם (RSVP)"},
+     {date:"5/11",time:"20:00",artist:"Quiet Riot",genre:"רוק / מטאל",extra:"בתשלום"},
+     {date:"7/11",time:"20:00",artist:"Rhymin' N Stealin'",genre:"היפ הופ / רוק",cover:"מחווה ל-Beastie Boys",extra:"בתשלום"},
+     {date:"12/11",time:"20:00",artist:"Matchbook 20",genre:"רוק",cover:"מחווה ל-Matchbox Twenty",extra:"בתשלום"},
+     {date:"14/11",time:"20:00",artist:"Guns 4 Roses",genre:"רוק / מטאל",cover:"מחווה ל-Guns N' Roses",extra:"בתשלום"}
+   ],
+   note:"נבדק ב-18/10 בלוח האירועים של Legacy Hall (השערים נפתחים כשעה לפני ההופעה). הדף לא מציין אם כל הופעה על הבמה הפנימית או בגן החיצוני. חידונים, קראוקי, בינגו ומסיבות צפייה לא נכללו."},
   {id:6,type:"lawn",tl:"🧺 דשא ופיקניק",name:"The Lawn at Grandscape",
    link:"https://www.grandscape.com/events/month/",
    desc:"דשא ענק במתחם Grandscape עם קונצרטים חינמיים על ה-Corona Stage, אירועי DJ ושווקים לאורך השנה. מוקף במסעדות ודוכני אוכל של המתחם.",
@@ -290,11 +279,14 @@ const A = [
    seating:"דשא פתוח מול הבמה (Corona Stage & Lawn) — ישיבה חופשית עם שמיכה/כיסא",
    tip:"בדקו את grandscape.com/events לעדכונים — לרוב יש מופע אחד–שניים בחודש, ולעיתים גם באוקטובר.",rating:8,
    shows:[
-     {date:"1/10",time:"19:00–21:00",artist:"Hip Hop Hooray",genre:"היפ הופ — להקת קאבר",extra:"חינם"},
-     {date:"2/10",time:"19:00–21:00",artist:"Barefoot Nation",genre:"קאנטרי",cover:"מחווה ל-Kenny Chesney",extra:"חינם"}
+     {date:"21/10",time:"19:00",artist:"Country Close Up (בחסות New Country 96.3 / 99.5 The Wolf)",genre:"קאנטרי"},
+     {date:"23/10",time:"19:00",artist:"Live on the Stage: Le Freak",genre:"דיסקו / פאנק",cover:"מחווה ל-Chic",extra:"חינם"},
+     {date:"23/10",time:"19:00",artist:"Nick Finzer Quartet (ב-Windmills Brewery)",genre:"ג'אז"},
+     {date:"24/10",time:"19:00",artist:"Brasuka (ב-Windmills Brewery)",genre:"ברזילאית"},
+     {date:"28/10",time:"18:30",artist:"Smooth Sessions Jazz Series: Vandell Andrew (ב-The Grotto)",genre:"ג'אז"},
+     {date:"29/10",time:"19:00",artist:"Emo Night Brooklyn (מסיבת DJ)",genre:"DJ / אימו"}
    ],
-   note:"הלו״ז המפורסם מראש דליל יחסית לחודש אוקטובר — ייתכנו הופעות נוספות שיתפרסמו קרוב למועד; בדקו grandscape.com/events."},
-
+   note:"הלוח בעמוד שנבדק מכסה רק עד 1/11 — ל-2–17/11 לא אומת דבר. רק Le Freak ו-Emo Night מתקיימים על הבמה/הדשא עצמם; השאר ב-Windmills Brewery או The Grotto. בדקו grandscape.com/events."},
   {id:7,type:"lawn",tl:"🧺 דשא ופיקניק",name:"Sundance Square Plaza",
    link:"https://sundancesquare.com/events/",
    desc:"כיכר עירונית פתוחה בלב פורט וורת' עם סדרת מוזיקה חיה קבועה בין רביעי לראשון (Sundance Square Music), ובנוסף אירוע חודשי גדול יותר — Greater Sundance Night Market (שבת ראשונה בחודש) עם מוזיקה חיה, 70+ דוכנים וזיקוקים.",
@@ -302,11 +294,8 @@ const A = [
    price:"חינם!",address:"201 Main St / 420 Main St, Fort Worth TX 76102",
    seating:"כיכר עירונית פתוחה — ישיבה/עמידה חופשית, אין דשא (מרצפת), אפשר להביא כיסא מתקפל",
    tip:"ה-Night Market החודשי (שבת ראשונה בחודש) הוא האירוע הכי בולט עם מוזיקה חיה + זיקוקים. ללו״ז השוטף (רביעי-ראשון) עקבו אחרי @sundancesquaremusic באינסטגרם.",rating:7,
-   shows:[
-     {date:"3/10",time:"17:00–22:00",artist:"Greater Sundance Night Market — מוזיקה חיה + זיקוקים",genre:"מגוון"}
-   ],
-   note:"בנוסף לשני התאריכים האלה יש גם סדרת מוזיקה שוטפת רביעי-ראשון באותה כיכר, אבל שמות הלהקות הספציפיים לא מתפרסמים מראש — רק דרך אינסטגרם קרוב למועד."},
-
+   shows:[],
+   note:"נבדק ב-18/10: בדף האירועים הרשמי אין הופעות מתוארכות בחלון (הרשומות היחידות שם מחודש מאי). Night Market החודשי לא אומת. לפי הפרסומים יש סדרה שוטפת, אבל שמות הלהקות מתפרסמים רק באינסטגרם."},
   {id:8,type:"bar",tl:"🍻 בר ומוזיקה חיה",name:"Truck Yard Dallas (Lower Greenville)",
    link:"https://www.truckyard.com/dallas/live-music",
    desc:"חצר ענקית עם עשרות דוכני אוכל טרקים קבועים, בית עץ, נדנדות ומוזיקה חיה. הלו״ז המפורסם מראש קצר יחסית ומתעדכן שוטף.",
@@ -314,9 +303,20 @@ const A = [
    price:"כניסה חינם (אוכל/משקאות בתשלום)",address:"5624 Sears St, Dallas TX 75206",
    seating:"חצר חיצונית פתוחה — שולחנות פיקניק ודשא, ישיבה חופשית ללא הזמנה",
    tip:"הבמה מנוהלת ע״י 13th Floor Music והלו״ז מתעדכן שוטף — בדקו truckyard.com/dallas/live-music קרוב למועד.",rating:7,
-   shows:[],
-   note:"חסר: נבדק שוב ב-27/9 — עדיין אין תאריכי הופעות מוזיקה חיה מאושרים לאוקטובר 2026 (המוזיקה כאן שוטפת/ספונטנית, \"tunes every darn day\", בלי תזמון שמתפרסם מראש). יש כן אירועים לא-מוזיקליים: Dolly Parton Day ב-25/9 ומסיבת צפייה בטקסס נגד אוקלהומה ב-10/10."},
-
+   shows:[
+     {date:"19/10",time:"18:00",artist:"Rodney Smith",genre:"מוזיקה חיה",extra:"כניסה חינם"},
+     {date:"21/10",time:"18:00",artist:"Colton Blue",genre:"מוזיקה חיה",extra:"כניסה חינם"},
+     {date:"22/10",time:"18:00",artist:"Justin Myers",genre:"מוזיקה חיה",extra:"כניסה חינם"},
+     {date:"23/10",time:"18:00",artist:"Jonathan Arthur",genre:"מוזיקה חיה",extra:"כניסה חינם"},
+     {date:"24/10",time:"14:00",artist:"Jared Pool",genre:"מוזיקה חיה",extra:"כניסה חינם"},
+     {date:"24/10",time:"18:00",artist:"Justin Russell",genre:"מוזיקה חיה",extra:"כניסה חינם"},
+     {date:"25/10",time:"14:00",artist:"Blake Cheek",genre:"מוזיקה חיה",extra:"כניסה חינם"},
+     {date:"26/10",time:"18:00",artist:"Tony Soldati",genre:"מוזיקה חיה",extra:"כניסה חינם"},
+     {date:"27/10",time:"18:00",artist:"Todd Stewart",genre:"מוזיקה חיה",extra:"כניסה חינם"},
+     {date:"28/10",time:"18:00",artist:"Justin Myers",genre:"מוזיקה חיה",extra:"כניסה חינם"},
+     {date:"29/10",time:"18:00",artist:"Jason Hatch",genre:"מוזיקה חיה",extra:"כניסה חינם"}
+   ],
+   note:"הלוח מדף המוזיקה החיה של המקום ומכסה רק 19–29/10 (20/10 סגור לאירוע פרטי); 30/10–17/11 לא היה גלוי. האמנים והלו\"ז כפופים לשינוי. ז'אנר לא פורסם."},
   {id:9,type:"bar",tl:"🍻 בר ומוזיקה חיה",name:"Truck Yard The Colony",
    link:"https://do214.com/venues/truck-yard-the-colony",
    desc:"הגרסה הצפונית של Truck Yard, ליד Grandscape — אותו קונספט של דוכני אוכל, מוזיקה חיה ואווירה כפרית-אורבנית, קרוב משמעותית לפלאנו מהסניף בדאלאס. מתאר עצמו כמארח מוזיקה חיה חינמית כמעט כל יום, אך לו״ז מפורסם מראש מצומצם.",
@@ -325,8 +325,7 @@ const A = [
    seating:"חצר חיצונית פתוחה — ישיבה חופשית, שולחנות ודשא",
    tip:"אפשר לשלב עם ביקור ב-Grandscape ו-The Lawn באותו יום.",rating:7,
    shows:[],
-   note:"חסר: נבדק שוב ב-27/9 — עדיין לא נמצאו תאריכי הופעות מוזיקה חיה מאושרים לאוקטובר 2026. בדקו את דף do214.com/venues/truck-yard-the-colony קרוב למועד הביקור."},
-
+   note:"נבדק ב-18/10: בדף do214 רשום רק 'Halloween Party' ב-24/10 בשעה 11:00 בלי שם מבצע, ולכן לא נכלל כהופעה מאומתת. המקום מצהיר על מוזיקה חיה יומית, אך אין לוח מתפרסם."},
   {id:10,type:"bar",tl:"🍻 בר ומוזיקה חיה",name:"TUPPS Brewery",
    link:"https://www.tuppsbrewery.com/upcoming-events",
    desc:"מבשלת בירה מקומית במקיני עם אולם ענק וחצר חיצונית (Outdoor Stage & Lawn), מארחת הופעות חיות באולם ובחוץ. ידידותי למשפחות בשעות היום.",
@@ -335,10 +334,10 @@ const A = [
    seating:"חצר חיצונית/דשא (Outdoor Stage & Lawn) או אולם הבירה הפנימי (Outdoor Beer Hall) — תלוי באירוע, ישיבה חופשית",
    tip:"בדקו את tuppsbrewery.com/upcoming-events לפני שמגיעים — הלוח מתעדכן באופן שוטף.",rating:7,
    shows:[
-     {date:"3/10",time:"בערב",artist:"Live on the Lawn: Smooth Operator",genre:"R&B / סול",cover:"מחווה ל-Sade"},
-     {date:"24/10",time:"בערב",artist:"TUPPS Halloween Party feat. The Dick Beldings",genre:"קאבר שנות ה-90"}
+     {date:"24/10",time:"19:00",artist:"TUPPS Halloween Party feat. The Dick Beldings",genre:"קאבר שנות ה-90"},
+     {date:"31/10",time:"19:00",artist:"Halloween Night Bash feat. The GenXiles",genre:"קאבר"}
    ],
-   note:"עדכון 27/9: לראשונה נמצאו כאן הופעות מוזיקה חיה מאושרות (בבדיקה הקודמת מ-19/9 היו רק אירועים לא-מוזיקליים) — ייתכן שיתווספו עוד קרוב למועד, בדקו את tuppsbrewery.com/upcoming-events."}
+   note:"שני האירועים ב-Outdoor Beer Hall. אירוע ב-7/11 (חגיגת יום הוותיקים) לא מציין מבצעים ולכן לא נכלל."}
 ];
 
 // ============================================================
