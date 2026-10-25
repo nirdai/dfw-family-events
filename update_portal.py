@@ -22,6 +22,8 @@ DFW Family Events Portal — Auto-Updater
 """
 
 from google import genai
+from google.genai import types
+from urllib.parse import urlparse
 import datetime
 import pathlib
 import sys
@@ -108,6 +110,8 @@ def build_prompt() -> str:
 - ⚠️ קריטי במיוחד לאירוע **רציף/יומי** שנמשך שבועות (יריד מדינתי, תערוכת דלעות/פסלים בגן בוטני וכו'): אם האירוע פתוח **כל יום** מתאריך פתיחה לתאריך סיום, שדה dates חייב לכלול **ממש כל יום קלנדרי** בטווח (כולל ימי חול!) — לא רק את השבתות/ימי הראשון. סינון "רק סוף"ש" באתר נגזר אוטומטית מרשימת התאריכים הזו (ראו הערה הבאה) — אם תכלול רק תאריכי סוף שבוע לאירוע שבאמת פתוח כל יום, האתר יסמן אותו בטעות כ"אירוע סוף שבוע" למרות שהוא לא כזה. דוגמה: יריד שפתוח כל יום 25/9–18/10 → dates = כל 24 התאריכים מ-2026-09-25 עד 2026-10-18 כולל, לא רק 4-5 שבתות/ראשונים לדוגמה
 - שדה weekend: מלא true/false בכל מקרה (חובה בסכימה), אבל שימו לב — **הקוד שלנו מתעלם לגמרי מהערך הזה ומחשב מחדש בעצמו** מתוך שדה dates (true רק אם *כל* התאריכים ברשימה חלים בשישי-ערב/שבת/ראשון). לכן הדיוק היחיד שבאמת קובע הוא ברשימת ה-dates עצמה, כמתואר בסעיף הקודם — לא משנה מה תשימו כאן.
 - שדה cat חייב להיות אחד בדיוק מהרשימה הזו: {cat_list}
+- 🔎 חובה להשתמש בחיפוש Google לכל אירוע. כלול אירוע **רק** אם מצאת בחיפוש עמוד שמאשר את התאריך שלו (עדיפות לעמוד הרשמי של העיר/המקום/המארגן). אם לא מצאת עמוד שמאשר תאריך — אל תכלול את האירוע ואל תנחש. עדיף פחות אירועים מאשר אירוע שלא קיים.
+- שדה source חובה: הכתובת המלאה (URL) של העמוד שבו אימתת את התאריך. הקוד שלנו בודק שהדומיין שלו אכן הופיע בתוצאות החיפוש שלך, ומשמיט אירועים שבהם הוא חסר או לא תואם.
 
 החזר **JSON בלבד** (לא קוד JavaScript, לא הסברים, לא backticks) — מערך אחד בפורמט JSON תקני, עם כמה שיותר אירועים (לפחות 25-40 אם אפשר, פרוסים על פני כל האזורים). כל מפתח ו-string חייבים להיות במרכאות כפולות כנדרש ב-JSON תקני:
 
@@ -126,7 +130,8 @@ def build_prompt() -> str:
     "hours": "10:00-18:00",
     "where": "שם המקום, עיר",
     "price": "חינם",
-    "rating": 8
+    "rating": 8,
+    "source": "https://example.org/events/the-exact-page-you-verified"
   }}
 ]
 
@@ -864,6 +869,62 @@ TRANSIENT_MARKERS = ("503", "UNAVAILABLE", "429", "RESOURCE_EXHAUSTED", "overloa
 # חשוב: ה-prompt וה-validate_events() זהים לכל המודלים, ולכן פלט של מודל גיבוי
 # עובר בדיוק את אותה בדיקה. אם מודל גיבוי מחזיר פלט גרוע, validate_events()
 # ידחה אותו כמו תמיד ו-index.html הקיים לא יידרס.
+# 25/10/2026: ריצת 19/10 החזירה 28 אירועים *בלי חיפוש ברשת* (Gemini כתב מהזיכרון), חלקם בדויים,
+# ודרסה את האתר המאומת. מעכשיו שלוש הגנות:
+#   1. הקריאה כוללת כלי Google Search (grounding) — המודל מחפש בפועל.
+#   2. כל אירוע חייב `source` (URL), והדומיין שלו חייב להופיע בין תוצאות החיפוש
+#      שהמודל באמת אחזר (grounding_chunks). אירוע בלי מקור תואם — מושמט.
+#   3. אם אחרי הסינון נשארו פחות מ-MIN_EVENTS_TO_PUBLISH אירועים (או שלא היה grounding בכלל)
+#      — הריצה נכשלת ו-index.html הקיים לא נדרס. עדיף אתר ישן עם כישלון ברור בלוג
+#      מאשר אתר חדש עם נתונים לא מאומתים.
+# מגבלה ידועה: זה מוודא שהמקור *נאחזר* בחיפוש, לא שהתאריך בדיוק כתוב בו. זו הגנה חזקה
+# מהמצב הקודם, אבל לא תחליף מלא לבדיקה אנושית.
+MIN_EVENTS_TO_PUBLISH = 30
+DOMAIN_RE = re.compile(r"^[a-z0-9][a-z0-9.\-]*\.[a-z]{2,}$")
+
+def make_config():
+    return types.GenerateContentConfig(
+        tools=[types.Tool(google_search=types.GoogleSearch())],
+        temperature=0.2,
+    )
+
+def _norm_domain(value) -> str:
+    """'https://www.Example.com/x' / 'www.example.com' -> 'example.com' (או '' אם זה לא נראה כמו דומיין)."""
+    if not isinstance(value, str):
+        return ""
+    v = value.strip().lower()
+    if "://" in v:
+        v = urlparse(v).netloc
+    v = v.split("/")[0].split(":")[0]
+    if v.startswith("www."):
+        v = v[4:]
+    return v if DOMAIN_RE.match(v) else ""
+
+def grounded_domains(response) -> set:
+    """דומיינים שהמודל אחזר בפועל בחיפוש (מ-grounding_metadata). קבוצה ריקה = לא היה grounding."""
+    domains = set()
+    for cand in (getattr(response, "candidates", None) or []):
+        gm = getattr(cand, "grounding_metadata", None)
+        for chunk in (getattr(gm, "grounding_chunks", None) or []):
+            web = getattr(chunk, "web", None)
+            if web is None:
+                continue
+            for field in ("domain", "title", "uri"):
+                d = _norm_domain(getattr(web, field, None))
+                # uri של Gemini הוא בדרך כלל redirect של vertexaisearch — לא מקור אמיתי, לא סופרים אותו
+                if d and d != "vertexaisearch.cloud.google.com":
+                    domains.add(d)
+    return domains
+
+def filter_events_by_grounding(events: list, allowed: set):
+    kept, dropped = [], []
+    for e in events:
+        src = e.get("source") if isinstance(e, dict) else None
+        dom = _norm_domain(src) if isinstance(src, str) and src.startswith(("http://", "https://")) else ""
+        ok = bool(dom) and any(dom == a or dom.endswith("." + a) or a.endswith("." + dom) for a in allowed)
+        (kept if ok else dropped).append(e)
+    return kept, dropped
+
 FALLBACK_MODELS = ["gemini-3.7-flash", "gemini-3.5-flash"]
 MODEL_UNAVAILABLE_MARKERS = ("404", "NOT_FOUND", "is not found", "is not supported")
 
@@ -877,7 +938,7 @@ def call_gemini_with_retry(client, model: str, prompt: str, max_attempts: int = 
     last_err = None
     for attempt in range(1, max_attempts + 1):
         try:
-            return client.models.generate_content(model=model, contents=prompt)
+            return client.models.generate_content(model=model, contents=prompt, config=make_config())
         except Exception as e:
             last_err = e
             if attempt < max_attempts and _is_transient(e):
@@ -919,8 +980,27 @@ def main():
 
         json_str = extract_json_array(raw)
         parsed   = json.loads(json_str)          # לעולם לא eval/exec — רק parsing נתונים
+
+        allowed = grounded_domains(response)
+        sample  = sorted(allowed)[:12]
+        log(f"  🔎 grounding: {len(allowed)} דומיינים אוחזרו בחיפוש (לדוגמה: {', '.join(sample) if sample else 'אין'})")
+        if not allowed:
+            raise ValueError("לא היה grounding (המודל לא אחזר מקורות בחיפוש) — לא מפרסמים נתונים לא מאומתים")
+        parsed, dropped = filter_events_by_grounding(parsed, allowed)
+        if dropped:
+            titles = ", ".join(str(d.get("title", "?"))[:30] for d in dropped[:8] if isinstance(d, dict))
+            log(f"  ⚠️ {len(dropped)} אירועים הושמטו (אין source תואם לתוצאות החיפוש): {titles}")
+
         events   = validate_events(parsed)        # רשימה-לבנה לכל שדה
-        log(f"  ✅ {len(events)} אירועים עברו אימות מתוך {len(parsed)} שהתקבלו")
+        log(f"  ✅ {len(events)} אירועים עברו אימות ({len(dropped)} הושמטו בבדיקת מקור)")
+        if len(events) < MIN_EVENTS_TO_PUBLISH:
+            raise ValueError(f"רק {len(events)} אירועים מאומתי-מקור (פחות מהמינימום {MIN_EVENTS_TO_PUBLISH}) — לא דורסים את index.html הקיים")
+
+        # DRY_RUN=1 (ריצה ידנית מה-Actions עם dry_run מסומן): כל הבדיקות רצו, אבל לא כותבים index.html —
+        # כדי לבדוק grounding/סינון מקורות מול Gemini אמיתי בלי לדרוס את האתר הקיים.
+        if os.environ.get("DRY_RUN") == "1":
+            log(f"  🧪 DRY_RUN: הריצה הייתה מפרסמת {len(events)} אירועים — לא נכתב index.html")
+            return
 
         # JSON תקני הוא תת-קבוצה חוקית של JS — בטוח לשימוש כ-literal של מערך,
         # ואין כאן שום דבר שהמודל "כתב" כקוד — רק ערכים שעברו אימות מעלה.

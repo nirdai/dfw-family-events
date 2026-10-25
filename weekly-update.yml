@@ -3,11 +3,16 @@ name: Weekly DFW Events Update
 on:
   # 25/10/2026: הריצה השבועית האוטומטית מושבתת זמנית. ריצת 19/10 החזירה 28 אירועים
   # לא מאומתים (בלי חיפוש ברשת) ודרסה את האתר המאומת. להפעלה מחדש: להסיר את ה-#
-  # משלוש השורות הבאות, אחרי שנוסיף חיפוש ברשת (grounding) לקריאת Gemini.
+  # משלוש השורות הבאות, אחרי ריצת dry_run מוצלחת מול Gemini (grounding נוסף ב-25/10/2026).
   # schedule:
   #   # 12:00 UTC = 07:00 בטקסס בשעון קיץ (CDT, UTC-5); בחורף 08:00.
   #   - cron: '0 12 * * 1'
-  workflow_dispatch: {}   # הרצה ידנית מלשונית Actions עדיין אפשרית
+  workflow_dispatch:      # הרצה ידנית מלשונית Actions
+    inputs:
+      dry_run:
+        description: 'ריצת בדיקה: מריצים הכל (כולל חיפוש וסינון) אבל לא דורסים את index.html'
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -34,6 +39,7 @@ jobs:
         id: run_update
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          DRY_RUN: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run == 'true') && '1' || '0' }}
         run: python update_portal.py
 
       # 28/09/2026: לפני התיקון הזה, כישלון בשלב הקודם (למשל 503 חוזר
