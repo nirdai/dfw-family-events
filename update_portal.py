@@ -852,21 +852,56 @@ def validate_events(data) -> list:
 # מוותרים (וה-except הקיים ב-main() כבר דואג לא לדרוס index.html).
 TRANSIENT_MARKERS = ("503", "UNAVAILABLE", "429", "RESOURCE_EXHAUSTED", "overloaded")
 
-def call_gemini_with_retry(client, model: str, prompt: str, max_attempts: int = 4, base_delay: int = 20):
+# 19/10/2026: ריצת 28/9 נכשלה עם 503 על כל 4 הניסיונות (כ-2:20 דקות), ובגלל
+# זה הפורטל לא התעדכן שלושה שבועות. שני שינויים, שניהם בשכבת הקריאה בלבד:
+#   1. חלון retry ארוך יותר: 5 ניסיונות עם המתנה 30/60/90/120 שניות (~5 דקות
+#      לכל מודל) במקום 4 ניסיונות ו-20/40/60. עומס 503 אצל גוגל נמשך לפעמים
+#      יותר מ-2 דקות.
+#   2. מודלי גיבוי: אם המודל הראשי עדיין נכשל אחרי כל ה-retry (או שהשם שלו
+#      כבר לא קיים - 404/NOT_FOUND, למשל אחרי הוצאה משימוש), עוברים למודל הבא
+#      ברשימה. שגיאה שגיבוי לא יעזור לה (מפתח API שגוי, 400/401/403) נזרקת
+#      מיד, בלי לבזבז זמן על מודלים אחרים.
+# חשוב: ה-prompt וה-validate_events() זהים לכל המודלים, ולכן פלט של מודל גיבוי
+# עובר בדיוק את אותה בדיקה. אם מודל גיבוי מחזיר פלט גרוע, validate_events()
+# ידחה אותו כמו תמיד ו-index.html הקיים לא יידרס.
+FALLBACK_MODELS = ["gemini-3.7-flash", "gemini-3.5-flash"]
+MODEL_UNAVAILABLE_MARKERS = ("404", "NOT_FOUND", "is not found", "is not supported")
+
+def _is_transient(err: Exception) -> bool:
+    return any(marker in str(err) for marker in TRANSIENT_MARKERS)
+
+def _is_model_unavailable(err: Exception) -> bool:
+    return any(marker in str(err) for marker in MODEL_UNAVAILABLE_MARKERS)
+
+def call_gemini_with_retry(client, model: str, prompt: str, max_attempts: int = 5, base_delay: int = 30):
     last_err = None
     for attempt in range(1, max_attempts + 1):
         try:
             return client.models.generate_content(model=model, contents=prompt)
         except Exception as e:
             last_err = e
-            is_transient = any(marker in str(e) for marker in TRANSIENT_MARKERS)
-            if attempt < max_attempts and is_transient:
-                delay = base_delay * attempt  # 20, 40, 60...
-                log(f"  ⚠️ קריאה ל-Gemini נכשלה (ניסיון {attempt}/{max_attempts}, כנראה עומס זמני): {e} — ממתין {delay}s ומנסה שוב")
+            if attempt < max_attempts and _is_transient(e):
+                delay = base_delay * attempt  # 30, 60, 90, 120
+                log(f"  ⚠️ {model}: קריאה נכשלה (ניסיון {attempt}/{max_attempts}, כנראה עומס זמני): {e} — ממתין {delay}s ומנסה שוב")
                 time.sleep(delay)
                 continue
             raise
     raise last_err  # לא אמור להגיע לכאן בפועל
+
+def call_gemini_with_fallback(client, prompt: str):
+    """מחזיר (response, model_used). עובר למודל הבא רק על כישלון זמני שנמשך או מודל שלא קיים."""
+    models = [MODEL] + [m for m in FALLBACK_MODELS if m != MODEL]
+    last_err = None
+    for idx, model in enumerate(models):
+        try:
+            return call_gemini_with_retry(client, model, prompt), model
+        except Exception as e:
+            last_err = e
+            if (_is_transient(e) or _is_model_unavailable(e)) and idx < len(models) - 1:
+                log(f"  ⚠️ {model} נכשל סופית ({e}) — עובר למודל גיבוי: {models[idx + 1]}")
+                continue
+            raise
+    raise last_err
 
 # ── Main ──────────────────────────────────────────────
 def main():
@@ -878,9 +913,9 @@ def main():
 
         log("  שולח בקשה ל-Gemini API...")
         client   = genai.Client(api_key=api_key)
-        response = call_gemini_with_retry(client, MODEL, build_prompt())
+        response, used_model = call_gemini_with_fallback(client, build_prompt())
         raw = (response.text or "").strip()
-        log(f"  התקבל תגובה ({len(raw)} תווים)")
+        log(f"  התקבלה תגובה ({len(raw)} תווים) מהמודל {used_model}")
 
         json_str = extract_json_array(raw)
         parsed   = json.loads(json_str)          # לעולם לא eval/exec — רק parsing נתונים

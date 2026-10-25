@@ -1,11 +1,13 @@
 name: Weekly DFW Events Update
 
 on:
-  schedule:
-    # 12:00 UTC = 07:00 בטקסס בשעון קיץ (CDT, UTC-5).
-    # בחורף (CST, UTC-6) זה יריץ ב-08:00 בבוקר במקום 07:00 — הפרש שעתיים בשנה, לא קריטי לעדכון שבועי.
-    - cron: '0 12 * * 1'
-  workflow_dispatch: {}   # מאפשר הרצה ידנית מלשונית Actions בגיטהאב
+  # 25/10/2026: הריצה השבועית האוטומטית מושבתת זמנית. ריצת 19/10 החזירה 28 אירועים
+  # לא מאומתים (בלי חיפוש ברשת) ודרסה את האתר המאומת. להפעלה מחדש: להסיר את ה-#
+  # משלוש השורות הבאות, אחרי שנוסיף חיפוש ברשת (grounding) לקריאת Gemini.
+  # schedule:
+  #   # 12:00 UTC = 07:00 בטקסס בשעון קיץ (CDT, UTC-5); בחורף 08:00.
+  #   - cron: '0 12 * * 1'
+  workflow_dispatch: {}   # הרצה ידנית מלשונית Actions עדיין אפשרית
 
 permissions:
   contents: write
@@ -13,6 +15,9 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
+    # 19/10/2026: חלון ה-retry + מודלי הגיבוי ב-update_portal.py יכולים להמתין עד ~15 דקות
+    # במקרה הגרוע. 45 דקות מגן מפני ריצה שנתקעת לגמרי (ברירת המחדל של GitHub היא 6 שעות).
+    timeout-minutes: 45
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
